@@ -1,2 +1,32 @@
+# dependencies
+node_modules
+
+# builds
+.next/
+out/
+build
+dist
+*.tsbuildinfo
+next-env.d.ts
+
+# turbo
+.turbo
+
+# env
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# testing
+coverage
+
+# misc
+.DS_Store
+*.pem
+*.log
+
+# tooling
 .playwright-mcp/
 *.mcpb
