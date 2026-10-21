@@ -102,4 +102,9 @@
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
+
+  ::selection {
+    /* Only the background, so selected text keeps its own colour on light and dark surfaces */
+    @apply bg-daylily/25;
+  }
 }
