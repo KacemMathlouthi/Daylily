@@ -1,8 +1,8 @@
 import { cn } from "cn";
-import { FileText, Folder, Lock } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { AiToggles } from "./ai-toggles";
+import { FileTree } from "./file-tree";
 import { GhostLine } from "./ghost-line";
 import { Reveal } from "./motion";
 import { SealedStack } from "./sealed-stack";
@@ -104,12 +104,6 @@ function AiCard() {
   );
 }
 
-const FILES = [
-  { name: "18/", sealed: true },
-  { name: "19/", sealed: true },
-  { name: "20/", today: true },
-] as const;
-
 function FilesCard() {
   return (
     <Card
@@ -117,34 +111,8 @@ function FilesCard() {
       className="lg:min-h-125"
       title="Plain files. Readable in 20 years."
     >
-      <Reveal className="relative z-10 flex w-full max-w-90 flex-col rounded-[14px] border border-ink/6 bg-paper-page p-2.5 font-mono text-[12.5px] shadow-[0_16px_36px_#78461e1a]">
-        <div className="flex h-7 items-center gap-2 px-2 text-ink">
-          <Folder className="fill-[#e9c77e] text-[#e9c77e]" size={14} />
-          journal/2026/10
-        </div>
-        {FILES.map((file) => (
-          <div
-            className="flex h-7 items-center gap-2 pr-2 pl-7.5 text-ink-muted"
-            key={file.name}
-          >
-            <Folder className="fill-[#e9c77e] text-[#e9c77e]" size={13} />
-            <span className="grow">{file.name}</span>
-            {"sealed" in file ? (
-              <Lock className="text-ink-faint" size={11} strokeWidth={2.4} />
-            ) : null}
-          </div>
-        ))}
-        <div className="flex h-7 items-center gap-2 rounded-md bg-[#fbf1e6] pr-2 pl-13">
-          <FileText className="text-daylily-deep" size={13} strokeWidth={2} />
-          <span className="grow text-ink">2026-10-20.md</span>
-          <span className="font-sans font-semibold text-[11px] text-daylily-deep">
-            today
-          </span>
-        </div>
-        <div className="flex h-7 items-center gap-2 pr-2 pl-13 text-ink-muted">
-          <FileText className="text-ink-subtle" size={13} strokeWidth={2} />
-          cover.jpg
-        </div>
+      <Reveal className="relative z-10 w-full max-w-90">
+        <FileTree />
       </Reveal>
       <Image
         alt="A stack of paper pages held by a paperclip, with a brass key"
