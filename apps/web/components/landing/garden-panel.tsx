@@ -4,7 +4,13 @@ import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { Garden } from "@daylily/ui/components/garden";
 import { cn } from "cn";
 import { motion, useInView } from "motion/react";
-import { type MouseEvent, useCallback, useRef, useState } from "react";
+import {
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { type GardenView, gardenFor } from "./garden-data";
 
 const VIEWS: { id: GardenView; label: string; maxCell: number }[] = [
@@ -47,6 +53,13 @@ export function GardenPanel() {
   const inView = useInView(ref, { margin: "-20% 0px", once: true });
   const [view, setView] = useState<GardenView>("season");
   const garden = gardenFor(view);
+
+  // A season of weeks is too dense to read on a phone, so small screens open on a month
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      setView("month");
+    }
+  }, []);
   const maxCell = VIEWS.find((option) => option.id === view)?.maxCell;
 
   const selectView = useCallback((event: MouseEvent<HTMLButtonElement>) => {

@@ -33,7 +33,7 @@ export function FooterArt({ children }: { children: ReactNode }) {
       {children}
       <motion.p
         aria-hidden="true"
-        className="relative mt-[clamp(80px,17vw,250px)] mb-[-0.08em] bg-[linear-gradient(180deg,#fffbf5f7_10%,#fff6eb8c_85%)] bg-clip-text text-center font-display text-[32vw] text-transparent leading-[0.87] tracking-[-0.045em]"
+        className="relative mt-[clamp(180px,17vw,250px)] mb-[-0.08em] bg-[linear-gradient(180deg,#fffbf5f7_10%,#fff6eb8c_85%)] bg-clip-text text-center font-display text-[32vw] text-transparent leading-[0.87] tracking-[-0.045em]"
         style={{ opacity: wordOpacity, y: wordY }}
       >
         Daylily

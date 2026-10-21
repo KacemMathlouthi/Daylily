@@ -37,9 +37,12 @@ export function Footer() {
               © 2026 Daylily · Free and open source
             </p>
           </div>
-          <nav className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:flex md:gap-20">
+          <nav className="grid grid-cols-3 gap-6 md:flex md:gap-20">
             {FOOTER_LINKS.map((group) => (
-              <div className="flex w-35 flex-col gap-2.5" key={group.heading}>
+              <div
+                className="flex flex-col gap-2.5 md:w-35"
+                key={group.heading}
+              >
                 <h3 className="font-semibold text-[13px] text-ink">
                   {group.heading}
                 </h3>
