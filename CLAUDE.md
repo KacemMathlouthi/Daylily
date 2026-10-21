@@ -298,6 +298,10 @@ Work accordingly.
   mobile) without building those features early. Keep boundaries clean so parts can be replaced.
 - **Leave it better.** Fix small things you touch. Update this file when reality changes.
 - **Be honest.** If something is unfinished, untested or uncertain, say so plainly.
+- **Ask, as much as you need.** This is cooperative work. Whenever something is ambiguous, or you're simply unsure
+  what's wanted, ask, as many questions as it takes (the `AskUserQuestion` tool is preferred). A few minutes spent
+  understanding each other is always cheaper than building the wrong thing. Never guess silently on product,
+  design or architecture choices.
 
 ---
 
