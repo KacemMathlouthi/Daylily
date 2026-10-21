@@ -8,8 +8,8 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Design complete for v1. No app code yet. |
-| **Stack** | Electron · React · TypeScript · Tiptap |
+| **Status** | Monorepo set up; landing page in progress. Desktop app not started. |
+| **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
 | **Last updated** | 2026-10-21 |
@@ -266,16 +266,44 @@ keychain and **never** into the journal folder.
   script via `contextBridge`. Every IPC payload is validated at the boundary.
 - **Time is injected.** Nothing reads the system clock directly; a clock is passed in so sealing is testable.
 
-### 4.3 Proposed repo layout
-To be confirmed when scaffolding.
+### 4.3 Repo layout
 
 ```
-apps/desktop/        Electron main, preload and renderer
-packages/core/       pure domain logic (days, sealing, hashing, frontmatter, flowers)
-packages/ui/         design tokens and shared React components
-site/                current static landing page (temporary, to be rebuilt in React/Next)
+apps/web/            Next.js landing page (later: docs, published codexes, accounts)
+apps/desktop/        later: Electron main, preload and renderer
+packages/ui/         the shared UI, used by every app
+  src/tokens/          design tokens as CSS variables (light and dark)
+  src/styles/          globals.css: Tailwind setup, tokens mapped to utilities
+  src/primitives/      accessible building blocks on Base UI (shadcn-generated, then owned)
+  src/components/      Daylily components: Flower, Garden, DayCover, Logo…
+packages/core/       later: pure domain logic (days, sealing, hashing, frontmatter, flowers)
+site/                static landing export (temporary; deleted when apps/web ships)
 brand/               brand and product assets
 ```
+
+- Packages are imported by path, never through barrel files: `@daylily/ui/primitives/button`.
+- Add primitives with the shadcn CLI from `apps/web` (`pnpm dlx shadcn@latest add <name>`). They land in
+  `packages/ui/src/primitives/`, and from then on they're our code to adapt.
+- The landing page renders real components from `packages/ui` instead of screenshots.
+
+### 4.4 Tooling
+
+| Concern | Choice |
+|---|---|
+| Package manager | pnpm (workspaces), Node 24 (`.nvmrc`) |
+| Monorepo tasks | Turborepo: `pnpm dev`, `pnpm build`, `pnpm typecheck` from the root |
+| Lint and format | Ultracite on Biome: `pnpm check`, `pnpm fix` |
+| Unused code and deps | knip: `pnpm knip` |
+| Git hooks | Lefthook runs `ultracite fix` on staged files before each commit |
+| Styling | Tailwind CSS 4, configured in CSS (`@theme`), no `tailwind.config.js` |
+| Primitives | Base UI, via shadcn's `base-nova` style |
+| Web framework | Next.js (App Router), deployed on Vercel |
+| TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
+| Component workbench | Storybook, later, once the first components exist |
+| CI | GitHub Actions: check, knip, typecheck, build on every PR |
+
+Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
+in `pnpm-workspace.yaml` under `allowBuilds`.
 
 ---
 
@@ -343,7 +371,7 @@ Work accordingly.
 - Tests describe behaviour ("seals yesterday on launch after 4am"), not implementation.
 
 ### Style and hygiene
-- ESLint and Prettier, enforced in CI. No warnings left behind.
+- Ultracite (Biome) for lint and format, and knip for unused code, both enforced in CI. No warnings left behind.
 - Comments explain **why**, never what. Delete commented-out code.
 - Dependencies must earn their place: well maintained, small, and better than a few lines of our own code.
   Pin versions; commit the lockfile.
@@ -458,15 +486,17 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-20 to 21 | App screens designed in Paper: launch, home, writing, sealed day, calendar, garden, ask, look-backs, settings, onboarding, dark mode |
 | 2026-10-21 | App icons for macOS, Windows and Linux (PR #2, merged) |
 | 2026-10-21 | v1 product decisions recorded; this file became the project manifesto |
+| 2026-10-22 | Monorepo set up: pnpm, Turborepo, Ultracite, knip, Lefthook, CI; `packages/ui` and `apps/web` |
 
 ### Next
-1. Scaffold the Electron + React + TypeScript project, with lint, typecheck, tests and CI.
-2. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
-3. Filesystem storage adapter with atomic writes and folder watching.
-4. Today's page: editor, title, cover, autosave.
-5. Sealing in the running app, then the sealed day view.
-6. Calendar, garden, search, onboarding, settings, reminder.
-7. Packaging and signing for all three platforms.
+1. Build the landing page in `apps/web` from the Paper design, with its components in `packages/ui`.
+2. Scaffold the Electron app in `apps/desktop` on the same packages, with tests.
+3. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
+4. Filesystem storage adapter with atomic writes and folder watching.
+5. Today's page: editor, title, cover, autosave.
+6. Sealing in the running app, then the sealed day view.
+7. Calendar, garden, search, onboarding, settings, reminder.
+8. Packaging and signing for all three platforms.
 
 ---
 
@@ -502,4 +532,3 @@ writes.* The garden is the expected visual layer, not a moat. We'd be second to 
 - **Cover gallery:** how many covers ship with the app, and how they're licensed.
 - **Curated nudges:** the exact set of offline questions and how they rotate.
 - **Codexes:** when, if ever, and whether they're the paid feature.
-- **Repo layout and tooling:** monorepo shape, package manager and build tool, confirmed at scaffold time.
