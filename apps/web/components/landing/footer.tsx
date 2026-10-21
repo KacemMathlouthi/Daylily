@@ -7,6 +7,8 @@ import { PillButton, PillLink } from "./pill-button";
 /**
  * The dusk meadow and the giant wordmark. Proportions come from the 1440px design
  * (art band 760px tall, wordmark 460px, 270px down) and scale with the page width.
+ * The word stands inside the meadow: the painting sits behind it, and a cutout of
+ * the nearest lilies and grass sits in front of it.
  */
 function DuskWordmark() {
   return (
@@ -23,9 +25,18 @@ function DuskWordmark() {
           src="/images/art/dusk.jpg"
         />
       </div>
-      <p className="absolute inset-x-0 top-[35.5%] bg-[linear-gradient(180deg,#fffbf5f7_10%,#fff6eb8c_85%)] bg-clip-text text-center font-display text-[31.95vw] text-transparent leading-[0.87] tracking-[-0.045em]">
+      <p className="absolute inset-x-0 top-[35.5%] bg-[linear-gradient(180deg,#fffbf5_8%,#fff6ebd9_55%,#fff1e099_88%)] bg-clip-text text-center font-display text-[31.95vw] text-transparent leading-[0.87] tracking-[-0.045em] drop-shadow-[0_1.2vw_2.4vw_#5a2d1433]">
         Daylily
       </p>
+      <div className="absolute inset-x-0 bottom-0 aspect-[1672/941]">
+        <Image
+          alt=""
+          className="object-cover"
+          fill
+          sizes="100vw"
+          src="/images/art/dusk-near.webp"
+        />
+      </div>
     </div>
   );
 }
