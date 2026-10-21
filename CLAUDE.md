@@ -413,6 +413,9 @@ tones, hand-printed botanical art. In the spirit of Anthropic's visual language.
 **Voice:** a kind friend who listens and never lectures. *"How was your day?"*, not *"Log your entry."* A missed day
 gets *"Welcome back"*, never *"You broke your streak."*
 
+**No em dashes** (—) anywhere users can read them: UI copy, page and window titles, metadata, docs pages. Use a colon,
+a comma, a middle dot (·) or two sentences instead.
+
 ### Type
 
 | Role | Family |
