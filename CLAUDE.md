@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Monorepo set up; landing page in progress. Desktop app not started. |
+| **Status** | Landing page built in `apps/web`. Desktop app not started. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -277,7 +277,6 @@ packages/ui/         the shared UI, used by every app
   src/primitives/      accessible building blocks on Base UI (shadcn-generated, then owned)
   src/components/      Daylily components: Flower, Garden, DayCover, Logo…
 packages/core/       later: pure domain logic (days, sealing, hashing, frontmatter, flowers)
-site/                static landing export (temporary; deleted when apps/web ships)
 brand/               brand and product assets
 ```
 
@@ -285,6 +284,8 @@ brand/               brand and product assets
 - Add primitives with the shadcn CLI from `apps/web` (`pnpm dlx shadcn@latest add <name>`). They land in
   `packages/ui/src/primitives/`, and from then on they're our code to adapt.
 - The landing page renders real components from `packages/ui` instead of screenshots.
+- Landing sections live in `apps/web/components/landing/`, one file per section. Client components (`"use client"`)
+  are kept to the interactive and animated parts.
 
 ### 4.4 Tooling
 
@@ -298,6 +299,8 @@ brand/               brand and product assets
 | Styling | Tailwind CSS 4, configured in CSS (`@theme`), no `tailwind.config.js` |
 | Primitives | Base UI, via shadcn's `base-nova` style |
 | Web framework | Next.js (App Router), deployed on Vercel |
+| Motion | Motion (`motion/react`) for scroll and entrance animation; every animation honours reduced motion |
+| Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
 | Component workbench | Storybook, later, once the first components exist |
 | CI | GitHub Actions: check, knip, typecheck, build on every PR |
@@ -434,12 +437,16 @@ gets *"Welcome back"*, never *"You broke your streak."*
 | `cornflower` | `#4A72D8` | Links, sparingly |
 | `soil` | `#8A5A3C` | Bare days, earth |
 
+Text and surfaces use a graded ink scale rather than opacity: `ink`, `ink-2` (writing), `ink-soft`, `ink-muted`,
+`ink-subtle`, `ink-faint`, `ink-ghost`, plus `ghost` for ghost prompts, `line` for hairlines, and `paper-sunk` /
+`paper-tint` for sunken and tinted surfaces. All live in `packages/ui/src/tokens/tokens.css`.
+
 Dark theme: background `#1E1611`, raised surfaces `#2A201A`, with the same accents. The exact values for every token
 are in the Paper file and should be read with the Paper MCP (`get_computed_styles`, `get_jsx`), never guessed from
 screenshots.
 
 ### Logo
-A single six-petal daylily. The flat mark works as a 16px favicon (`site/assets/favicon.svg`). The textured,
+A single six-petal daylily. The flat mark works as a 16px favicon (`apps/web/app/icon.svg`). The textured,
 hand-printed mark is for the app icon and large uses (`brand/landing/spots/mark-textured.png`).
 
 ---
@@ -471,7 +478,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | `brand/landing/textures/` | Torn paper edge, grain, garden contribution graph (PNG and SVG) |
 | `brand/landing/*-sheet.png` | Source sheets the covers and spots were cut from |
 | `brand/icon/` | App icons: `daylily.icns` (macOS), `daylily.ico` (Windows, 16–256px), `linux-{16…512}.png`, and 1024px masters for each platform |
-| `site/` | Static HTML/CSS export of the landing page, deployed on Vercel to share with friends. Temporary: the real landing page will be rebuilt in React/Next. |
+| `apps/web/public/images/` | Web-sized copies of the art and covers used by the landing page |
 
 `*.mcpb` bundles and `.playwright-mcp/` are ignored.
 
@@ -487,16 +494,16 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-21 | App icons for macOS, Windows and Linux (PR #2, merged) |
 | 2026-10-21 | v1 product decisions recorded; this file became the project manifesto |
 | 2026-10-22 | Monorepo set up: pnpm, Turborepo, Ultracite, knip, Lefthook, CI; `packages/ui` and `apps/web` |
+| 2026-10-22 | Landing page built in Next.js from the Paper design, with live product parts and Motion; static `site/` export removed |
 
 ### Next
-1. Build the landing page in `apps/web` from the Paper design, with its components in `packages/ui`.
-2. Scaffold the Electron app in `apps/desktop` on the same packages, with tests.
-3. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
-4. Filesystem storage adapter with atomic writes and folder watching.
-5. Today's page: editor, title, cover, autosave.
-6. Sealing in the running app, then the sealed day view.
-7. Calendar, garden, search, onboarding, settings, reminder.
-8. Packaging and signing for all three platforms.
+1. Scaffold the Electron app in `apps/desktop` on the same packages, with tests.
+2. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
+3. Filesystem storage adapter with atomic writes and folder watching.
+4. Today's page: editor, title, cover, autosave.
+5. Sealing in the running app, then the sealed day view.
+6. Calendar, garden, search, onboarding, settings, reminder.
+7. Packaging and signing for all three platforms.
 
 ---
 
