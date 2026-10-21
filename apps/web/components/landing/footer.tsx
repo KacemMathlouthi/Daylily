@@ -23,7 +23,7 @@ export function Footer() {
       </Reveal>
 
       <FooterArt>
-        <div className="relative mx-auto flex w-full max-w-328 flex-col justify-between gap-10 border-ink/10 border-t px-5 pt-10 md:flex-row md:px-0">
+        <div className="relative mx-auto flex w-full max-w-328 flex-col justify-between gap-10 border-ink/10 border-t px-5 pt-10 md:flex-row md:px-8 xl:px-0">
           <div className="flex max-w-105 flex-col gap-3">
             <div className="flex items-center gap-2">
               <DaylilyMark className="text-ink" size={18} />
