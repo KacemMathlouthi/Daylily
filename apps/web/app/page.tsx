@@ -1,3 +1,4 @@
+import { Calendar } from "@/components/landing/calendar";
 import { Features } from "@/components/landing/features";
 import { Garden } from "@/components/landing/garden";
 import { Hero } from "@/components/landing/hero";
@@ -12,6 +13,7 @@ export default function Page() {
         <Statement />
         <Features />
         <Garden />
+        <Calendar />
       </main>
     </MotionProvider>
   );
