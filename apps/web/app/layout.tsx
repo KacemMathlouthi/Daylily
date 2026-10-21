@@ -35,7 +35,7 @@ const description =
 export const metadata: Metadata = {
   description,
   openGraph: { description, siteName: "Daylily", type: "website" },
-  title: "Daylily — One page a day. Yours to keep.",
+  title: "Daylily: One page a day. Yours to keep.",
   twitter: { card: "summary_large_image" },
 };
 

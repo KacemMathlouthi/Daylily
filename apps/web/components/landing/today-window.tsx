@@ -191,7 +191,7 @@ export function TodayWindow({ className }: { className?: string }) {
   return (
     <AppWindow
       className={cn("w-full max-w-285 lg:h-180", className)}
-      title="Daylily — Today"
+      title="Daylily · Today"
     >
       <Sidebar />
       <TodayPage />
