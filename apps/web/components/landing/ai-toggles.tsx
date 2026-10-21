@@ -43,7 +43,7 @@ export function AiToggles() {
         <span className="font-semibold text-ink-subtle text-xs">Model</span>
         <span className="flex items-center gap-1.5 rounded-[7px] bg-paper-tint px-2.25 py-1 font-medium text-ink text-xs">
           <span className="size-1.5 rounded-full bg-[#4f9a5a]" />
-          Ollama · llama3.2 · local
+          Ollama · qwen3.8:27b · local
         </span>
       </div>
       {FEATURES.map((feature) => (
