@@ -29,17 +29,26 @@ const THIS_WEEK = [
   { day: "Thu", dot: "bg-moss", title: "Fresh flowers" },
 ] as const;
 
+/** Hover feedback for the mock's controls; they look alive without being focusable dead ends. */
+const HOVERABLE =
+  "cursor-pointer transition-colors duration-200 ease-soft hover:bg-ink/[0.05]";
+
 function Sidebar() {
   return (
     <aside className="hidden w-58 shrink-0 flex-col justify-between border-line border-r bg-paper-sunk px-2.5 py-3.5 lg:flex">
       <div className="flex flex-col gap-4.5">
-        <div className="flex items-center gap-2 px-2 py-1">
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-[7px] px-2 py-1",
+            HOVERABLE
+          )}
+        >
           <DaylilyMark className="text-daylily" size={16} />
           <span className="font-semibold text-[13px] text-ink">
             Kacem’s journal
           </span>
         </div>
-        <div className="flex h-7.5 items-center gap-2 rounded-[7px] border border-line bg-paper-page px-2.5">
+        <div className="flex h-7.5 cursor-text items-center gap-2 rounded-[7px] border border-line bg-paper-page px-2.5 transition-colors duration-200 hover:border-ink-ghost">
           <Search className="text-ink-subtle" size={13} strokeWidth={2.2} />
           <span className="grow text-[12.5px] text-ink-subtle">
             Search days
@@ -53,7 +62,7 @@ function Sidebar() {
               <div
                 className={cn(
                   "flex h-7.5 items-center gap-2.25 rounded-[7px] px-2.5",
-                  active && "bg-[#ede6da]"
+                  active ? "bg-[#ede6da]" : HOVERABLE
                 )}
                 key={label}
               >
@@ -88,7 +97,10 @@ function Sidebar() {
           </span>
           {THIS_WEEK.map((day) => (
             <div
-              className="flex h-7 items-center gap-2.25 px-2.5"
+              className={cn(
+                "flex h-7 items-center gap-2.25 rounded-[7px] px-2.5",
+                HOVERABLE
+              )}
               key={day.title}
             >
               <span className="flex w-4 shrink-0 justify-center">
@@ -112,7 +124,7 @@ function Sidebar() {
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-2.25 rounded-[9px] border border-line bg-paper-page p-2.5">
+      <div className="flex cursor-pointer items-center gap-2.25 rounded-[9px] border border-line bg-paper-page p-2.5 transition-colors duration-200 hover:border-ink-ghost">
         <Folder className="text-moss" size={15} strokeWidth={1.9} />
         <div className="flex flex-col gap-px">
           <span className="font-medium text-ink text-xs">~/Journal</span>
@@ -125,27 +137,33 @@ function Sidebar() {
   );
 }
 
+const CRUMB =
+  "-mx-1 cursor-pointer rounded-md px-1 py-0.5 transition-colors duration-200 hover:bg-ink/[0.05] hover:text-ink";
+
 function TodayPage() {
   return (
     <div className="flex min-w-0 grow flex-col bg-paper-page">
       <div className="flex h-11 shrink-0 items-center justify-between px-4.5 text-[12.5px]">
         <div className="flex items-center gap-1.5 text-ink-subtle">
-          <span>2026</span>
+          <span className={CRUMB}>2026</span>
           <span className="text-ink-ghost">/</span>
-          <span>October</span>
+          <span className={CRUMB}>October</span>
           <span className="text-ink-ghost">/</span>
           <span className="font-medium text-ink">20</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex h-6.5 items-center gap-1.5 rounded-full border border-[#f3dcc4] bg-[#fbf1e6] px-2.5 font-medium text-[#a8481a] text-[11.5px]">
+          <span className="flex h-6.5 cursor-default items-center gap-1.5 rounded-full border border-[#f3dcc4] bg-[#fbf1e6] px-2.5 font-medium text-[#a8481a] text-[11.5px]">
             <Lock className="text-daylily-deep" size={11} strokeWidth={2.4} />
             Seals in 6h 12m
           </span>
-          <Ellipsis
-            className="mx-1.5 text-ink-subtle"
-            size={14}
-            strokeWidth={2}
-          />
+          <span
+            className={cn(
+              "flex h-6.5 w-7 items-center justify-center rounded-md text-ink-subtle hover:text-ink",
+              HOVERABLE
+            )}
+          >
+            <Ellipsis size={14} strokeWidth={2} />
+          </span>
         </div>
       </div>
       <div className="flex grow flex-col items-center px-5 pt-4.5 pb-10 md:px-10">
