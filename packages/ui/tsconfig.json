@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@daylily/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

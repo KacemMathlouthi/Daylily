@@ -1,0 +1,65 @@
+/*
+ * Daylily design tokens. The single source for colour, type, radius and motion.
+ * Exact values come from the Paper file; change them here, never in components.
+ */
+
+:root {
+  /* Brand palette */
+  --paper: #f4eee3;
+  --paper-raised: #fbf8f3;
+  --paper-page: #fffdf9;
+  --ink: #241b15;
+  --daylily: #e8642b;
+  --saffron: #f4b630;
+  --petal: #f08bb0;
+  --moss: #4f6b3a;
+  --cornflower: #4a72d8;
+  --soil: #8a5a3c;
+
+  /* Type: next/font (web) or @fontsource (desktop) provide the --font-face-* variables */
+  --font-display: var(--font-face-display, "Instrument Serif"), Georgia, serif;
+  --font-sans: var(--font-face-sans, "Instrument Sans"), system-ui, sans-serif;
+  --font-writing: var(--font-face-writing, "Newsreader"), Georgia, serif;
+  --font-mono: var(--font-face-mono, "Geist Mono"), ui-monospace, monospace;
+
+  /* Shape */
+  --radius: 0.625rem;
+
+  /* Motion: slow and soft, nothing bounces */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-quick: 200ms;
+  --duration-calm: 400ms;
+  --destructive: #b8432f;
+}
+
+.dark {
+  --paper: #1e1611;
+  --paper-raised: #2a201a;
+  --paper-page: #2a201a;
+  --ink: #f4eee3;
+
+  --destructive: #e07a63;
+}
+
+/* Declared on both so a nested .dark recomputes the roles from its own palette */
+:root,
+.dark {
+  /* Semantic roles (shadcn names, so generated primitives pick up the brand) */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-raised);
+  --card-foreground: var(--ink);
+  --popover: var(--paper-page);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper-page);
+  --secondary: color-mix(in oklch, var(--ink) 6%, var(--paper));
+  --secondary-foreground: var(--ink);
+  --muted: color-mix(in oklch, var(--ink) 5%, var(--paper));
+  --muted-foreground: color-mix(in oklch, var(--ink) 62%, var(--paper));
+  --accent: color-mix(in oklch, var(--daylily) 12%, var(--paper));
+  --accent-foreground: var(--ink);
+  --border: color-mix(in oklch, var(--ink) 12%, transparent);
+  --input: color-mix(in oklch, var(--ink) 16%, transparent);
+  --ring: var(--daylily);
+}

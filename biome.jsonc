@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/next"
+  ],
+  "files": {
+    // site/ is the temporary static export of the landing page; brand/ is assets only
+    "includes": ["!site", "!brand"]
+  }
+}

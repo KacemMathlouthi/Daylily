@@ -1,0 +1,26 @@
+{
+  "name": "daylily",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "check": "ultracite check",
+    "dev": "turbo dev",
+    "fix": "ultracite fix",
+    "knip": "knip",
+    "prepare": "lefthook install",
+    "typecheck": "turbo typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "knip": "6.42.1",
+    "lefthook": "2.2.2",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3",
+    "ultracite": "8.0.1"
+  },
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=24"
+  }
+}
