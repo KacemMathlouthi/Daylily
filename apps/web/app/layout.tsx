@@ -29,10 +29,14 @@ const mono = Geist_Mono({
   variable: "--font-face-mono",
 });
 
+const description =
+  "A human-first journal. One page a day, written by you, kept by you, grown into a garden.";
+
 export const metadata: Metadata = {
-  description:
-    "A human-first journal. One page a day, written by you, kept by you, grown into a garden.",
-  title: "Daylily — one page a day",
+  description,
+  openGraph: { description, siteName: "Daylily", type: "website" },
+  title: "Daylily — One page a day. Yours to keep.",
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
