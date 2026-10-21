@@ -69,7 +69,7 @@ export function GhostLine({ text, prompt }: GhostLineProps) {
         <span aria-hidden="true">{text.slice(0, typed)}</span>
         <span
           aria-hidden="true"
-          className="ml-0.5 inline-block h-5 w-[1.5px] translate-y-1 animate-caret bg-daylily"
+          className="ml-0.5 inline-block h-[1.15em] w-[1.5px] translate-y-[0.2em] animate-caret bg-daylily"
         />
         <AnimatePresence>
           {paused ? (
