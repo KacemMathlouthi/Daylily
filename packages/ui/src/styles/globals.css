@@ -12,8 +12,18 @@
   --color-paper: var(--paper);
   --color-paper-raised: var(--paper-raised);
   --color-paper-page: var(--paper-page);
+  --color-paper-sunk: var(--paper-sunk);
+  --color-line: var(--line);
   --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-ghost: var(--ink-ghost);
+  --color-ghost: var(--ghost);
   --color-daylily: var(--daylily);
+  --color-daylily-deep: var(--daylily-deep);
   --color-saffron: var(--saffron);
   --color-petal: var(--petal);
   --color-moss: var(--moss);
@@ -52,6 +62,14 @@
   --radius-2xl: calc(var(--radius) * 1.8);
 
   --ease-soft: var(--ease-soft);
+
+  --animate-caret: caret 1.1s steps(1) infinite;
+
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {

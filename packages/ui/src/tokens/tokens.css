@@ -8,8 +8,18 @@
   --paper: #f4eee3;
   --paper-raised: #fbf8f3;
   --paper-page: #fffdf9;
+  --paper-sunk: #f6f2eb;
+  --line: #ece4d8;
   --ink: #241b15;
+  --ink-2: #3a2e26;
+  --ink-soft: #4a3d33;
+  --ink-muted: #6e6054;
+  --ink-subtle: #8a7a6c;
+  --ink-faint: #a39486;
+  --ink-ghost: #c9b9a6;
+  --ghost: #bfaf9e;
   --daylily: #e8642b;
+  --daylily-deep: #c4551f;
   --saffron: #f4b630;
   --petal: #f08bb0;
   --moss: #4f6b3a;
@@ -36,7 +46,16 @@
   --paper: #1e1611;
   --paper-raised: #2a201a;
   --paper-page: #2a201a;
+  --paper-sunk: #18110d;
+  --line: #3a2e26;
   --ink: #f4eee3;
+  --ink-2: #e9e0d2;
+  --ink-soft: #d8ccbc;
+  --ink-muted: #b5a493;
+  --ink-subtle: #9a8b7e;
+  --ink-faint: #7b6c60;
+  --ink-ghost: #5c4e43;
+  --ghost: #6e6054;
 
   --destructive: #e07a63;
 }
@@ -56,10 +75,10 @@
   --secondary: color-mix(in oklch, var(--ink) 6%, var(--paper));
   --secondary-foreground: var(--ink);
   --muted: color-mix(in oklch, var(--ink) 5%, var(--paper));
-  --muted-foreground: color-mix(in oklch, var(--ink) 62%, var(--paper));
+  --muted-foreground: var(--ink-muted);
   --accent: color-mix(in oklch, var(--daylily) 12%, var(--paper));
   --accent-foreground: var(--ink);
-  --border: color-mix(in oklch, var(--ink) 12%, transparent);
+  --border: var(--line);
   --input: color-mix(in oklch, var(--ink) 16%, transparent);
   --ring: var(--daylily);
 }
