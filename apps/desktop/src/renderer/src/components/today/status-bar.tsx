@@ -1,22 +1,23 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { cn } from "@daylily/ui/lib/cn";
 
-export type SaveState = "blank" | "saving" | "saved";
+/**
+ * Whether the page is kept. Until storage exists, words live only in memory, and
+ * the bar says so rather than claim a save that didn't happen.
+ */
+export type SaveState = "blank" | "unsaved";
 
 const WORDS = new Intl.NumberFormat("en");
 
 /** The quiet line under the page: whether it's kept, the nudges, the word count. */
 export function StatusBar({
   save,
-  path,
   notice,
   ghostPrompts,
   words,
   className,
 }: {
   save: SaveState;
-  /** Where the page lives in the journal folder. */
-  path: string;
   /** A passing message, such as after copying, shown in place of the save state. */
   notice: string | null;
   ghostPrompts: boolean;
@@ -27,8 +28,8 @@ export function StatusBar({
     notice ??
     {
       blank: "Today’s page is saved to your journal from the first word.",
-      saved: `Saved to ${path}`,
-      saving: "Saving…",
+      unsaved:
+        "Not saved yet: kept in memory until Daylily writes to your journal.",
     }[save];
 
   return (
@@ -42,7 +43,7 @@ export function StatusBar({
         <span
           className={cn(
             "size-1.5 shrink-0 rounded-full transition-colors duration-200",
-            save === "saved" ? "bg-leaf" : "bg-ink-ghost"
+            save === "unsaved" ? "bg-saffron" : "bg-ink-ghost"
           )}
         />
         <span className="truncate">{label}</span>

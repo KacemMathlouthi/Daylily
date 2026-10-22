@@ -1,7 +1,7 @@
 import type { PageChange } from "@daylily/ui/editor/use-page-editor";
 import { cn } from "@daylily/ui/lib/cn";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CoverPicker } from "../components/today/cover-picker";
 import { PageMenu } from "../components/today/page-menu";
 import { PageView } from "../components/today/page-view";
@@ -9,7 +9,6 @@ import { type SaveState, StatusBar } from "../components/today/status-bar";
 import { WritingHeader } from "../components/today/writing-header";
 import type { Cover } from "../lib/covers";
 import { useFocusMode } from "../lib/focus-mode";
-import type { DayKey } from "../lib/month";
 import { useGhostPrompts } from "../lib/preferences";
 import { updateTodayPage, useTodayPage } from "../lib/today-page";
 import { useNow } from "../lib/use-now";
@@ -19,30 +18,9 @@ export const Route = createFileRoute("/today")({
   component: TodayScreen,
 });
 
-/** Matches the autosave to come: kept ~500ms after typing stops. */
-const SAVE_DELAY_MS = 500;
 const NOTICE_MS = 2500;
 /** In focus mode the bars come back on a mouse move, then fade after this long. */
 const CHROME_IDLE_MS = 2000;
-
-/** Where the day's file will live, as §3.2 lays the journal out. */
-function journalPath(day: DayKey) {
-  const [year, month, date] = day.split("-");
-  return `~/Journal/${year}/${month}/${date}/${day}.md`;
-}
-
-/** "Saving…" while words are arriving, then "Saved". */
-function useSaving() {
-  const [saving, setSaving] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const touch = useCallback(() => {
-    setSaving(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setSaving(false), SAVE_DELAY_MS);
-  }, []);
-  return [saving, touch] as const;
-}
 
 /** A short message in the status bar, such as after copying. */
 function useNotice() {
@@ -107,30 +85,26 @@ function TodayScreen() {
   const page = useTodayPage(today);
   const [ghostPrompts, setGhostPrompts] = useGhostPrompts();
   const { chromeVisible, focused, setFocused } = useFocus();
-  const [saving, touch] = useSaving();
   const [notice, setNotice] = useNotice();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const write = useCallback(
     ({ markdown, words }: PageChange) => {
       updateTodayPage(today, { markdown, words });
-      touch();
     },
-    [today, touch]
+    [today]
   );
   const retitle = useCallback(
     (title: string) => {
       updateTodayPage(today, { title });
-      touch();
     },
-    [today, touch]
+    [today]
   );
   const recover = useCallback(
     (cover: Cover | null) => {
       updateTodayPage(today, { cover });
-      touch();
     },
-    [today, touch]
+    [today]
   );
   const openPicker = useCallback(() => setPickerOpen(true), []);
 
@@ -146,12 +120,7 @@ function TodayScreen() {
 
   const isBlank =
     page.words === 0 && page.title.trim() === "" && page.cover === null;
-  let save: SaveState = "saved";
-  if (isBlank) {
-    save = "blank";
-  } else if (saving) {
-    save = "saving";
-  }
+  const save: SaveState = isBlank ? "blank" : "unsaved";
 
   // The bars stay reachable by hover and keyboard while faded
   const chrome = cn(
@@ -191,7 +160,6 @@ function TodayScreen() {
         className={chrome}
         ghostPrompts={ghostPrompts}
         notice={notice}
-        path={journalPath(today)}
         save={save}
         words={page.words}
       />
