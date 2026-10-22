@@ -1,28 +1,15 @@
+import { AppleLogo } from "@/components/site/apple-logo";
+import { HeaderSpacer } from "@/components/site/header-spacer";
 import { Reveal } from "@/components/site/motion";
 import { PillLink } from "@/components/site/pill-button";
 import { HeroMeadow } from "./hero-meadow";
 import { TodayWindow } from "./today-window";
 
-function AppleLogo() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="currentColor"
-      height="16"
-      viewBox="0 0 24 24"
-      width="16"
-    >
-      <path d="M16.4 12.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.3-.9c-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.3 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4 1-1.4 1.3-2.7 1.4-2.8-.1 0-2.5-1-2.5-4.1zM14 5.1c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z" />
-    </svg>
-  );
-}
-
 export function Hero() {
   return (
     <section className="relative flex flex-col items-center overflow-clip bg-[linear-gradient(180deg,#b4cfec_0%,#c6daec_22%,#d9e2e6_40%,#e8e2d6_52%,#ebdcc6_62%)] pb-16 md:pb-22.5">
       <HeroMeadow />
-      {/* Room for the fixed header */}
-      <div aria-hidden="true" className="h-20 md:h-25.5" />
+      <HeaderSpacer />
 
       <div className="relative flex flex-col items-center gap-6.5 px-5 pt-12 text-center md:pt-23">
         <Reveal y={12}>
