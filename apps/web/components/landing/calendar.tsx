@@ -167,7 +167,10 @@ function DayCell({ day, index }: { day: Day; index: number }) {
 
 export function Calendar() {
   return (
-    <section className="flex flex-col items-center bg-paper-raised px-4 py-28 md:px-16 md:py-42.5">
+    <section
+      className="flex flex-col items-center bg-paper-raised px-4 py-28 md:px-16 md:py-42.5"
+      id="calendar"
+    >
       <div className="flex w-full max-w-328 flex-col gap-14">
         <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="flex flex-col gap-4">

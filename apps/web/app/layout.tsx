@@ -8,6 +8,8 @@ import {
   Newsreader,
 } from "next/font/google";
 import type { ReactNode } from "react";
+import { Header } from "@/components/site/header";
+import { MotionProvider } from "@/components/site/motion";
 
 const display = Instrument_Serif({
   style: ["normal", "italic"],
@@ -45,7 +47,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${display.variable} ${sans.variable} ${writing.variable} ${mono.variable}`}
       lang="en"
     >
-      <body>{children}</body>
+      <body>
+        <MotionProvider>
+          <Header />
+          {children}
+        </MotionProvider>
+      </body>
     </html>
   );
 }

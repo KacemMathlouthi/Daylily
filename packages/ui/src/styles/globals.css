@@ -99,6 +99,17 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    /* Anchor links land below the fixed site header */
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }

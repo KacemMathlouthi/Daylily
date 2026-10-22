@@ -4,11 +4,10 @@ import { Garden } from "@/components/landing/garden";
 import { Hero } from "@/components/landing/hero";
 import { Statement } from "@/components/landing/statement";
 import { Footer } from "@/components/site/footer";
-import { MotionProvider } from "@/components/site/motion";
 
 export default function Page() {
   return (
-    <MotionProvider>
+    <>
       <main className="bg-paper-raised">
         <Hero />
         <Statement />
@@ -17,6 +16,6 @@ export default function Page() {
         <Calendar />
       </main>
       <Footer />
-    </MotionProvider>
+    </>
   );
 }

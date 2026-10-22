@@ -2,7 +2,7 @@ import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import Image from "next/image";
 import { FOOTER_LINKS, GITHUB_URL } from "./links";
 import { Reveal } from "./motion";
-import { PillButton, PillLink } from "./pill-button";
+import { PillLink } from "./pill-button";
 
 /**
  * The dusk meadow and the giant wordmark. Proportions come from the 1440px design
@@ -52,8 +52,8 @@ export function Footer() {
           Tonight is a good night to start. It takes about four minutes.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-1.5">
-          <PillButton>Download Daylily</PillButton>
-          <PillLink href={GITHUB_URL} tone="glass">
+          <PillLink href="/download">Download Daylily</PillLink>
+          <PillLink href={GITHUB_URL} tone="paper">
             Star on GitHub
           </PillLink>
         </div>

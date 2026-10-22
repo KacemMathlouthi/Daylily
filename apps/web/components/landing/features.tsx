@@ -127,7 +127,10 @@ function FilesCard() {
 
 export function Features() {
   return (
-    <section className="flex flex-col items-center gap-14 bg-paper-raised px-4 pt-10 pb-28 md:px-16 md:pb-40">
+    <section
+      className="flex flex-col items-center gap-14 bg-paper-raised px-4 pt-10 pb-28 md:px-16 md:pb-40"
+      id="features"
+    >
       <Reveal className="flex flex-col items-center gap-3.5 text-center">
         <p className="font-medium text-[13px] text-daylily">How it works</p>
         <h2 className="font-display text-[44px] text-ink leading-[1.03] tracking-[-0.025em] md:text-[64px]">

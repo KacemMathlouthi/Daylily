@@ -1,6 +1,5 @@
-import { Nav } from "@/components/site/header";
 import { Reveal } from "@/components/site/motion";
-import { PillButton } from "@/components/site/pill-button";
+import { PillLink } from "@/components/site/pill-button";
 import { HeroMeadow } from "./hero-meadow";
 import { TodayWindow } from "./today-window";
 
@@ -22,7 +21,8 @@ export function Hero() {
   return (
     <section className="relative flex flex-col items-center overflow-clip bg-[linear-gradient(180deg,#b4cfec_0%,#c6daec_22%,#d9e2e6_40%,#e8e2d6_52%,#ebdcc6_62%)] pb-16 md:pb-22.5">
       <HeroMeadow />
-      <Nav />
+      {/* Room for the fixed header */}
+      <div aria-hidden="true" className="h-20 md:h-25.5" />
 
       <div className="relative flex flex-col items-center gap-6.5 px-5 pt-12 text-center md:pt-23">
         <Reveal y={12}>
@@ -52,11 +52,13 @@ export function Hero() {
 
         <Reveal className="flex flex-col items-center gap-6.5" delay={0.44}>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <PillButton>
+            <PillLink href="/download">
               <AppleLogo />
               Download for Mac
-            </PillButton>
-            <PillButton tone="glass">Windows &amp; Linux</PillButton>
+            </PillLink>
+            <PillLink href="/download" tone="paper">
+              Windows &amp; Linux
+            </PillLink>
           </div>
           <p className="text-[13px] text-ink-muted">
             Free &amp; open source · Your files stay on your machine
