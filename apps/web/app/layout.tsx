@@ -47,7 +47,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${display.variable} ${sans.variable} ${writing.variable} ${mono.variable}`}
       lang="en"
     >
-      <body>
+      {/* Extensions like ColorZilla add attributes to <body> before React hydrates */}
+      <body suppressHydrationWarning>
         <MotionProvider>
           <Header />
           {children}
