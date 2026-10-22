@@ -6,6 +6,7 @@
     "./globals.css": "./src/styles/globals.css",
     "./primitives/*": "./src/primitives/*.tsx",
     "./components/*": "./src/components/*.tsx",
+    "./editor/*": "./src/editor/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
     "./lib/*": "./src/lib/*.ts"
   },
@@ -14,6 +15,12 @@
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
+    "@tiptap/core": "3.32.0",
+    "@tiptap/extensions": "3.32.0",
+    "@tiptap/markdown": "3.32.0",
+    "@tiptap/pm": "3.32.0",
+    "@tiptap/react": "3.32.0",
+    "@tiptap/starter-kit": "3.32.0",
     "class-variance-authority": "0.7.1",
     "cmdk": "^1.1.1",
     "cn": "0.5.0",

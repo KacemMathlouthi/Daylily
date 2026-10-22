@@ -30,6 +30,8 @@
   --saffron: #f4b630;
   --petal: #f08bb0;
   --moss: #4f6b3a;
+  /* A small live dot: saved, synced */
+  --leaf: #5fa65a;
   --cornflower: #4a72d8;
   --soil: #8a5a3c;
   --soil-soft: #b08a6a;
@@ -137,6 +139,9 @@
   --text-ui-lg: 13.5px;
   --text-body-sm: 15px;
   --text-body: 17px;
+  /* The writing page: Newsreader with room between the lines */
+  --text-writing: 18px;
+  --text-writing--line-height: 31px;
   --text-lead: 19px;
   --text-lede: 21px;
   --text-title-2xs: 24px;

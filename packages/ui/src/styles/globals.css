@@ -33,6 +33,7 @@
   --color-saffron: var(--saffron);
   --color-petal: var(--petal);
   --color-moss: var(--moss);
+  --color-leaf: var(--leaf);
   --color-cornflower: var(--cornflower);
   --color-soil: var(--soil);
   --color-soil-soft: var(--soil-soft);
@@ -91,6 +92,15 @@
   --animate-bud-close: bud-close 320ms var(--ease-soft) 120ms both;
 
   --animate-bloom: bloom 0.9s var(--ease-soft) both;
+
+  /* A ghost prompt arrives slowly, so it reads as a thought rather than an alert */
+  --animate-ghost-in: ghost-in 700ms var(--ease-soft) both;
+
+  @keyframes ghost-in {
+    from {
+      opacity: 0;
+    }
+  }
 
   @keyframes bud-close {
     to {

@@ -9,7 +9,14 @@ import { createCn } from "cn/config";
 export const cn = createCn({
   extend: {
     theme: {
-      animate: ["bloom", "bud-close", "caret", "petal-open", "rise-in"],
+      animate: [
+        "bloom",
+        "bud-close",
+        "caret",
+        "ghost-in",
+        "petal-open",
+        "rise-in",
+      ],
       ease: ["soft"],
       leading: [
         "display",
@@ -64,6 +71,7 @@ export const cn = createCn({
         "ui",
         "ui-lg",
         "wordmark",
+        "writing",
       ],
       tracking: [
         "caps",
