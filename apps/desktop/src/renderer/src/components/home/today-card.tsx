@@ -1,17 +1,7 @@
 import { Button } from "@daylily/ui/primitives/button";
 import { Kbd } from "@daylily/ui/primitives/kbd";
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
-import { msUntilNextBoundary } from "../../lib/month";
-
-const MINUTE = 60_000;
-
-/** "3h 13m" until the next 4am boundary, or "42m" in the last hour. */
-function sealsIn(now: Date) {
-  const minutes = Math.ceil(msUntilNextBoundary(now) / MINUTE);
-  const hours = Math.floor(minutes / 60);
-  return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
-}
+import { SealCountdown } from "../seal-countdown";
 
 /** The invitation to write: today's state, when it seals, and the way in. */
 export function TodayCard({ now, written }: { now: Date; written: boolean }) {
@@ -30,10 +20,7 @@ export function TodayCard({ now, written }: { now: Date; written: boolean }) {
               : "Today’s page is still blank."}
           </span>
           <span className="text-ink-ghost">·</span>
-          <span className="flex items-center gap-1.25 font-medium text-daylily-ink">
-            <Lock className="size-2.75 text-daylily-deep" strokeWidth={2.4} />
-            Seals in {sealsIn(now)}
-          </span>
+          <SealCountdown now={now} />
         </p>
       </div>
       <Button
