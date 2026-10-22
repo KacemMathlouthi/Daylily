@@ -220,6 +220,16 @@
     @apply text-code-comment italic;
   }
 
+  .page-content a {
+    @apply cursor-pointer text-cornflower underline decoration-cornflower/40 underline-offset-3;
+  }
+}
+
+/*
+ * Checklists, in the utilities layer: the page's own list utilities (bullets, a
+ * 24px indent) would otherwise win over a component-layer reset.
+ */
+@layer utilities {
   .page-content ul[data-type="taskList"] {
     @apply list-none pl-0.5;
   }
@@ -242,9 +252,5 @@
 
   .page-content ul[data-type="taskList"] li[data-checked="true"] > div {
     @apply text-ink-faint line-through decoration-ink-ghost;
-  }
-
-  .page-content a {
-    @apply cursor-pointer text-cornflower underline decoration-cornflower/40 underline-offset-3;
   }
 }
