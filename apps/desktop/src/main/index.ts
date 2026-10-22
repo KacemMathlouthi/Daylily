@@ -4,10 +4,16 @@ import { registerIpc } from "./ipc";
 
 const PAPER = "#f4eee3";
 
+// Packaged builds carry the icon as a resource; in development it sits in resources/
+const ICON = app.isPackaged
+  ? join(process.resourcesPath, "icon.png")
+  : join(import.meta.dirname, "../../build/icon.png");
+
 function createWindow() {
   const window = new BrowserWindow({
     backgroundColor: PAPER,
     height: 860,
+    icon: ICON,
     minHeight: 600,
     minWidth: 900,
     show: false,
