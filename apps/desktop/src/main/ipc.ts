@@ -7,6 +7,7 @@ import {
   dialog,
   type IpcMainInvokeEvent,
   ipcMain,
+  nativeImage,
 } from "electron";
 import { CHANNELS } from "../shared/channels";
 import {
@@ -49,6 +50,9 @@ function firstName(username: string): string | null {
   }
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
+
+/** The share card is 2160 square; anything far beyond that isn't one. */
+const MAX_IMAGE_SIDE = 8192;
 
 /** The image types a cover can be, by extension. */
 const COVER_TYPES: Record<string, string> = {
@@ -105,6 +109,12 @@ export function registerIpc() {
   handle(CHANNELS.saveGardenImage, async (event, rawPng, rawName) => {
     const png = pngSchema.parse(rawPng);
     const name = imageNameSchema.parse(rawName);
+    // Decode it: only a real image of a sensible size is written as a .png
+    const image = nativeImage.createFromBuffer(Buffer.from(png));
+    const { width, height } = image.getSize();
+    if (image.isEmpty() || width > MAX_IMAGE_SIDE || height > MAX_IMAGE_SIDE) {
+      throw new Error("Rejected an image that is not a share card");
+    }
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) {
       return false;
