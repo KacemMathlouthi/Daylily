@@ -216,13 +216,13 @@ keychain and **never** into the journal folder.
 
 | Screen | Behaviour |
 |---|---|
-| **Launch** | Six-petal bloom (~1.2s with the wordmark), a greeting by time of day, a progress bar and a quote over the dusk meadow. Stays until the bloom finishes, then fades into the app. Never blocks on I/O longer than needed. |
+| **Launch** | A small frameless splash window (300 × 390) the instant the app starts: the six-petal bloom over the dusk meadow, "Opening your journal…", a progress bar that follows real loading, and a quote. The main window loads hidden behind it; the splash stays at least ~1.4s for the bloom, then fades as the app appears on Home. Paper: 01c. |
 | **Onboarding** | Three steps: *welcome*, *your folder* (choose or create the journal folder, defaulting to `~/Daylily`), *a little help* (reminder time, defaulting to 21:00; the AI options in the design are deferred). |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
 | **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. |
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
-| **Calendar** | Month grid of covers and titles. Empty days are bare. Click opens the sealed day. |
-| **Garden** | Every written day as a flower, bare soil for missed days. Year contribution graph in flowers. |
+| **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
+| **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three numbers and the meadow (Paper: 06c). |
 | **Search** | Full-text search across all days. Results show date, title and a snippet, and open the day. |
 | **Settings** | Journal (folder, what's on disk), Writing & sealing (ghost prompts, the 4am seal, gallery covers), Reminders (on/off, time, a preview), Appearance (light, dark, match the system; the sidebar's sun and moon switch too), About. AI hidden in v1. Paper: 09a to 09e. |
 
@@ -537,6 +537,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Home and garden screens on a year and a half of sample days; Settings with five sections, designed in Paper first |
 | 2026-10-22 | Today's page: a shared markdown editor with ghost prompts and a selection toolbar, title, gallery or own cover, focus mode; held in memory until storage exists |
 | 2026-10-22 | Sealed and rested days, opened from the calendar, garden and Home; the page seals in place at 4am |
+| 2026-10-23 | Feedback round: months-only calendar, garden by year with a share card, more formats with code highlighting and a paste prompt, logo-mark theme cards, Home without header art, a splash window at launch |
 
 ### Next
 1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
