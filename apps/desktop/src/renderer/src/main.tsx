@@ -9,11 +9,11 @@ import {
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { LaunchScreen } from "./components/launch/launch-screen";
-import { applyTheme, initialTheme } from "./lib/theme";
+import { startTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
 
-// Before the first render, so the app never flashes the wrong theme
-applyTheme(initialTheme());
+// Before React renders; the first paint is the launch screen, which is light in both themes
+startTheme();
 
 const queryClient = new QueryClient();
 
