@@ -22,6 +22,11 @@ function blankPage(day: DayKey): TodayPage {
  */
 const store = createStore<ReadonlyMap<DayKey, TodayPage>>(new Map());
 
+/** Every page written while the app has been open, by day. */
+export function useWrittenPages() {
+  return store.use();
+}
+
 /** Today's page; a new day opens on a blank one. */
 export function useTodayPage(today: DayKey): TodayPage {
   return store.use().get(today) ?? blankPage(today);
