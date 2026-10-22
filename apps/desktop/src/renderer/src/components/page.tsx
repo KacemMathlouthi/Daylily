@@ -24,7 +24,8 @@ export function Page({
     <div className="relative flex grow flex-col px-8 pt-12 pb-8">
       {backdrop}
       {corner ? (
-        <div className="absolute top-0 right-0 flex h-12 items-center px-5">
+        // Above macOS's drag strip, and clickable through it
+        <div className="absolute top-0 right-0 z-20 flex h-12 items-center px-5 [-webkit-app-region:no-drag]">
           {corner}
         </div>
       ) : null}
