@@ -466,7 +466,8 @@ Text and surfaces use a graded ink scale rather than opacity: `ink`, `ink-2` (wr
 `ink-subtle`, `ink-faint`, `ink-ghost`, plus `ghost` for ghost prompts, `line` for hairlines, and `paper-sunk` /
 `paper-tint` for sunken and tinted surfaces. All live in `packages/ui/src/tokens/tokens.css`.
 
-Dark theme: background `#1E1611`, raised surfaces `#2A201A`, with the same accents. The exact values for every token
+Dark theme: the same warm browns taken close to black: the sidebar `#0E0B09`, the page `#14100D`, raised
+surfaces `#18130F`, with the same accents (Paper: "05d Calendar · dark"). The exact values for every token
 are in the Paper file and should be read with the Paper MCP (`get_computed_styles`, `get_jsx`), never guessed from
 screenshots.
 
