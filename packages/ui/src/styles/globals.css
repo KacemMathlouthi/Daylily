@@ -220,6 +220,29 @@
     @apply text-code-comment italic;
   }
 
+  /* Tables from pasted or written markdown: quiet rules, never wider than the page */
+  .page-content .tableWrapper {
+    @apply overflow-x-auto;
+  }
+
+  .page-content table {
+    @apply w-full border-collapse font-sans text-ink-2 text-ui;
+  }
+
+  .page-content th,
+  .page-content td {
+    @apply border border-line px-3 py-2 text-left align-top;
+  }
+
+  .page-content th {
+    @apply bg-paper-tint font-semibold text-ink;
+  }
+
+  .page-content td p,
+  .page-content th p {
+    @apply m-0;
+  }
+
   .page-content a {
     @apply cursor-pointer text-cornflower underline decoration-cornflower/40 underline-offset-3;
   }
