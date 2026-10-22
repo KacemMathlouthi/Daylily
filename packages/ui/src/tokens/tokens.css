@@ -40,7 +40,8 @@
   --code-string: #4f6b3a;
   --code-number: #8a5a3c;
   --code-title: #3f5fb3;
-  --code-comment: #a39486;
+  /* Quieter than the code, still 4.5:1 on the code block */
+  --code-comment: #7a6a5d;
 
   /* Text on ink surfaces (the dark cards) */
   --on-ink: #fbf8f3;
@@ -101,7 +102,7 @@
   --code-string: #a3c283;
   --code-number: #d4a274;
   --code-title: #92aef2;
-  --code-comment: #6e6054;
+  --code-comment: #8c7d70;
 }
 
 /* Declared on each so a nested .dark or .light recomputes the roles from its own palette */
