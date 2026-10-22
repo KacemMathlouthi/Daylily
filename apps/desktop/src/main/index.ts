@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { app, BrowserWindow, shell } from "electron";
-import { registerIpc } from "./ipc";
+import { registerIpc, whenAppReady } from "./ipc";
+import { loadPage, openSplash } from "./splash";
 
 const PAPER = "#f4eee3";
 
@@ -11,6 +12,9 @@ const ICON = app.isPackaged
 
 /** What a link may open outside the app: web pages, and mail from links in a page. */
 const EXTERNAL_LINK = /^(https?:\/\/|mailto:)/i;
+
+/** If the app never says it's ready (an error on load), show it anyway after this long. */
+const READY_FALLBACK_MS = 10_000;
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -32,8 +36,6 @@ function createWindow() {
     width: 1320,
   });
 
-  window.once("ready-to-show", () => window.show());
-
   // Links leave the app for the system browser; the window itself never navigates away
   window.webContents.setWindowOpenHandler(({ url }) => {
     if (EXTERNAL_LINK.test(url)) {
@@ -43,22 +45,37 @@ function createWindow() {
   });
   window.webContents.on("will-navigate", (event) => event.preventDefault());
 
-  const devUrl = process.env.ELECTRON_RENDERER_URL;
-  if (devUrl) {
-    window.loadURL(devUrl);
-  } else {
-    window.loadFile(join(import.meta.dirname, "../renderer/index.html"));
-  }
+  loadPage(window, "index");
+  return window;
+}
+
+/** Opens the app behind the splash, which follows its loading and hands over when it has painted. */
+function launch() {
+  const splash = openSplash({ background: PAPER, icon: ICON });
+  const window = createWindow();
+  splash.progress(15);
+  window.webContents.once("did-start-loading", () => splash.progress(35));
+  window.webContents.once("dom-ready", () => splash.progress(70));
+
+  let handedOver = false;
+  const handOver = () => {
+    if (!handedOver) {
+      handedOver = true;
+      splash.handOver(window);
+    }
+  };
+  whenAppReady(window.webContents, handOver);
+  setTimeout(handOver, READY_FALLBACK_MS);
 }
 
 app.whenReady().then(() => {
   registerIpc();
-  createWindow();
+  launch();
 
   // macOS keeps apps alive without windows; clicking the dock icon opens one again
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      launch();
     }
   });
 });

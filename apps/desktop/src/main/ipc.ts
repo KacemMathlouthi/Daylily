@@ -5,9 +5,11 @@ import {
   app,
   BrowserWindow,
   dialog,
+  type IpcMainEvent,
   type IpcMainInvokeEvent,
   ipcMain,
   nativeImage,
+  type WebContents,
 } from "electron";
 import { CHANNELS } from "../shared/channels";
 import {
@@ -18,7 +20,7 @@ import {
 } from "../shared/schemas";
 
 /** Only answer requests that come from our own renderer, never from other frames. */
-function isTrustedSender(event: IpcMainInvokeEvent) {
+function isTrustedSender(event: IpcMainEvent | IpcMainInvokeEvent) {
   const url = event.senderFrame?.url ?? "";
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   return (
@@ -37,6 +39,17 @@ function handle<T>(
     }
     return handler(event, ...args);
   });
+}
+
+/** Calls `onReady` once the app in `contents` says it has painted. */
+export function whenAppReady(contents: WebContents, onReady: () => void) {
+  const listener = (event: IpcMainEvent) => {
+    if (event.sender === contents && isTrustedSender(event)) {
+      ipcMain.off(CHANNELS.appReady, listener);
+      onReady();
+    }
+  };
+  ipcMain.on(CHANNELS.appReady, listener);
 }
 
 const NAME_SEPARATORS = /[\s._-]+/;
