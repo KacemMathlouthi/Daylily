@@ -184,8 +184,9 @@ app: daylily/0.1.0
 - `words` and `updated` are rewritten on every save. `created` is set once.
 - Unknown fields are preserved on save. Users and other tools may add their own.
 
-**Settings are split.** Journal preferences (reminder time, theme) live in `.daylily/config.json`. Machine-local
-state (journal path, window size) lives in the app data directory. Secrets, such as future API keys, go in the OS
+**Settings are split.** Journal preferences (reminder time) live in `.daylily/config.json`. Machine-local
+state (journal path, window size, theme, the sidebar's collapsed state) lives on the device, since each
+screen may want its own. Secrets, such as future API keys, go in the OS
 keychain and **never** into the journal folder.
 
 ### 3.3 The day boundary and sealing
@@ -219,7 +220,7 @@ keychain and **never** into the journal folder.
 | **Calendar** | Month grid of covers and titles. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days. Year contribution graph in flowers. |
 | **Search** | Full-text search across all days. Results show date, title and a snippet, and open the day. |
-| **Settings** | Journal folder, reminder, theme (light, dark, system). AI section hidden in v1. |
+| **Settings** | Journal folder, reminder. AI section hidden in v1. The theme toggle lives in the sidebar: it follows the system until first used. |
 
 ### 3.5 Behaviours
 
@@ -465,7 +466,8 @@ Text and surfaces use a graded ink scale rather than opacity: `ink`, `ink-2` (wr
 `ink-subtle`, `ink-faint`, `ink-ghost`, plus `ghost` for ghost prompts, `line` for hairlines, and `paper-sunk` /
 `paper-tint` for sunken and tinted surfaces. All live in `packages/ui/src/tokens/tokens.css`.
 
-Dark theme: background `#1E1611`, raised surfaces `#2A201A`, with the same accents. The exact values for every token
+Dark theme: the same warm browns taken close to black: the sidebar `#0E0B09`, the page `#14100D`, raised
+surfaces `#18130F`, with the same accents (Paper: "05d Calendar · dark"). The exact values for every token
 are in the Paper file and should be read with the Paper MCP (`get_computed_styles`, `get_jsx`), never guessed from
 screenshots.
 
@@ -526,6 +528,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Sticky header with section links, deeper buttons, Manifesto and Download pages; designed in Paper first |
 | 2026-10-22 | Desktop skeleton: secure Electron window, typed preload bridge, app shell with sidebar and routes |
 | 2026-10-22 | Launch screen: the bloom, a greeting by time of day and a quote, over mocked loading until storage exists |
+| 2026-10-22 | Light and dark themes from a sidebar toggle; the sidebar folds into an icon rail; the month calendar on sample days |
 
 ### Next
 1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.

@@ -32,3 +32,6 @@ coverage
 # tooling
 .playwright-mcp/
 *.mcpb
+
+# agent worktrees: other checkouts of this repo
+.claude/worktrees
