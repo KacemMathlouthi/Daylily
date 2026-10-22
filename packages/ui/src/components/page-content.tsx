@@ -6,7 +6,7 @@ import { cn } from "../lib/cn";
  * paragraphs 14px apart, a daylily caret. The same styles render a sealed day.
  */
 const PAGE = cn(
-  "font-writing text-ink-2 text-writing caret-daylily",
+  "page-content font-writing text-ink-2 text-writing caret-daylily",
   "[&_.ProseMirror]:flex [&_.ProseMirror]:flex-col [&_.ProseMirror]:gap-3.5 [&_.ProseMirror]:outline-none",
   // The empty page's question, from the Placeholder extension
   "[&_.is-editor-empty:first-child]:before:pointer-events-none [&_.is-editor-empty:first-child]:before:float-left [&_.is-editor-empty:first-child]:before:h-0 [&_.is-editor-empty:first-child]:before:text-ghost [&_.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]",

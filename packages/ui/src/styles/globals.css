@@ -37,6 +37,11 @@
   --color-soil: var(--soil);
   --color-soil-soft: var(--soil-soft);
   --color-saffron-soft: var(--saffron-soft);
+  --color-code-keyword: var(--code-keyword);
+  --color-code-string: var(--code-string);
+  --color-code-number: var(--code-number);
+  --color-code-title: var(--code-title);
+  --color-code-comment: var(--code-comment);
   --color-on-ink: var(--on-ink);
   --color-on-ink-2: var(--on-ink-2);
   --color-on-ink-muted: var(--on-ink-muted);
@@ -164,5 +169,82 @@
   ::selection {
     /* Only the background, so selected text keeps its own colour on light and dark surfaces */
     @apply bg-daylily/25;
+  }
+}
+
+/*
+ * What a journal page holds beyond paragraphs: code, checklists and links. Kept
+ * here rather than in utility strings because the editor renders this markup.
+ */
+@layer components {
+  .page-content :not(pre) > code {
+    @apply rounded-sm bg-paper-tint px-1 py-0.5 font-mono text-[0.85em] text-ink;
+  }
+
+  .page-content pre {
+    @apply overflow-x-auto rounded-tile border border-line bg-paper-sunk px-4 py-3.5 font-mono text-code text-ink-2;
+  }
+
+  /* The fence's language, as a small label over the code */
+  .page-content pre[data-language]:not([data-language=""])::before {
+    content: attr(data-language);
+    @apply mb-2 block font-sans font-semibold text-ink-faint text-tag uppercase tracking-eyebrow;
+  }
+
+  .page-content .hljs-keyword,
+  .page-content .hljs-built_in,
+  .page-content .hljs-literal,
+  .page-content .hljs-meta {
+    @apply text-code-keyword;
+  }
+
+  .page-content .hljs-string,
+  .page-content .hljs-regexp {
+    @apply text-code-string;
+  }
+
+  .page-content .hljs-number,
+  .page-content .hljs-type,
+  .page-content .hljs-attr {
+    @apply text-code-number;
+  }
+
+  .page-content .hljs-title,
+  .page-content .hljs-function,
+  .page-content .hljs-section {
+    @apply text-code-title;
+  }
+
+  .page-content .hljs-comment,
+  .page-content .hljs-quote {
+    @apply text-code-comment italic;
+  }
+
+  .page-content ul[data-type="taskList"] {
+    @apply list-none pl-0.5;
+  }
+
+  .page-content ul[data-type="taskList"] li {
+    @apply flex items-start gap-2.5 pl-0;
+  }
+
+  .page-content ul[data-type="taskList"] li > label {
+    @apply flex h-7.75 shrink-0 items-center;
+  }
+
+  .page-content ul[data-type="taskList"] li > div {
+    @apply min-w-0 grow;
+  }
+
+  .page-content ul[data-type="taskList"] input[type="checkbox"] {
+    @apply size-4 cursor-pointer accent-daylily;
+  }
+
+  .page-content ul[data-type="taskList"] li[data-checked="true"] > div {
+    @apply text-ink-faint line-through decoration-ink-ghost;
+  }
+
+  .page-content a {
+    @apply cursor-pointer text-cornflower underline decoration-cornflower/40 underline-offset-3;
   }
 }

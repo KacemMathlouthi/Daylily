@@ -48,6 +48,7 @@ export const cn = createCn({
         "body",
         "body-sm",
         "caption",
+        "code",
         "display",
         "display-lg",
         "display-sm",
