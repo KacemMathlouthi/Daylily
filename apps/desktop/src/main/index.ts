@@ -9,6 +9,9 @@ const ICON = app.isPackaged
   ? join(process.resourcesPath, "icon.png")
   : join(import.meta.dirname, "../../build/icon.png");
 
+/** What a link may open outside the app: web pages, and mail from links in a page. */
+const EXTERNAL_LINK = /^(https?:\/\/|mailto:)/i;
+
 function createWindow() {
   const window = new BrowserWindow({
     backgroundColor: PAPER,
@@ -33,7 +36,7 @@ function createWindow() {
 
   // Links leave the app for the system browser; the window itself never navigates away
   window.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("https://")) {
+    if (EXTERNAL_LINK.test(url)) {
       shell.openExternal(url);
     }
     return { action: "deny" };
