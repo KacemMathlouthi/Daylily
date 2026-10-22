@@ -62,26 +62,28 @@
 }
 
 .dark {
-  --paper: #1e1611;
-  --paper-raised: #2a201a;
-  --paper-page: #2a201a;
-  --paper-sunk: #18110d;
-  --paper-tint: #241b15;
-  --paper-press: #33281f;
-  --line-strong: #4a3d33;
-  --line: #3a2e26;
+  /* The same warm browns taken close to black: the sidebar darkest, the page a step up */
+  --paper: #110d0a;
+  --paper-raised: #18130f;
+  --paper-page: #14100d;
+  --paper-sunk: #0e0b09;
+  --paper-tint: #1c1713;
+  --paper-press: #221b16;
+  --line-strong: #352b23;
+  --line: #2a221c;
   --ink: #f4eee3;
   --ink-2: #e9e0d2;
   --ink-soft: #d8ccbc;
-  --ink-muted: #b5a493;
-  --ink-subtle: #9a8b7e;
-  --ink-faint: #7b6c60;
-  --ink-ghost: #5c4e43;
-  --ghost: #6e6054;
+  --ink-muted: #a89888;
+  --ink-subtle: #8c7d70;
+  --ink-faint: #6e6054;
+  --ink-ghost: #4a3d33;
+  --ghost: #5c4e43;
   --daylily-deep: #f0875a;
   --daylily-ink: #f0875a;
-  --daylily-wash: #3a2418;
-  --daylily-wash-line: #5a3420;
+  --daylily-wash: #2a1a12;
+  --daylily-wash-line: #4a2a1a;
+  --soil-soft: #8a6a50;
   --on-ink: #241b15;
   --on-ink-2: #3a2e26;
   --on-ink-muted: #6e6054;

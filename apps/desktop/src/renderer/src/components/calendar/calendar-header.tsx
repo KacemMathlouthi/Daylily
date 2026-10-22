@@ -61,7 +61,7 @@ export function CalendarHeader({
           value={["month"]}
         >
           <ToggleGroupItem
-            className="h-auto rounded-row! border-0 px-3 py-1.25 font-medium text-caption text-ink-subtle hover:bg-transparent hover:text-ink data-pressed:bg-paper-page data-pressed:text-ink data-pressed:shadow-hairline"
+            className="h-auto rounded-row! border-0 px-3 py-1.25 font-medium text-caption text-ink-subtle hover:bg-transparent hover:text-ink data-pressed:bg-paper-page data-pressed:text-ink data-pressed:shadow-hairline dark:data-pressed:bg-paper-press"
             value="month"
           >
             Month
