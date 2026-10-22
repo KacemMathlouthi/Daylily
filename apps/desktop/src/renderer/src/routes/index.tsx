@@ -109,7 +109,8 @@ function HomeScreen() {
       {/* Light in both themes: it sits on the meadow, which keeps its daylight colours */}
       <header className="light flex flex-col gap-1.5">
         <p className="font-medium text-ink-soft text-ui">
-          {DATE.format(now)} · {TIME.format(now).toLowerCase()}
+          {/* The journal's day, which turns at 4am, and the clock's time */}
+          {DATE.format(fromKey(today))} · {TIME.format(now).toLowerCase()}
         </p>
         <h1 className="font-display text-display text-ink leading-15 tracking-heading">
           {greetingFor(now, info?.userName)}
