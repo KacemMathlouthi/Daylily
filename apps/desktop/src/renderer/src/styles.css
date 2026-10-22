@@ -1,0 +1,26 @@
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+@import "@fontsource-variable/instrument-sans/index.css";
+@import "@fontsource-variable/newsreader/index.css";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+@import "@fontsource-variable/geist-mono/index.css";
+@import "@daylily/ui/globals.css";
+
+/* Fonts are bundled so the app looks right offline */
+:root {
+  --font-face-display: "Instrument Serif";
+  --font-face-sans: "Instrument Sans Variable";
+  --font-face-writing: "Newsreader Variable";
+  --font-face-mono: "Geist Mono Variable";
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  user-select: none;
+}
