@@ -19,8 +19,9 @@ export type PastDay =
     }
   | { kind: "rested" };
 
-function hasWords(page: TodayPage) {
-  return page.words > 0 || page.title.trim() !== "";
+/** The same test as the seal: a page with words, a title or a cover was written. */
+function wasWritten(page: TodayPage) {
+  return page.words > 0 || page.title.trim() !== "" || page.cover !== null;
 }
 
 /**
@@ -30,7 +31,7 @@ function hasWords(page: TodayPage) {
 export function usePastDay(key: DayKey): PastDay {
   const written = useWrittenPages().get(key);
   return useMemo(() => {
-    if (written && hasWords(written)) {
+    if (written && wasWritten(written)) {
       return {
         cover: written.cover
           ? { label: coverLabel(written.cover), url: coverUrl(written.cover) }
@@ -66,7 +67,7 @@ export function useNeighbours(key: DayKey, today: DayKey) {
   return useMemo(() => {
     const keys = new Set(MOCK_DAYS.keys());
     for (const [day, page] of pages) {
-      if (hasWords(page)) {
+      if (wasWritten(page)) {
         keys.add(day);
       }
     }
