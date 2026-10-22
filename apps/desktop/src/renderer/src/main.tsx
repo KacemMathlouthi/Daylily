@@ -8,11 +8,10 @@ import {
 } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { LaunchScreen } from "./components/launch/launch-screen";
 import { startTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
 
-// Before React renders; the first paint is the launch screen, which is light in both themes
+// Before React renders, so the first paint is already in the right theme
 startTheme();
 
 const queryClient = new QueryClient();
@@ -36,9 +35,12 @@ if (root) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-        {/* Over the app, which renders underneath so it's ready when the screen fades */}
-        <LaunchScreen />
       </QueryClientProvider>
     </StrictMode>
   );
 }
+
+// Two frames after the first render the app has painted; the splash window can hand over
+requestAnimationFrame(() =>
+  requestAnimationFrame(() => window.daylily.app.ready())
+);
