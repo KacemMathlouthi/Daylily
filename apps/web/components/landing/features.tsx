@@ -1,4 +1,4 @@
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { Reveal } from "@/components/site/motion";

@@ -12,9 +12,9 @@ import {
   InputGroupAddon,
 } from "@daylily/ui/primitives/input-group";
 import { Command as CommandPrimitive } from "cmdk";
-import { cn } from "cn";
 import { CheckIcon, SearchIcon } from "lucide-react";
 import type * as React from "react";
+import { cn } from "../lib/cn";
 
 function Command({
   className,

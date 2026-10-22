@@ -1,7 +1,7 @@
 import { BLOOM_MS, DaylilyBloom } from "@daylily/ui/components/daylily-bloom";
+import { cn } from "@daylily/ui/lib/cn";
 import { Progress } from "@daylily/ui/primitives/progress";
 import { useQuery } from "@tanstack/react-query";
-import { cn } from "cn";
 import { useEffect, useState } from "react";
 import dusk from "../../assets/dusk.jpg";
 import { greetingFor } from "./greeting";

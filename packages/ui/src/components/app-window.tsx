@@ -1,5 +1,5 @@
-import { cn } from "cn";
 import type { ComponentProps } from "react";
+import { cn } from "../lib/cn";
 
 type AppWindowProps = ComponentProps<"div"> & {
   title: string;

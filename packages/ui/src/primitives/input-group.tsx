@@ -4,8 +4,8 @@ import { Button } from "@daylily/ui/primitives/button";
 import { Input } from "@daylily/ui/primitives/input";
 import { Textarea } from "@daylily/ui/primitives/textarea";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
 import type * as React from "react";
+import { cn } from "../lib/cn";
 
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
