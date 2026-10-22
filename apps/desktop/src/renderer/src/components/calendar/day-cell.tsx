@@ -4,6 +4,14 @@ import type { ReactNode } from "react";
 import { dateFormat } from "../../lib/format";
 import type { CalendarDay, DayKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
+import {
+  HOVER_LIFT,
+  HOVER_REST_DOT,
+  HOVER_REST_LABEL,
+  HOVER_REST_TILE,
+  HOVER_WARM,
+  HOVER_ZOOM,
+} from "../day/hover";
 
 const MONTH_SHORT = dateFormat({ month: "short" });
 
@@ -74,11 +82,15 @@ export function DayCell({
       ? `${MONTH_SHORT.format(new Date(`${day.key}T12:00`))} 1`
       : String(day.day);
 
+  const opens = isToday || look === "written" || look === "resting";
+
   return (
     <DayLink dayKey={day.key} isToday={isToday} look={look}>
       <div
         className={cn(
-          "flex aspect-19/12 w-full items-center justify-center overflow-hidden rounded-md transition-[filter] duration-200 group-hover:brightness-105",
+          "flex aspect-19/12 w-full items-center justify-center overflow-hidden rounded-md",
+          opens && HOVER_LIFT,
+          look === "resting" && HOVER_REST_TILE,
           look === "outside" && "bg-paper-sunk/45",
           look === "resting" && "bg-paper-tint",
           look === "future" && "border border-line-strong border-dashed",
@@ -89,7 +101,7 @@ export function DayCell({
         {look === "written" && entry ? (
           <img
             alt=""
-            className="size-full object-cover"
+            className={cn("size-full object-cover", HOVER_ZOOM)}
             draggable={false}
             height={404}
             src={entry.cover}
@@ -97,7 +109,9 @@ export function DayCell({
           />
         ) : null}
         {look === "resting" ? (
-          <span className="size-1.5 rounded-full bg-soil-soft" />
+          <span
+            className={cn("size-1.5 rounded-full bg-soil-soft", HOVER_REST_DOT)}
+          />
         ) : null}
       </div>
       <div className="flex min-w-0 items-baseline gap-1.5">
@@ -107,18 +121,26 @@ export function DayCell({
             look === "written" || look === "resting"
               ? "text-ink"
               : "text-ink-ghost",
-            isToday && "text-daylily-deep"
+            isToday && "text-daylily-deep",
+            look === "written" && HOVER_WARM
           )}
         >
           {number}
         </span>
         {look === "written" && entry ? (
-          <span className="truncate font-display text-base text-ink leading-4.75">
+          <span
+            className={cn(
+              "truncate font-display text-base text-ink leading-4.75",
+              HOVER_WARM
+            )}
+          >
             {entry.title}
           </span>
         ) : null}
         {look === "resting" ? (
-          <span className="text-ink-faint text-xs">Resting</span>
+          <span className={cn("text-ink-faint text-xs", HOVER_REST_LABEL)}>
+            Resting
+          </span>
         ) : null}
       </div>
     </DayLink>
