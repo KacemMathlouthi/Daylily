@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -8,6 +9,15 @@ export default defineConfig({
   main: { build: { externalizeDeps: false } },
   preload: {},
   renderer: {
+    // Two pages: the app, and the splash window that shows while it loads
+    build: {
+      rollupOptions: {
+        input: {
+          index: join(import.meta.dirname, "src/renderer/index.html"),
+          splash: join(import.meta.dirname, "src/renderer/splash.html"),
+        },
+      },
+    },
     plugins: [
       // Paths are relative to the renderer root, src/renderer
       tanstackRouter({
