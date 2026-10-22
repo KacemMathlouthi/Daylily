@@ -1,11 +1,19 @@
-import type { DayKey } from "../lib/month";
+import type { FlowerColor } from "@daylily/ui/components/garden";
+import { type DayKey, dayKey, fromKey, todayKey } from "../lib/month";
 
 /**
- * Sample days from Paper's "05 Calendar", standing in for the journal folder until
- * the storage layer exists. Covers are the design's, cropped to the tile.
+ * Sample days standing in for the journal folder until the storage layer exists.
+ * October 2026 is Paper's "05 Calendar" exactly; the months before it are grown
+ * from a seed so the garden has something to show.
  */
 export interface MockDay {
+  /** The flower's colour, which the real app samples from the cover. */
+  color: FlowerColor;
   cover: string;
+  /** A first line, for the days the design quotes. */
+  excerpt?: string;
+  /** The hour writing began, 0 to 23. */
+  hour: number;
   title: string;
   words: number;
 }
@@ -15,29 +23,136 @@ const COVERS = import.meta.glob<string>("./covers/*.webp", {
   import: "default",
 });
 
-function day(key: DayKey, title: string, words: number): [DayKey, MockDay] {
-  const cover = COVERS[`./covers/oct-${key.slice(-2)}.webp`];
-  if (!cover) {
-    throw new Error(`Missing mock cover for ${key}`);
+/** Each cover's dominant colour, as a flower. */
+const COVER_COLORS: Record<string, FlowerColor> = {
+  "01": "saffron",
+  "02": "daylily",
+  "04": "saffron",
+  "05": "daylily",
+  "07": "petal",
+  "08": "petal",
+  "09": "petal",
+  "10": "cornflower",
+  "11": "daylily",
+  "12": "cornflower",
+  "13": "cornflower",
+  "15": "saffron",
+  "16": "daylily",
+  "18": "petal",
+  "19": "saffron",
+  "20": "daylily",
+};
+const COVER_IDS = Object.keys(COVER_COLORS);
+
+function cover(id: string) {
+  const url = COVERS[`./covers/oct-${id}.webp`];
+  if (!url) {
+    throw new Error(`Missing mock cover ${id}`);
   }
-  return [key, { cover, title, words }];
+  return { color: COVER_COLORS[id] ?? "daylily", cover: url };
 }
 
-export const MOCK_DAYS: ReadonlyMap<DayKey, MockDay> = new Map([
-  day("2026-10-01", "A new notebook", 412),
-  day("2026-10-02", "Market morning", 388),
-  day("2026-10-04", "Sunday pancakes", 521),
-  day("2026-10-05", "On the train", 297),
-  day("2026-10-07", "Mara’s birthday", 640),
-  day("2026-10-08", "A slow morning", 455),
-  day("2026-10-09", "Fresh air", 302),
-  day("2026-10-10", "By the river", 389),
-  day("2026-10-11", "Slow Sunday", 476),
-  day("2026-10-12", "Rain and soup", 518),
-  day("2026-10-13", "Home again", 350),
-  day("2026-10-15", "First light", 433),
-  day("2026-10-16", "Fresh flowers", 401),
-  day("2026-10-18", "Evening walk", 366),
-  day("2026-10-19", "On my way", 512),
-  day("2026-10-20", "The long way home", 352),
-]);
+const OCTOBER: [day: string, title: string, words: number][] = [
+  ["01", "A new notebook", 412],
+  ["02", "Market morning", 388],
+  ["04", "Sunday pancakes", 521],
+  ["05", "On the train", 297],
+  ["07", "Mara’s birthday", 640],
+  ["08", "A slow morning", 455],
+  ["09", "Fresh air", 302],
+  ["10", "By the river", 389],
+  ["11", "Slow Sunday", 476],
+  ["12", "Rain and soup", 518],
+  ["13", "Home again", 350],
+  ["15", "First light", 433],
+  ["16", "Fresh flowers", 401],
+  ["18", "Evening walk", 366],
+  ["19", "On my way", 512],
+  ["20", "The long way home", 352],
+];
+
+const TITLES = [
+  "A quiet Tuesday",
+  "Coffee with Sam",
+  "Long walk home",
+  "Rain all day",
+  "Small wins",
+  "Back to it",
+  "Late light",
+  "A good tired",
+  "Sunday reset",
+  "Letters",
+  "The bus ride",
+  "Garden chores",
+  "New shoes",
+  "Out with friends",
+  "Thinking about home",
+  "Market day",
+];
+
+const FIRST_DAY = new Date(2025, 3, 14);
+const OCTOBER_2026 = "2026-10";
+const WRITE_CHANCE = 0.8;
+
+/** Park–Miller PRNG, seeded so the sample garden is the same on every launch. */
+function seededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state * 16_807) % 2_147_483_647;
+    return (state - 1) / 2_147_483_646;
+  };
+}
+
+function grow(): Map<DayKey, MockDay> {
+  const days = new Map<DayKey, MockDay>();
+  const random = seededRandom(1015);
+  const today = todayKey(new Date());
+
+  for (
+    const date = new Date(FIRST_DAY);
+    dayKey(date) < today;
+    date.setDate(date.getDate() + 1)
+  ) {
+    const key = dayKey(date);
+    const roll = random();
+    const pick = random();
+    const length = random();
+    const late = random();
+    if (key.startsWith(OCTOBER_2026) || roll > WRITE_CHANCE) {
+      continue;
+    }
+    const id = COVER_IDS[Math.floor(pick * COVER_IDS.length)] ?? "01";
+    days.set(key, {
+      ...cover(id),
+      // Most evenings land between nine and ten, as in Paper's garden stats
+      hour: late < 0.7 ? 21 : 18 + Math.floor(late * 5),
+      title: TITLES[Math.floor(length * TITLES.length)] ?? "A day",
+      words: Math.round(80 + length ** 1.5 * 820),
+    });
+  }
+
+  for (const [day, title, words] of OCTOBER) {
+    days.set(`${OCTOBER_2026}-${day}`, {
+      ...cover(day),
+      hour: 21,
+      title,
+      words,
+    });
+  }
+
+  // Home's "one year ago today" card, wherever today falls
+  const yearAgo = fromKey(today);
+  yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+  days.set(dayKey(yearAgo), {
+    ...cover("10"),
+    excerpt:
+      "He skipped a stone eleven times and pretended it was nothing. I’m still smiling about it.",
+    hour: 20,
+    title: "By the river with Dad",
+    words: 468,
+  });
+
+  return days;
+}
+
+export const MOCK_DAYS: ReadonlyMap<DayKey, MockDay> = grow();
