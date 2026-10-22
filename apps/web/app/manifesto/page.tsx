@@ -150,25 +150,31 @@ function Never() {
   );
 }
 
+/**
+ * On wide screens the words sit in the painting's open cream area. On phones that
+ * area is too small, so the words come first and the painting follows as a card.
+ */
 function WhyDaylily() {
   return (
-    <section className="px-4 pt-30 md:px-16">
-      <Reveal className="relative mx-auto flex aspect-[4/5] max-w-328 overflow-clip rounded-[28px] sm:aspect-[1312/738]">
-        <Image
-          alt="A single orange daylily among grasses and wildflowers"
-          className="object-cover object-right"
-          fill
-          sizes="(max-width: 1312px) 100vw, 1312px"
-          src="/images/art/lily.jpg"
-        />
-        <div className="relative flex max-w-135 flex-col gap-5 px-6 pt-10 md:px-20 md:pt-21">
+    <section className="px-4 pt-14 md:px-16 md:pt-30">
+      <Reveal className="mx-auto flex max-w-328 flex-col gap-7 md:relative md:aspect-[1312/738] md:overflow-clip md:rounded-[28px]">
+        <div className="relative aspect-square overflow-clip rounded-3xl md:absolute md:inset-0 md:aspect-auto md:rounded-none">
+          <Image
+            alt="A single orange daylily among grasses and wildflowers"
+            className="object-cover object-[78%_50%] md:object-right"
+            fill
+            sizes="(max-width: 1312px) 100vw, 1312px"
+            src="/images/art/lily.jpg"
+          />
+        </div>
+        <div className="relative -order-1 flex max-w-135 flex-col gap-4 px-2 md:order-none md:gap-5 md:px-20 md:pt-21">
           <p className="font-medium text-[13px] text-daylily-deep">
             Why Daylily
           </p>
-          <h2 className="font-display text-[48px] text-ink leading-[1.03] tracking-[-0.025em] md:text-[64px]">
+          <h2 className="font-display text-[48px] text-ink leading-[1.04] tracking-[-0.025em] md:text-[64px]">
             Beauty for a day.
           </h2>
-          <p className="font-writing text-[19px] text-ink-2 leading-8 md:text-xl md:leading-8.25">
+          <p className="font-writing text-[19px] text-ink-2 leading-7.75 md:text-xl md:leading-8.25">
             Daylilies, Hemerocallis in Greek, bloom for exactly one day, and a
             new flower opens the next morning. That is the one-page-a-day rule,
             as a flower.
