@@ -3,7 +3,8 @@
  * Exact values come from the Paper file; change them here, never in components.
  */
 
-:root {
+:root,
+.light {
   /* Brand palette */
   --paper: #f4eee3;
   --paper-raised: #fbf8f3;
@@ -88,8 +89,9 @@
   --destructive: #e07a63;
 }
 
-/* Declared on both so a nested .dark recomputes the roles from its own palette */
+/* Declared on each so a nested .dark or .light recomputes the roles from its own palette */
 :root,
+.light,
 .dark {
   /* Semantic roles (shadcn names, so generated primitives pick up the brand) */
   --background: var(--paper);
