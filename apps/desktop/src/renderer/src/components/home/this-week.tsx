@@ -4,6 +4,14 @@ import { Plus } from "lucide-react";
 import { dateFormat } from "../../lib/format";
 import { type DayKey, fromKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
+import {
+  HOVER_LIFT,
+  HOVER_REST_DOT,
+  HOVER_REST_LABEL,
+  HOVER_REST_TILE,
+  HOVER_WARM,
+  HOVER_ZOOM,
+} from "../day/hover";
 
 const WEEKDAY = dateFormat({ weekday: "short" });
 
@@ -42,26 +50,34 @@ export function ThisWeek({
             >
               <div
                 className={cn(
-                  "flex aspect-19/12 items-center justify-center overflow-hidden rounded-md transition-[filter] duration-200 group-hover:brightness-105",
-                  !entry && "bg-paper-tint"
+                  "flex aspect-19/12 items-center justify-center overflow-hidden rounded-md",
+                  HOVER_LIFT,
+                  !entry && ["bg-paper-tint", HOVER_REST_TILE]
                 )}
               >
                 {entry ? (
                   <img
                     alt=""
-                    className="size-full object-cover"
+                    className={cn("size-full object-cover", HOVER_ZOOM)}
                     height={404}
                     src={entry.cover}
                     width={640}
                   />
                 ) : (
-                  <span className="size-1.5 rounded-full bg-soil-soft" />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full bg-soil-soft",
+                      HOVER_REST_DOT
+                    )}
+                  />
                 )}
               </div>
               <span
                 className={cn(
                   "text-meta leading-3.5",
-                  entry ? "text-ink-subtle" : "text-ink-faint"
+                  entry
+                    ? ["text-ink-subtle", HOVER_WARM]
+                    : ["text-ink-faint", HOVER_REST_LABEL]
                 )}
               >
                 {entry ? label : `${label} · resting`}
