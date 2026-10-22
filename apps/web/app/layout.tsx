@@ -48,6 +48,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
     >
       {/* Extensions like ColorZilla add attributes to <body> before React hydrates */}
+      <head>
+        {/* Without JavaScript, scroll reveals never run, so show their content as is */}
+        <noscript>
+          <style>
+            {"[data-reveal]{opacity:1!important;transform:none!important}"}
+          </style>
+        </noscript>
+      </head>
       <body suppressHydrationWarning>
         <MotionProvider>
           <Header />

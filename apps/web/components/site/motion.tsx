@@ -19,6 +19,7 @@ type RevealProps = ComponentProps<typeof motion.div> & {
 export function Reveal({ delay = 0, y = 24, ...props }: RevealProps) {
   return (
     <motion.div
+      data-reveal=""
       initial={{ opacity: 0, y }}
       transition={{ delay, duration: 0.9, ease: EASE_SOFT }}
       viewport={{ margin: "-10% 0px", once: true }}
