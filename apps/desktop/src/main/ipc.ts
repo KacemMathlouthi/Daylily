@@ -1,6 +1,6 @@
-import { writeFile } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 import { userInfo } from "node:os";
-import { join } from "node:path";
+import { basename, extname, join } from "node:path";
 import {
   app,
   BrowserWindow,
@@ -13,6 +13,7 @@ import {
   appInfoSchema,
   captureRectSchema,
   imageNameSchema,
+  pickedImageSchema,
 } from "../shared/schemas";
 
 /** Only answer requests that come from our own renderer, never from other frames. */
@@ -49,6 +50,19 @@ function firstName(username: string): string | null {
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
+/** The image types a cover can be, by extension. */
+const COVER_TYPES: Record<string, string> = {
+  ".avif": "image/avif",
+  ".gif": "image/gif",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
+
+/** Larger than any photo a phone takes; it keeps a stray video or scan out of memory. */
+const MAX_COVER_BYTES = 30 * 1024 * 1024;
+
 export function registerIpc() {
   handle(CHANNELS.appInfo, () =>
     appInfoSchema.parse({
@@ -57,6 +71,36 @@ export function registerIpc() {
       version: app.getVersion(),
     })
   );
+
+  handle(CHANNELS.pickCover, async (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) {
+      return null;
+    }
+    const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+      defaultPath: app.getPath("pictures"),
+      filters: [
+        {
+          extensions: Object.keys(COVER_TYPES).map((ext) => ext.slice(1)),
+          name: "Images",
+        },
+      ],
+      properties: ["openFile"],
+    });
+    const [filePath] = filePaths;
+    if (canceled || !filePath) {
+      return null;
+    }
+    const type = COVER_TYPES[extname(filePath).toLowerCase()];
+    if (!type || (await stat(filePath)).size > MAX_COVER_BYTES) {
+      return null;
+    }
+    const data = await readFile(filePath);
+    return pickedImageSchema.parse({
+      dataUrl: `data:${type};base64,${data.toString("base64")}`,
+      name: basename(filePath),
+    });
+  });
 
   handle(CHANNELS.saveGardenImage, async (event, rawRect, rawName) => {
     const rect = captureRectSchema.parse(rawRect);

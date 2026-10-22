@@ -6,6 +6,9 @@ const api: DaylilyApi = {
   app: {
     info: () => ipcRenderer.invoke(CHANNELS.appInfo),
   },
+  cover: {
+    pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
+  },
   garden: {
     saveImage: (rect, name) =>
       ipcRenderer.invoke(CHANNELS.saveGardenImage, rect, name),
