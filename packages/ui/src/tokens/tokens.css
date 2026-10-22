@@ -10,6 +10,7 @@
   --paper-page: #fffdf9;
   --paper-sunk: #f6f2eb;
   --paper-tint: #f3eee6;
+  --paper-press: #ede6da;
   --line: #ece4d8;
   --ink: #241b15;
   --ink-2: #3a2e26;
@@ -49,6 +50,7 @@
   --paper-page: #2a201a;
   --paper-sunk: #18110d;
   --paper-tint: #241b15;
+  --paper-press: #33281f;
   --line: #3a2e26;
   --ink: #f4eee3;
   --ink-2: #e9e0d2;
@@ -84,4 +86,12 @@
   --border: var(--line);
   --input: color-mix(in oklch, var(--ink) 16%, transparent);
   --ring: var(--daylily);
+
+  /* The app sidebar: sunken paper, a soft fill for the current place */
+  --sidebar: var(--paper-sunk);
+  --sidebar-foreground: var(--ink-soft);
+  --sidebar-accent: var(--paper-press);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--daylily);
 }
