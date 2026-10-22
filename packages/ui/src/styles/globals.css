@@ -92,6 +92,15 @@
 
   --animate-bloom: bloom 0.9s var(--ease-soft) both;
 
+  /* A ghost prompt arrives slowly, so it reads as a thought rather than an alert */
+  --animate-ghost-in: ghost-in 700ms var(--ease-soft) both;
+
+  @keyframes ghost-in {
+    from {
+      opacity: 0;
+    }
+  }
+
   @keyframes bud-close {
     to {
       opacity: 0;

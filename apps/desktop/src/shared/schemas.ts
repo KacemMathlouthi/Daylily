@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { AppInfo, CaptureRect } from "./channels";
+import type { AppInfo, CaptureRect, PickedImage } from "./channels";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
 export const appInfoSchema = z.object({
@@ -24,3 +24,10 @@ export const imageNameSchema = z
   .min(1)
   .max(80)
   .regex(/^[\p{L}\p{N} ._-]+$/u);
+
+export const pickedImageSchema = z
+  .object({
+    dataUrl: z.string().startsWith("data:image/"),
+    name: z.string().min(1),
+  })
+  .nullable() satisfies z.ZodType<PickedImage | null>;

@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
+import { useFocusMode } from "../lib/focus-mode";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -52,6 +53,7 @@ function useNewPageShortcut() {
 
 function AppShell() {
   const [open, setOpen] = useSidebarOpen();
+  const [focused] = useFocusMode();
   useNewPageShortcut();
 
   return (
@@ -62,7 +64,8 @@ function AppShell() {
         open={open}
         style={SIDEBAR_SIZE}
       >
-        <AppSidebar />
+        {/* Focus mode leaves only the page */}
+        {focused ? null : <AppSidebar />}
         <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
           {/*
            * macOS hides the title bar, so this strip drags the window there. It overlays the

@@ -5,6 +5,7 @@
  */
 export const CHANNELS = {
   appInfo: "app:info",
+  pickCover: "cover:pick",
   saveGardenImage: "garden:save-image",
 } as const;
 
@@ -23,10 +24,22 @@ export interface CaptureRect {
   y: number;
 }
 
+/** An image chosen from the computer, held in memory until days are saved as files. */
+export interface PickedImage {
+  /** The image itself, as a data: URL the page can show. */
+  dataUrl: string;
+  /** The file's name, for display. */
+  name: string;
+}
+
 /** What the preload exposes to the renderer as `window.daylily`. */
 export interface DaylilyApi {
   app: {
     info: () => Promise<AppInfo>;
+  };
+  cover: {
+    /** Opens the system's file picker for one image. Null if cancelled. */
+    pick: () => Promise<PickedImage | null>;
   };
   garden: {
     /** Asks where to save, then writes that region of the window as a PNG. False if cancelled. */
