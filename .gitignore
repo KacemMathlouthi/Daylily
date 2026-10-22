@@ -7,6 +7,7 @@ out/
 build
 dist
 out
+release
 *.tsbuildinfo
 next-env.d.ts
 
