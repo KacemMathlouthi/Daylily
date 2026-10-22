@@ -4,17 +4,13 @@ import {
   type PageChange,
   usePageEditor,
 } from "@daylily/ui/editor/use-page-editor";
+import { cn } from "@daylily/ui/lib/cn";
 import { type ChangeEvent, type KeyboardEvent, useCallback } from "react";
-import { fromKey } from "../../lib/month";
+import { coverLabel, coverUrl } from "../../lib/covers";
 import type { TodayPage } from "../../lib/today-page";
+import { DayCover } from "../day/day-cover";
+import { DayDate } from "../day/day-date";
 import { NUDGES } from "./nudges";
-import { PageCover } from "./page-cover";
-
-const DATE = new Intl.DateTimeFormat("en", {
-  day: "numeric",
-  month: "long",
-  weekday: "long",
-});
 
 const LINE_BREAKS = /[\r\n]+/g;
 
@@ -25,12 +21,15 @@ const LINE_BREAKS = /[\r\n]+/g;
  */
 export function PageView({
   page,
+  sealed = false,
   ghostPrompts,
   onWrite,
   onTitle,
   onChooseCover,
 }: {
   page: TodayPage;
+  /** At 4am the page seals in place: the ink settles and it stops taking input. */
+  sealed?: boolean;
   ghostPrompts: boolean;
   onWrite: (change: PageChange) => void;
   onTitle: (title: string) => void;
@@ -39,6 +38,7 @@ export function PageView({
   const editor = usePageEditor({
     autofocus: true,
     content: page.markdown,
+    editable: !sealed,
     ghostPrompts: { enabled: ghostPrompts, prompts: NUDGES },
     onChange: onWrite,
     placeholder: "How was your day?",
@@ -63,22 +63,28 @@ export function PageView({
 
   return (
     <>
-      <PageCover cover={page.cover} onChoose={onChooseCover} />
+      <DayCover
+        label={page.cover ? coverLabel(page.cover) : ""}
+        url={page.cover ? coverUrl(page.cover) : null}
+        {...(sealed ? {} : { onChoose: onChooseCover })}
+      />
       <div className="flex flex-col gap-3.5 pt-7.5">
-        <p className="font-medium text-ink-subtle text-xs tracking-label">
-          {DATE.format(fromKey(page.day))}
-        </p>
+        <DayDate day={page.day} />
         <textarea
           aria-label="Today’s title"
           className="field-sizing-content resize-none overflow-hidden bg-transparent font-display text-display-sm text-ink leading-12 tracking-title outline-none placeholder:text-ink-ghost"
           onChange={changeTitle}
           onKeyDown={titleKeys}
           placeholder="Give today a title"
+          readOnly={sealed}
           rows={1}
           value={page.title}
         />
         <PageContent
-          className="pt-1 [&_.ProseMirror]:min-h-60"
+          className={cn(
+            "pt-1 transition-colors duration-600 ease-soft [&_.ProseMirror]:min-h-60",
+            sealed && "text-ink-soft"
+          )}
           editor={editor}
         />
         <FormatToolbar editor={editor} />
