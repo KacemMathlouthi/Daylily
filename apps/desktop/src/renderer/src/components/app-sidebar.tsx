@@ -33,7 +33,7 @@ const NAV: { to: AppPath; label: string; icon: LucideIcon }[] = [
 
 /** Paper's row: 30px tall, 13px medium labels, a muted icon that darkens when current. */
 const ROW =
-  "h-7.5 gap-2.25 rounded-[7px] px-2.5 font-medium text-[13px] [-webkit-app-region:no-drag] [&_svg]:size-3.75 [&_svg]:text-ink-muted data-active:[&_svg]:text-ink";
+  "h-7.5 gap-2.25 rounded-row px-2.5 font-medium text-ui [-webkit-app-region:no-drag] [&_svg]:size-3.75 [&_svg]:text-ink-muted data-active:[&_svg]:text-ink";
 
 function NavItem({
   to,
@@ -72,7 +72,7 @@ export function AppSidebar() {
         {isMac ? <div className="h-5" /> : null}
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="h-8 gap-2.25 px-2 font-semibold text-[13.5px] text-ink [-webkit-app-region:no-drag]">
+            <SidebarMenuButton className="h-8 gap-2.25 px-2 font-semibold text-ink text-ui-lg [-webkit-app-region:no-drag]">
               <DaylilyMark className="text-daylily" size={18} />
               <span className="grow">Your journal</span>
               <ChevronDown
@@ -83,13 +83,11 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
         <button
-          className="flex h-7.5 items-center gap-2 rounded-[7px] border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 [-webkit-app-region:no-drag] hover:border-ink-ghost"
+          className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 [-webkit-app-region:no-drag] hover:border-ink-ghost"
           type="button"
         >
           <Search className="text-ink-subtle" size={13} strokeWidth={2.2} />
-          <span className="grow text-[12.5px] text-ink-subtle">
-            Search days
-          </span>
+          <span className="grow text-caption text-ink-subtle">Search days</span>
           <Kbd className="bg-transparent px-0 font-sans text-ink-faint">
             {isMac ? "⌘K" : "Ctrl K"}
           </Kbd>
