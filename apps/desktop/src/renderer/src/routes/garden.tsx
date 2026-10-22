@@ -3,17 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Share } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import meadow from "../assets/meadow.jpg";
-import { OUTLINED, Segmented } from "../components/controls";
+import { OUTLINED } from "../components/controls";
 import { hourSpan } from "../components/garden/format";
 import { GardenBoard } from "../components/garden/garden-board";
+import { YearList } from "../components/garden/year-list";
 import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
-import {
-  type GardenRange,
-  gardenGrid,
-  gardenStats,
-  rangeDates,
-} from "../lib/garden";
+import { gardenGrid, gardenStats, gardenYears } from "../lib/garden";
 import { useToday } from "../lib/use-today";
 import { MOCK_DAYS } from "../mock/journal";
 
@@ -21,57 +17,44 @@ export const Route = createFileRoute("/garden")({
   component: GardenScreen,
 });
 
-const RANGES = [
-  { label: "Season", value: "season" },
-  { label: "Year", value: "year" },
-  { label: "All time", value: "all" },
-] as const;
-
-const FLOWERS_LABEL: Record<GardenRange, string> = {
-  all: "flowers in all",
-  season: "flowers this season",
-  year: "flowers this year",
-};
-
 const MONTH = dateFormat({ month: "long" });
-const MONTH_SHORT = dateFormat({ month: "short" });
 const NUMBER = new Intl.NumberFormat("en");
-const FIRST_DAY = [...MOCK_DAYS.keys()].sort()[0] ?? "2025-01-01";
-
-function rangeLabel(range: GardenRange, start: Date, end: Date) {
-  if (range === "year") {
-    return String(start.getFullYear());
-  }
-  if (range === "season") {
-    return `${MONTH_SHORT.format(start)} – ${MONTH_SHORT.format(end)}`;
-  }
-  return `since ${MONTH_SHORT.format(start)} ${start.getFullYear()}`;
-}
 
 /** Paper's "06 Garden": every written day a flower, bare soil for days that rested. */
 function GardenScreen() {
   const today = useToday();
-  const [range, setRange] = useState<GardenRange>("year");
+  const years = useMemo(() => gardenYears(MOCK_DAYS.keys(), today), [today]);
+  const [year, setYear] = useState(() => Number(today.slice(0, 4)));
   const board = useRef<HTMLElement>(null);
 
-  const { grid, stats, start, end } = useMemo(() => {
-    const dates = rangeDates(range, today, FIRST_DAY);
-    const built = gardenGrid(dates.start, dates.end, today, MOCK_DAYS);
-    return { ...dates, grid: built, stats: gardenStats(built, MOCK_DAYS) };
-  }, [range, today]);
+  const { grid, stats } = useMemo(() => {
+    const built = gardenGrid(
+      new Date(year, 0, 1),
+      new Date(year, 11, 31),
+      today,
+      MOCK_DAYS
+    );
+    return { grid: built, stats: gardenStats(built, MOCK_DAYS) };
+  }, [year, today]);
 
   const saveImage = useCallback(() => {
     const rect = board.current?.getBoundingClientRect();
     if (rect) {
       window.daylily.garden.saveImage(
         { height: rect.height, width: rect.width, x: rect.left, y: rect.top },
-        `Daylily garden ${today}`
+        `Daylily garden ${year}`
       );
     }
-  }, [today]);
+  }, [year]);
 
   const tiles = [
-    { label: FLOWERS_LABEL[range], value: NUMBER.format(stats.flowers) },
+    {
+      label:
+        year === Number(today.slice(0, 4))
+          ? "flowers this year"
+          : `flowers in ${year}`,
+      value: NUMBER.format(stats.flowers),
+    },
     { label: "words, every one yours", value: NUMBER.format(stats.words) },
     {
       label: "your fullest month",
@@ -100,21 +83,13 @@ function GardenScreen() {
         <div className="flex flex-col gap-0.5">
           <h1 className="flex items-baseline gap-2.5 font-display text-display-xs leading-11 tracking-heading-sm">
             <span className="text-ink">Your garden</span>
-            <span className="text-ink-faint">
-              {rangeLabel(range, start, end)}
-            </span>
+            <span className="text-ink-faint">{year}</span>
           </h1>
           <p className="text-ink-subtle text-ui">
             Every flower is a day you wrote. Bare soil is a day you rested.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Segmented
-            label="Garden range"
-            onChange={setRange}
-            options={RANGES}
-            value={range}
-          />
           <Button
             className={`${OUTLINED} gap-1.75 px-3 font-medium text-caption text-ink`}
             onClick={saveImage}
@@ -126,12 +101,15 @@ function GardenScreen() {
         </div>
       </header>
 
-      <GardenBoard
-        currentMonth={today.slice(0, 7)}
-        days={MOCK_DAYS}
-        grid={grid}
-        ref={board}
-      />
+      <div className="flex items-start gap-4">
+        <GardenBoard
+          currentMonth={today.slice(0, 7)}
+          days={MOCK_DAYS}
+          grid={grid}
+          ref={board}
+        />
+        <YearList onSelect={setYear} selected={year} years={years} />
+      </div>
 
       <div className="grid grid-cols-4 gap-4">
         {tiles.map((tile) => (

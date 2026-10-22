@@ -1,16 +1,10 @@
 import { Button } from "@daylily/ui/primitives/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { dateFormat } from "../../lib/format";
-import { OUTLINED, Segmented } from "../controls";
+import { OUTLINED } from "../controls";
 
 const MONTH_NAME = dateFormat({ month: "long" });
 const NUMBER = new Intl.NumberFormat("en");
-
-const VIEWS = [
-  { label: "Month", value: "month" },
-  // The year view comes once it's designed
-  { disabled: true, label: "Year", value: "year" },
-] as const;
 
 export interface MonthStats {
   resting: number;
@@ -22,21 +16,19 @@ function plural(count: number, one: string, many: string) {
   return `${NUMBER.format(count)} ${count === 1 ? one : many}`;
 }
 
-/** The month title, its tally, and the controls to move between months. */
+/** The month title, its tally, and the arrows to move between months (Paper: "05"). */
 export function CalendarHeader({
   year,
   month,
   stats,
   onPrevious,
   onNext,
-  onToday,
 }: {
   year: number;
   month: number;
   stats: MonthStats;
   onPrevious: () => void;
   onNext: () => void;
-  onToday: () => void;
 }) {
   return (
     <header className="flex items-center justify-between gap-6">
@@ -53,8 +45,7 @@ export function CalendarHeader({
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Segmented label="Calendar view" options={VIEWS} value="month" />
+      <div className="flex items-center gap-1">
         <Button
           aria-label="Previous month"
           className={`${OUTLINED} w-7.5`}
@@ -63,13 +54,6 @@ export function CalendarHeader({
           variant="ghost"
         >
           <ChevronLeft className="size-3.5" strokeWidth={2} />
-        </Button>
-        <Button
-          className={`${OUTLINED} px-3 font-medium text-caption text-ink`}
-          onClick={onToday}
-          variant="ghost"
-        >
-          Today
         </Button>
         <Button
           aria-label="Next month"

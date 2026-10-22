@@ -12,8 +12,6 @@ export interface GardenEntry {
   words: number;
 }
 
-export type GardenRange = "season" | "year" | "all";
-
 export interface GardenGrid {
   /** One per cell, Monday first, a week per column. */
   cells: GardenDay[];
@@ -34,24 +32,18 @@ function mondayOnOrBefore(date: Date) {
   return monday;
 }
 
-/** The span a view covers: Season is this month and the two before it. */
-export function rangeDates(
-  range: GardenRange,
-  today: DayKey,
-  firstDay: DayKey
-): { end: Date; start: Date } {
-  const now = fromKey(today);
-  if (range === "year") {
-    return {
-      end: new Date(now.getFullYear(), 11, 31),
-      start: new Date(now.getFullYear(), 0, 1),
-    };
+/** The years with at least one written day, newest first, always including this one. */
+export function gardenYears(
+  written: Iterable<DayKey>,
+  today: DayKey
+): number[] {
+  const years = new Set([Number(today.slice(0, 4))]);
+  for (const key of written) {
+    if (key <= today) {
+      years.add(Number(key.slice(0, 4)));
+    }
   }
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  if (range === "season") {
-    return { end, start: new Date(now.getFullYear(), now.getMonth() - 2, 1) };
-  }
-  return { end, start: fromKey(firstDay) };
+  return [...years].sort((a, b) => b - a);
 }
 
 /**

@@ -13,10 +13,8 @@ import type { MockDay } from "../../mock/journal";
 import { DayPeek } from "./day-peek";
 
 const MONTH_SHORT = dateFormat({ month: "short" });
-/** The largest flower cell: a year fits at 22px; a season's few weeks grow bigger. */
-const YEAR_CELL = 22;
-const SEASON_CELL = 32;
-const SEASON_WEEKS = 16;
+/** The largest flower cell; a year of weeks fits at 22px. */
+const CELL = 22;
 /** However long the garden, it finishes blooming in about this long. */
 const BLOOM_SPREAD_MS = 1400;
 
@@ -32,13 +30,12 @@ export function GardenBoard({
 }: {
   grid: GardenGrid;
   days: ReadonlyMap<string, MockDay>;
-  /** `YYYY-MM`, so only this year's month is marked in a view spanning years. */
+  /** `YYYY-MM`, so only the current month is marked, and only in its own year. */
   currentMonth: string;
   ref?: Ref<HTMLElement>;
 }) {
-  const cellSize = grid.columns <= SEASON_WEEKS ? SEASON_CELL : YEAR_CELL;
   const columns = {
-    gridTemplateColumns: `repeat(${grid.columns}, minmax(0, ${cellSize}px))`,
+    gridTemplateColumns: `repeat(${grid.columns}, minmax(0, ${CELL}px))`,
   } as CSSProperties;
 
   const renderDay = useCallback(
@@ -56,7 +53,7 @@ export function GardenBoard({
 
   return (
     <section
-      className="flex flex-col gap-3 rounded-2xl border border-line bg-paper-page/90 px-6 pt-5.5 pb-5 shadow-card"
+      className="flex min-w-0 grow flex-col gap-3 rounded-2xl border border-line bg-paper-page/90 px-6 pt-5.5 pb-5 shadow-card"
       ref={ref}
     >
       <div className="grid justify-center" style={columns}>
@@ -81,7 +78,7 @@ export function GardenBoard({
       </div>
       <Garden
         days={grid.cells}
-        maxCell={cellSize}
+        maxCell={CELL}
         renderDay={renderDay}
         staggerMs={Math.min(35, BLOOM_SPREAD_MS / grid.columns)}
         todayIndex={grid.todayIndex}

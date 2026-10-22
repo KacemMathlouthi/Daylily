@@ -56,10 +56,6 @@ function CalendarScreen() {
   }, []);
   const previous = useCallback(() => move(-1), [move]);
   const next = useCallback(() => move(1), [move]);
-  const goToToday = useCallback(() => {
-    const [year, month] = today.split("-").map(Number) as [number, number];
-    setShown({ month: month - 1, year });
-  }, [today]);
 
   return (
     <Page>
@@ -67,7 +63,6 @@ function CalendarScreen() {
         month={shown.month}
         onNext={next}
         onPrevious={previous}
-        onToday={goToToday}
         stats={stats}
         year={shown.year}
       />
