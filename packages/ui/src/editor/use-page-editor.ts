@@ -52,7 +52,6 @@ export function usePageEditor({
   onChangeRef.current = onChange;
   const onPasteRef = useRef(onMarkdownPaste);
   onPasteRef.current = onMarkdownPaste;
-  const offersPasteFormatting = onMarkdownPaste !== undefined;
   const hasGhostPrompts = ghostPrompts !== undefined;
 
   const editor = useEditor({
@@ -65,9 +64,8 @@ export function usePageEditor({
     extensions: pageExtensions({
       ...(placeholder ? { placeholder } : {}),
       ...(ghostPrompts ? { ghostPrompts } : {}),
-      ...(offersPasteFormatting
-        ? { markdownPaste: { onPaste: (paste) => onPasteRef.current?.(paste) } }
-        : {}),
+      // Always installed, so a callback given later still works; without one it does nothing
+      markdownPaste: { onPaste: (paste) => onPasteRef.current?.(paste) },
     }),
     // The editor is created in the browser only; nothing renders on a server
     immediatelyRender: true,
