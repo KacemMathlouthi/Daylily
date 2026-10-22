@@ -68,22 +68,10 @@
 
   --animate-bloom: bloom 0.9s var(--ease-soft) both;
 
-  --animate-sway: sway 7s ease-in-out infinite;
-
   @keyframes bloom {
     from {
       opacity: 0;
       transform: scale(0) rotate(-60deg);
-    }
-  }
-
-  @keyframes sway {
-    0%,
-    100% {
-      rotate: -7.5deg;
-    }
-    50% {
-      rotate: -4deg;
     }
   }
 
