@@ -86,7 +86,7 @@
   --animate-caret: caret 1.1s steps(1) infinite;
 
   /* The launch bloom: each petal unfolds from the centre, then the words rise in */
-  --animate-petal-open: petal-open 520ms var(--ease-soft) both;
+  --animate-petal-open: petal-open 400ms var(--ease-soft) both;
   --animate-rise-in: rise-in 440ms var(--ease-soft) both;
   --animate-bud-close: bud-close 320ms var(--ease-soft) 120ms both;
 

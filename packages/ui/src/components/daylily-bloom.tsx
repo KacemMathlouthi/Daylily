@@ -1,6 +1,9 @@
 import type { ComponentProps, CSSProperties } from "react";
 import { PETAL } from "./daylily-mark";
 
+/** How long each petal takes to open; matches --animate-petal-open. */
+const PETAL_MS = 400;
+
 /**
  * When each petal starts to open, in ms: the top petal first, then its neighbours,
  * then the bottom one, as in Paper's "Launch bloom" storyboard.
@@ -9,13 +12,14 @@ const OPENING = [
   { angle: 0, delay: 0 },
   { angle: 60, delay: 120 },
   { angle: 300, delay: 120 },
-  { angle: 120, delay: 300 },
-  { angle: 240, delay: 300 },
-  { angle: 180, delay: 440 },
+  { angle: 120, delay: 240 },
+  { angle: 240, delay: 240 },
+  { angle: 180, delay: 360 },
 ];
 
-/** The bloom settles here; anything that follows it starts at this point. */
-export const BLOOM_MS = 760;
+/** Full bloom, when the last petal settles; anything that follows starts here. */
+export const BLOOM_MS =
+  Math.max(...OPENING.map(({ delay }) => delay)) + PETAL_MS;
 
 type DaylilyBloomProps = ComponentProps<"svg"> & {
   size?: number;
