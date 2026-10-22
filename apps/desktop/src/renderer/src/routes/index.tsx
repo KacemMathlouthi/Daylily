@@ -11,6 +11,7 @@ import { Page } from "../components/page";
 import { gardenGrid } from "../lib/garden";
 import { greetingFor } from "../lib/greeting";
 import { type DayKey, dayKey, fromKey } from "../lib/month";
+import { useTodayPage } from "../lib/today-page";
 import { useNow } from "../lib/use-now";
 import { useToday } from "../lib/use-today";
 import { MOCK_DAYS } from "../mock/journal";
@@ -74,6 +75,7 @@ function useGlance(today: DayKey) {
 function HomeScreen() {
   const now = useNow();
   const today = useToday();
+  const todayPage = useTodayPage(today);
   const { data: info } = useQuery({
     queryFn: () => window.daylily.app.info(),
     queryKey: ["app", "info"],
@@ -118,7 +120,10 @@ function HomeScreen() {
         </h1>
       </header>
 
-      <TodayCard now={now} written={MOCK_DAYS.has(today)} />
+      <TodayCard
+        now={now}
+        written={MOCK_DAYS.has(today) || todayPage.words > 0}
+      />
 
       <div
         className={

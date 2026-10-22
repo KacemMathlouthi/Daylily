@@ -1,5 +1,6 @@
 import { Switch } from "@daylily/ui/primitives/switch";
 import { useState } from "react";
+import { useGhostPrompts } from "../../lib/preferences";
 import { useNow } from "../../lib/use-now";
 import { SealCountdown } from "../seal-countdown";
 import {
@@ -12,8 +13,8 @@ import {
 /** Paper's "09b": nudges while writing, and how days seal. */
 export function WritingSection() {
   const now = useNow();
+  const [nudges, setNudges] = useGhostPrompts();
   // Held here until the journal's config file exists
-  const [nudges, setNudges] = useState(true);
   const [galleryCovers, setGalleryCovers] = useState(true);
 
   return (
