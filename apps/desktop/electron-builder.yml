@@ -13,10 +13,10 @@ extraResources:
     to: icon.png
 win:
   icon: resources/icon.ico
+  # An unpacked folder: a portable .exe re-extracts the whole runtime on every launch,
+  # which takes seconds; the installer comes with signed releases
   target:
-    - target: portable
+    - target: dir
       arch: [x64]
   # Editing the .exe (icon, version info) needs Wine on Linux; the CI Windows build will do it
   signAndEditExecutable: false
-portable:
-  artifactName: Daylily-${version}-portable.exe
