@@ -278,7 +278,11 @@ function SidebarTrigger({
   );
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+function SidebarRail({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -295,10 +299,13 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
       )}
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      onClick={toggleSidebar}
       tabIndex={-1}
       title="Toggle Sidebar"
       {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        toggleSidebar();
+      }}
     />
   );
 }
