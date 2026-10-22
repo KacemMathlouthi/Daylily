@@ -68,7 +68,7 @@ function DropdownMenuLabel({
         "px-1.5 py-1 font-medium text-muted-foreground text-xs data-inset:pl-7",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="dropdown-menu-label"
       {...props}
     />
@@ -90,7 +90,7 @@ function DropdownMenuItem({
         "group/dropdown-menu-item relative flex cursor-default select-none items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-disabled:pointer-events-none data-inset:pl-7 data-[variant=destructive]:text-destructive data-disabled:opacity-50 data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 data-[variant=destructive]:*:[svg]:text-destructive",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="dropdown-menu-item"
       data-variant={variant}
       {...props}
@@ -116,7 +116,7 @@ function DropdownMenuSubTrigger({
         "flex cursor-default select-none items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-open:bg-accent data-popup-open:bg-accent data-inset:pl-7 data-open:text-accent-foreground data-popup-open:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="dropdown-menu-sub-trigger"
       {...props}
     >
@@ -166,7 +166,7 @@ function DropdownMenuCheckboxItem({
         "relative flex cursor-default select-none items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-disabled:pointer-events-none data-inset:pl-7 data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="dropdown-menu-checkbox-item"
       {...props}
     >
@@ -206,7 +206,7 @@ function DropdownMenuRadioItem({
         "relative flex cursor-default select-none items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-disabled:pointer-events-none data-inset:pl-7 data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
-      data-inset={inset}
+      data-inset={inset || undefined}
       data-slot="dropdown-menu-radio-item"
       {...props}
     >
