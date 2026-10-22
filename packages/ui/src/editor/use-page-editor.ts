@@ -68,7 +68,11 @@ export function usePageEditor({
 
   const enabled = ghostPrompts?.enabled;
   useEffect(() => {
-    if (hasGhostPrompts && enabled !== undefined) {
+    // The extension is chosen when the editor is created; a later change of mind can't add it
+    const installed = editor.extensionManager.extensions.some(
+      (extension) => extension.name === "ghostPrompts"
+    );
+    if (installed && hasGhostPrompts && enabled !== undefined) {
       editor.commands.setGhostPrompts(enabled);
     }
   }, [editor, enabled, hasGhostPrompts]);
