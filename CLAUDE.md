@@ -285,7 +285,7 @@ brand/               brand and product assets
 ```
 
 - Packages are imported by path, never through barrel files: `@daylily/ui/primitives/button`.
-- Add primitives with the shadcn CLI from `apps/web` (`pnpm dlx shadcn@latest add <name>`). They land in
+- Add primitives with the shadcn CLI from `packages/ui` (`pnpm dlx shadcn@latest add <name>`). They land in
   `packages/ui/src/primitives/`, and from then on they're our code to adapt.
 - The landing page renders real components from `packages/ui` instead of screenshots.
 - Landing sections live in `apps/web/components/landing/`, one file per section. Client components (`"use client"`)
