@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const NOTICE_MS = 2500;
 
-/** A short message for the status bar, such as after copying, that clears itself. */
+/**
+ * A short message for the status bar, such as after copying, that clears itself.
+ * Showing it again, even with the same words, starts its time over.
+ */
 export function useNotice() {
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; shown: number } | null>(
+    null
+  );
   useEffect(() => {
     if (notice === null) {
       return;
@@ -12,5 +17,9 @@ export function useNotice() {
     const timer = setTimeout(() => setNotice(null), NOTICE_MS);
     return () => clearTimeout(timer);
   }, [notice]);
-  return [notice, setNotice] as const;
+  const show = useCallback(
+    (text: string) => setNotice({ shown: performance.now(), text }),
+    []
+  );
+  return [notice?.text ?? null, show] as const;
 }
