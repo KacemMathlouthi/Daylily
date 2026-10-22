@@ -219,7 +219,7 @@ keychain and **never** into the journal folder.
 | **Calendar** | Month grid of covers and titles. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days. Year contribution graph in flowers. |
 | **Search** | Full-text search across all days. Results show date, title and a snippet, and open the day. |
-| **Settings** | Journal folder, reminder, theme (light, dark, system). AI section hidden in v1. |
+| **Settings** | Journal folder, reminder. AI section hidden in v1. The theme toggle lives in the sidebar: it follows the system until first used. |
 
 ### 3.5 Behaviours
 
@@ -526,6 +526,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Sticky header with section links, deeper buttons, Manifesto and Download pages; designed in Paper first |
 | 2026-10-22 | Desktop skeleton: secure Electron window, typed preload bridge, app shell with sidebar and routes |
 | 2026-10-22 | Launch screen: the bloom, a greeting by time of day and a quote, over mocked loading until storage exists |
+| 2026-10-22 | Light and dark themes from a sidebar toggle; the sidebar folds into an icon rail; the month calendar on sample days |
 
 ### Next
 1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
