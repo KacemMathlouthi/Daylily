@@ -13,7 +13,7 @@ const fan = (rotate: number, x: number, y: number) => ({
 export function SealedStack() {
   return (
     <motion.div
-      className="relative mx-auto h-56 w-[min(340px,100%)] lg:absolute lg:top-53.5 lg:left-27 lg:mx-0"
+      className="relative mx-auto h-56 w-[min(340px,100%)] xl:absolute xl:top-53.5 xl:left-27 xl:mx-0"
       initial="hidden"
       transition={{ duration: 1.1, ease: EASE_SOFT, staggerChildren: 0.08 }}
       viewport={{ margin: "-15% 0px", once: true }}

@@ -138,7 +138,7 @@ export function Features() {
         </h2>
       </Reveal>
       <div className="flex w-full max-w-328 flex-col gap-5">
-        <div className="grid gap-5 lg:grid-cols-[776fr_516fr]">
+        <div className="grid gap-5 xl:grid-cols-[776fr_516fr]">
           <GhostCard />
           <SealedCard />
         </div>
