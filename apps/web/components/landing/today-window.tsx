@@ -178,7 +178,7 @@ function TodayPage() {
           />
           <div className="flex flex-col gap-3.5 pt-7">
             <p className="font-medium text-ink-subtle text-xs tracking-[0.02em]">
-              Tuesday, October 20 · 74 words
+              Tuesday, October 20 · 61 words
             </p>
             <h3 className="font-display text-[32px] text-ink leading-11 tracking-[-0.015em] md:text-[40px]">
               The long way home
