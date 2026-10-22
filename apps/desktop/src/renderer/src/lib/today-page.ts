@@ -16,24 +16,25 @@ function blankPage(day: DayKey): TodayPage {
 }
 
 /**
- * Today's page, kept in memory so it survives a visit to another screen. It is
- * lost when the app closes, until the journal folder and autosave exist.
+ * Pages by day, kept in memory so they survive a visit to another screen and the
+ * 4am turn of the day. They are lost when the app closes, until the journal
+ * folder and autosave exist.
  */
-const store = createStore<TodayPage>(blankPage(""));
+const store = createStore<ReadonlyMap<DayKey, TodayPage>>(new Map());
 
 /** Today's page; a new day opens on a blank one. */
 export function useTodayPage(today: DayKey): TodayPage {
-  const page = store.use();
-  return page.day === today ? page : blankPage(today);
+  return store.use().get(today) ?? blankPage(today);
 }
 
-/** Changes today's page, starting a fresh one if the day has turned. */
+/** Changes today's page, leaving earlier days as they were. */
 export function updateTodayPage(
   today: DayKey,
   change: Partial<Omit<TodayPage, "day">>
 ) {
-  store.set((page) => ({
-    ...(page.day === today ? page : blankPage(today)),
-    ...change,
-  }));
+  store.set((pages) => {
+    const next = new Map(pages);
+    next.set(today, { ...(pages.get(today) ?? blankPage(today)), ...change });
+    return next;
+  });
 }
