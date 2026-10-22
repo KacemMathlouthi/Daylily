@@ -18,8 +18,13 @@ function AppShell() {
     <SidebarProvider className="h-full min-h-0" style={SIDEBAR_WIDTH}>
       <AppSidebar />
       <SidebarInset className="min-w-0 overflow-y-auto bg-paper-page">
-        {/* A strip the window can be dragged by, above every screen */}
-        <div className="h-12 shrink-0 [-webkit-app-region:drag]" />
+        {/*
+         * macOS hides the title bar, so this strip drags the window there. Elsewhere the
+         * window has its own frame, and drag regions would swallow the cursor styles.
+         */}
+        <div
+          className={`h-12 shrink-0 ${window.daylily.platform === "darwin" ? "[-webkit-app-region:drag]" : ""}`}
+        />
         <Outlet />
       </SidebarInset>
     </SidebarProvider>

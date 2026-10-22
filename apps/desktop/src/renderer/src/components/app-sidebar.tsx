@@ -33,7 +33,7 @@ const NAV: { to: AppPath; label: string; icon: LucideIcon }[] = [
 
 /** Paper's row: 30px tall, 13px medium labels, a muted icon that darkens when current. */
 const ROW =
-  "h-7.5 gap-2.25 rounded-row px-2.5 font-medium text-ui [-webkit-app-region:no-drag] [&_svg]:size-3.75 [&_svg]:text-ink-muted data-active:[&_svg]:text-ink";
+  "h-7.5 gap-2.25 rounded-row px-2.5 font-medium text-ui [&_svg]:size-3.75 [&_svg]:text-ink-muted data-active:[&_svg]:text-ink";
 
 function NavItem({
   to,
@@ -66,13 +66,13 @@ export function AppSidebar() {
   const isMac = window.daylily.platform === "darwin";
 
   return (
-    <Sidebar className="[-webkit-app-region:drag]">
+    <Sidebar>
       <SidebarHeader className="gap-4.5 px-3 pt-3.5">
-        {/* Room for the macOS traffic lights, which the window draws itself */}
-        {isMac ? <div className="h-5" /> : null}
+        {/* Room for the macOS traffic lights; the only part of the sidebar that drags the window */}
+        {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="h-8 gap-2.25 px-2 font-semibold text-ink text-ui-lg [-webkit-app-region:no-drag]">
+            <SidebarMenuButton className="h-8 gap-2.25 px-2 font-semibold text-ink text-ui-lg">
               <DaylilyMark className="text-daylily" size={18} />
               <span className="grow">Your journal</span>
               <ChevronDown
@@ -83,7 +83,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
         <button
-          className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 [-webkit-app-region:no-drag] hover:border-ink-ghost"
+          className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 hover:border-ink-ghost"
           type="button"
         >
           <Search className="text-ink-subtle" size={13} strokeWidth={2.2} />
