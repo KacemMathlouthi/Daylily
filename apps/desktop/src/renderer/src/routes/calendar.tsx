@@ -5,6 +5,7 @@ import {
   type MonthStats,
 } from "../components/calendar/calendar-header";
 import { DayCell } from "../components/calendar/day-cell";
+import { Page } from "../components/page";
 import { type DayKey, monthWeeks } from "../lib/month";
 import { useToday } from "../lib/use-today";
 import { MOCK_DAYS } from "../mock/journal";
@@ -61,7 +62,7 @@ function CalendarScreen() {
   }, [today]);
 
   return (
-    <div className="flex flex-col gap-4.5 px-8 pb-8">
+    <Page>
       <CalendarHeader
         month={shown.month}
         onNext={next}
@@ -88,6 +89,6 @@ function CalendarScreen() {
           />
         ))}
       </div>
-    </div>
+    </Page>
   );
 }
