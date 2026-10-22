@@ -9,7 +9,7 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import { useRef } from "react";
-import { Reveal } from "./motion";
+import { Reveal } from "@/components/site/motion";
 
 interface Segment {
   image?: { src: string; alt: string };

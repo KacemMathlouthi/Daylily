@@ -1,10 +1,10 @@
 import { cn } from "cn";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { Reveal } from "@/components/site/motion";
 import { AiToggles } from "./ai-toggles";
 import { FileTree } from "./file-tree";
 import { GhostLine } from "./ghost-line";
-import { Reveal } from "./motion";
 import { SealedStack } from "./sealed-stack";
 
 function Card({

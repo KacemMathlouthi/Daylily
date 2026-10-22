@@ -1,10 +1,10 @@
 import { Calendar } from "@/components/landing/calendar";
 import { Features } from "@/components/landing/features";
-import { Footer } from "@/components/landing/footer";
 import { Garden } from "@/components/landing/garden";
 import { Hero } from "@/components/landing/hero";
-import { MotionProvider } from "@/components/landing/motion";
 import { Statement } from "@/components/landing/statement";
+import { Footer } from "@/components/site/footer";
+import { MotionProvider } from "@/components/site/motion";
 
 export default function Page() {
   return (

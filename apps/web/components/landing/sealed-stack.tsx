@@ -2,7 +2,7 @@
 
 import { Lock } from "lucide-react";
 import { motion } from "motion/react";
-import { EASE_SOFT } from "./motion";
+import { EASE_SOFT } from "@/components/site/motion";
 
 const fan = (rotate: number, x: number, y: number) => ({
   hidden: { opacity: 0, rotate: 0, x: 0, y: 40 },

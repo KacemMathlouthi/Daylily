@@ -1,7 +1,7 @@
+import { Nav } from "@/components/site/header";
+import { Reveal } from "@/components/site/motion";
+import { PillButton } from "@/components/site/pill-button";
 import { HeroMeadow } from "./hero-meadow";
-import { Reveal } from "./motion";
-import { Nav } from "./nav";
-import { PillButton } from "./pill-button";
 import { TodayWindow } from "./today-window";
 
 function AppleLogo() {

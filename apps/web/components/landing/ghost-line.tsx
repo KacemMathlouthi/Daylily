@@ -7,7 +7,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { EASE_SOFT } from "./motion";
+import { EASE_SOFT } from "@/components/site/motion";
 
 const TYPE_DELAY_MS = 900;
 const KEYSTROKE_MS = 55;

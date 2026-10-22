@@ -1,6 +1,6 @@
 import Image from "next/image";
+import { Reveal } from "@/components/site/motion";
 import { GardenPanel } from "./garden-panel";
-import { Reveal } from "./motion";
 
 export function Garden() {
   return (

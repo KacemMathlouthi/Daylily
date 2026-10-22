@@ -1,7 +1,7 @@
 import { cn } from "cn";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { Reveal } from "./motion";
+import { Reveal } from "@/components/site/motion";
 
 type Day =
   | { date: number; title: string; cover: string; alt: string }
