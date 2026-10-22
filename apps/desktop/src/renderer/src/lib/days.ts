@@ -1,3 +1,4 @@
+import { countWords } from "@daylily/ui/editor/extensions";
 import { useMemo } from "react";
 import { MOCK_DAYS } from "../mock/journal";
 import { mockPage } from "../mock/pages";
@@ -47,13 +48,15 @@ export function usePastDay(key: DayKey): PastDay {
     if (!day) {
       return { kind: "rested" };
     }
+    const markdown = mockPage(key, day);
     return {
       cover: { label: day.title, url: day.cover },
       kind: "written",
-      markdown: mockPage(key, day),
+      markdown,
       source: "journal",
       title: day.title,
-      words: day.words,
+      // Counted from the page itself, so the bar never shows a length the page doesn't have
+      words: countWords(markdown),
     };
   }, [key, written]);
 }
