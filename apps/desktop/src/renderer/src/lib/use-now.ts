@@ -9,6 +9,8 @@ export function useNow(): Date {
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     const tick = () => {
+      // A focus can tick between timers; keep a single chain running
+      clearTimeout(timer);
       const current = new Date();
       setNow(current);
       timer = setTimeout(tick, MINUTE - (current.getTime() % MINUTE));
