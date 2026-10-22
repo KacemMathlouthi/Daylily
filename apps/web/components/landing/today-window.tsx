@@ -62,7 +62,7 @@ function Sidebar() {
               <div
                 className={cn(
                   "flex h-7.5 items-center gap-2.25 rounded-[7px] px-2.5",
-                  active ? "bg-[#ede6da]" : HOVERABLE
+                  active ? "bg-paper-press" : HOVERABLE
                 )}
                 key={label}
               >
