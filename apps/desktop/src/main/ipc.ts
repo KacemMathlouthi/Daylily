@@ -41,15 +41,24 @@ function handle<T>(
   });
 }
 
-/** Calls `onReady` once the app in `contents` says it has painted. */
+/**
+ * Calls `onReady` once the app in `contents` says it has painted. Returns a way
+ * to stop listening, which also happens on its own if the window goes away.
+ */
 export function whenAppReady(contents: WebContents, onReady: () => void) {
+  const stop = () => {
+    ipcMain.off(CHANNELS.appReady, listener);
+    contents.off("destroyed", stop);
+  };
   const listener = (event: IpcMainEvent) => {
     if (event.sender === contents && isTrustedSender(event)) {
-      ipcMain.off(CHANNELS.appReady, listener);
+      stop();
       onReady();
     }
   };
   ipcMain.on(CHANNELS.appReady, listener);
+  contents.once("destroyed", stop);
+  return stop;
 }
 
 const NAME_SEPARATORS = /[\s._-]+/;

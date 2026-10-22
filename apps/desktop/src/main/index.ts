@@ -57,15 +57,15 @@ function launch() {
   window.webContents.once("did-start-loading", () => splash.progress(35));
   window.webContents.once("dom-ready", () => splash.progress(70));
 
-  let handedOver = false;
-  const handOver = () => {
-    if (!handedOver) {
-      handedOver = true;
-      splash.handOver(window);
-    }
-  };
-  whenAppReady(window.webContents, handOver);
-  setTimeout(handOver, READY_FALLBACK_MS);
+  let fallback: ReturnType<typeof setTimeout> | undefined;
+  const stopWaiting = whenAppReady(window.webContents, () => {
+    clearTimeout(fallback);
+    splash.handOver(window);
+  });
+  fallback = setTimeout(() => {
+    stopWaiting();
+    splash.handOver(window);
+  }, READY_FALLBACK_MS);
 }
 
 app.whenReady().then(() => {
