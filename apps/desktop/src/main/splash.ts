@@ -28,7 +28,8 @@ export function openSplash({
   /** The paper colour, so the window never flashes white before it paints. */
   background: string;
 }) {
-  const openedAt = Date.now();
+  // Counted from when it appears, so a slow first paint doesn't eat into the bloom
+  let shownAt = Date.now();
   let progress = 0;
   const splash = new BrowserWindow({
     backgroundColor: background,
@@ -49,7 +50,10 @@ export function openSplash({
     },
     width: 300,
   });
-  splash.once("ready-to-show", () => splash.show());
+  splash.once("ready-to-show", () => {
+    shownAt = Date.now();
+    splash.show();
+  });
 
   // Numbers only, set by this process; the page listens for the event
   const send = () => {
@@ -69,9 +73,13 @@ export function openSplash({
     handOver(app: BrowserWindow) {
       progress = 100;
       send();
-      const wait = Math.max(0, MIN_SPLASH_MS - (Date.now() - openedAt));
+      const wait = Math.max(0, MIN_SPLASH_MS - (Date.now() - shownAt));
       setTimeout(() => {
-        app.show();
+        // Behind the splash while it fades, then brought forward once it's gone
+        if (app.isDestroyed()) {
+          return;
+        }
+        app.showInactive();
         let step = 0;
         const fade = setInterval(() => {
           step += 1;
@@ -79,6 +87,9 @@ export function openSplash({
             clearInterval(fade);
             if (!splash.isDestroyed()) {
               splash.close();
+            }
+            if (!app.isDestroyed()) {
+              app.focus();
             }
             return;
           }
