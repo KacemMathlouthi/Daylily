@@ -6,7 +6,7 @@
     "ultracite/biome/next"
   ],
   "files": {
-    // site/ is the temporary static export of the landing page; brand/ is assets only
-    "includes": ["!site", "!brand"]
+    // brand/ holds assets only
+    "includes": ["!brand"]
   }
 }

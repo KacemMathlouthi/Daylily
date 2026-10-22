@@ -8,6 +8,8 @@ import {
   Newsreader,
 } from "next/font/google";
 import type { ReactNode } from "react";
+import { Header } from "@/components/site/header";
+import { MotionProvider } from "@/components/site/motion";
 
 const display = Instrument_Serif({
   style: ["normal", "italic"],
@@ -29,10 +31,14 @@ const mono = Geist_Mono({
   variable: "--font-face-mono",
 });
 
+const description =
+  "A human-first journal. One page a day, written by you, kept by you, grown into a garden.";
+
 export const metadata: Metadata = {
-  description:
-    "A human-first journal. One page a day, written by you, kept by you, grown into a garden.",
-  title: "Daylily — one page a day",
+  description,
+  openGraph: { description, siteName: "Daylily", type: "website" },
+  title: "Daylily: One page a day. Yours to keep.",
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -41,7 +47,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${display.variable} ${sans.variable} ${writing.variable} ${mono.variable}`}
       lang="en"
     >
-      <body>{children}</body>
+      {/* Extensions like ColorZilla add attributes to <body> before React hydrates */}
+      <head>
+        {/* Without JavaScript, scroll reveals never run, so show their content as is */}
+        <noscript>
+          <style>
+            {"[data-reveal]{opacity:1!important;transform:none!important}"}
+          </style>
+        </noscript>
+      </head>
+      <body suppressHydrationWarning>
+        <MotionProvider>
+          <Header />
+          {children}
+        </MotionProvider>
+      </body>
     </html>
   );
 }
