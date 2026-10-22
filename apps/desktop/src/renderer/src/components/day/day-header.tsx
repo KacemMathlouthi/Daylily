@@ -46,7 +46,10 @@ export function DayHeader({
       )}
     >
       <div className="flex items-center gap-2.5">
-        {leading}
+        {/* Clickable through macOS's draggable header, like the controls on the right */}
+        {leading ? (
+          <div className="[-webkit-app-region:no-drag]">{leading}</div>
+        ) : null}
         <nav
           aria-label="The page’s place in the journal"
           className="flex items-center gap-1.5 text-caption"
