@@ -9,7 +9,11 @@ import {
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { LaunchScreen } from "./components/launch/launch-screen";
+import { applyTheme, initialTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
+
+// Before the first render, so the app never flashes the wrong theme
+applyTheme(initialTheme());
 
 const queryClient = new QueryClient();
 
