@@ -49,7 +49,8 @@ export function LaunchScreen() {
     <div
       aria-busy={!leaving}
       className={cn(
-        "fixed inset-0 z-50 flex select-none flex-col items-center justify-center overflow-hidden bg-paper transition-opacity duration-400 ease-soft motion-reduce:transition-none",
+        // Light in both themes: Paper designs it once, and the meadow is a daytime scene
+        "light fixed inset-0 z-50 flex select-none flex-col items-center justify-center overflow-hidden bg-paper transition-opacity duration-400 ease-soft motion-reduce:transition-none",
         leaving && "pointer-events-none opacity-0"
       )}
     >
