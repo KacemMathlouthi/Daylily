@@ -66,7 +66,7 @@ export function AppSidebar() {
   const isMac = window.daylily.platform === "darwin";
 
   return (
-    <Sidebar>
+    <Sidebar className="select-none">
       <SidebarHeader className="gap-4.5 px-3 pt-3.5">
         {/* Room for the macOS traffic lights; the only part of the sidebar that drags the window */}
         {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}
