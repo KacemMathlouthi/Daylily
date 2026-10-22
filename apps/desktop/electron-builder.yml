@@ -13,10 +13,17 @@ extraResources:
     to: icon.png
 win:
   icon: resources/icon.ico
-  # An unpacked folder: a portable .exe re-extracts the whole runtime on every launch,
-  # which takes seconds; the installer comes with signed releases
+  # An unpacked folder for everyday builds: a portable .exe re-extracts the whole runtime
+  # on every launch, which takes seconds. Releases build the installer (package:win:installer)
   target:
     - target: dir
       arch: [x64]
   # Editing the .exe (icon, version info) needs Wine on Linux; the CI Windows build will do it
   signAndEditExecutable: false
+# The release installer: per user, no admin rights, the user picks where it goes.
+# NSIS needs Windows (or Wine) to build, so this runs on Windows or a Windows CI runner
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: Daylily-${version}-setup.exe
