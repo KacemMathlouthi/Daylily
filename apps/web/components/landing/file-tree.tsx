@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import { ChevronRight, FileText, Folder, Image, Lock } from "lucide-react";
 import { type MouseEvent, useCallback, useState } from "react";
 

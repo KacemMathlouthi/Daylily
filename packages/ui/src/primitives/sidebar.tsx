@@ -20,9 +20,9 @@ import {
   TooltipTrigger,
 } from "@daylily/ui/primitives/tooltip";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
 import { PanelLeftIcon } from "lucide-react";
 import * as React from "react";
+import { cn } from "../lib/cn";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

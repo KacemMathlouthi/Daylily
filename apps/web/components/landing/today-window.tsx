@@ -1,6 +1,6 @@
 import { AppWindow } from "@daylily/ui/components/app-window";
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import {
   Calendar,
   Ellipsis,

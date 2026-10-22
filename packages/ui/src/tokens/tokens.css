@@ -135,6 +135,7 @@
   --text-body: 17px;
   --text-lead: 19px;
   --text-lede: 21px;
+  --text-title-2xs: 24px;
   --text-title-xs: 26px;
   --text-title-sm: 30px;
   --text-title: 34px;
@@ -143,6 +144,7 @@
   --text-display: 56px;
   --text-display-lg: 64px;
   --text-display-xl: 80px;
+  --text-wordmark: 72px;
 
   /* Fluid display sizes that scale with the viewport */
   --text-fluid-statement: clamp(40px, 6.7vw, 96px);

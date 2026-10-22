@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import {
   type MotionValue,
   motion,

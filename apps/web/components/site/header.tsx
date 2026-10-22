@@ -1,7 +1,7 @@
 "use client";
 
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";

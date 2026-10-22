@@ -211,7 +211,7 @@ keychain and **never** into the journal folder.
 
 | Screen | Behaviour |
 |---|---|
-| **Launch** | Six-petal bloom animation, under one second. Never blocks on I/O longer than needed. |
+| **Launch** | Six-petal bloom (~1.2s with the wordmark), a greeting by time of day, a progress bar and a quote over the dusk meadow. Stays until the bloom finishes, then fades into the app. Never blocks on I/O longer than needed. |
 | **Onboarding** | Three steps: *welcome*, *your folder* (choose or create the journal folder, defaulting to `~/Daylily`), *a little help* (reminder time, defaulting to 21:00; the AI options in the design are deferred). |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
 | **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. |
@@ -525,6 +525,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Landing page built in Next.js from the Paper design, with live product parts and Motion; static `site/` export removed |
 | 2026-10-22 | Sticky header with section links, deeper buttons, Manifesto and Download pages; designed in Paper first |
 | 2026-10-22 | Desktop skeleton: secure Electron window, typed preload bridge, app shell with sidebar and routes |
+| 2026-10-22 | Launch screen: the bloom, a greeting by time of day and a quote, over mocked loading until storage exists |
 
 ### Next
 1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.

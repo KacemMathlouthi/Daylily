@@ -1,4 +1,4 @@
-import { cn } from "cn";
+import { cn } from "@daylily/ui/lib/cn";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Reveal } from "@/components/site/motion";

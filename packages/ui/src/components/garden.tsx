@@ -1,5 +1,5 @@
-import { cn } from "cn";
 import type { CSSProperties } from "react";
+import { cn } from "../lib/cn";
 import { DaylilyMark } from "./daylily-mark";
 
 export type FlowerColor = "daylily" | "petal" | "saffron" | "cornflower";
