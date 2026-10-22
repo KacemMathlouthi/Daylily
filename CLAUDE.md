@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Landing page built in `apps/web`. Desktop app not started. |
+| **Status** | Website live. Desktop app skeleton running; journal logic not started. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -270,7 +270,11 @@ keychain and **never** into the journal folder.
 
 ```
 apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
-apps/desktop/        later: Electron main, preload and renderer
+apps/desktop/        Electron app
+  src/main/            the backend: windows, IPC handlers, later the journal store and seal scheduler
+  src/preload/         the bridge: exposes the typed window.daylily API, nothing else
+  src/shared/          the IPC contract (channels, types, Zod schemas); private to the desktop app
+  src/renderer/        the React app: TanStack Router routes, screens, components
 packages/ui/         the shared UI, used by every app
   src/tokens/          design tokens as CSS variables (light and dark)
   src/styles/          globals.css: Tailwind setup, tokens mapped to utilities
@@ -303,6 +307,11 @@ brand/               brand and product assets
 | Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
 | Component workbench | Storybook, later, once the first components exist |
+| Desktop build | electron-vite (Vite for main, preload and renderer); electron-builder for packaging, added when we package |
+| Electron | 44.x, the mature stable line; `pnpm-workspace.yaml` allows its install script |
+| Desktop routing | TanStack Router, file-based, hash history (the app loads from `file://`) |
+| Desktop data | TanStack Query over the `window.daylily` bridge |
+| Validation | Zod at every boundary: IPC, config, frontmatter |
 | CI | GitHub Actions: check, knip, typecheck, build on every PR |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
@@ -361,6 +370,12 @@ Work accordingly.
 
 ### React and UI
 - Function components and hooks. Keep state close to where it's used; lift only when shared.
+- **shadcn first.** Before writing any UI building block (button, sidebar, dialog, menu, tooltip, input, command
+  palette…), check whether shadcn has it. If it does, add it with the CLI from `packages/ui`
+  (`pnpm dlx shadcn@latest add <name>`), then style it with our tokens. Hand-write only what is Daylily's own:
+  the garden, flowers, the mark, covers, the editor's nudges.
+- Generated primitives stay close to upstream so updates stay easy; Biome relaxes its stricter style rules for
+  `packages/ui/src/primitives` and `hooks`.
 - Design tokens are CSS custom properties ([§8](#8-design-system)). No hard-coded colours, sizes or fonts in
   components.
 - Accessible by default: semantic HTML, keyboard navigation everywhere, visible focus, WCAG AA contrast, and
@@ -503,15 +518,15 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Monorepo set up: pnpm, Turborepo, Ultracite, knip, Lefthook, CI; `packages/ui` and `apps/web` |
 | 2026-10-22 | Landing page built in Next.js from the Paper design, with live product parts and Motion; static `site/` export removed |
 | 2026-10-22 | Sticky header with section links, deeper buttons, Manifesto and Download pages; designed in Paper first |
+| 2026-10-22 | Desktop skeleton: secure Electron window, typed preload bridge, app shell with sidebar and routes |
 
 ### Next
-1. Scaffold the Electron app in `apps/desktop` on the same packages, with tests.
-2. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
-3. Filesystem storage adapter with atomic writes and folder watching.
-4. Today's page: editor, title, cover, autosave.
-5. Sealing in the running app, then the sealed day view.
-6. Calendar, garden, search, onboarding, settings, reminder.
-7. Packaging and signing for all three platforms.
+1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
+2. Filesystem storage adapter with atomic writes and folder watching.
+3. Today's page: editor, title, cover, autosave.
+4. Sealing in the running app, then the sealed day view.
+5. Calendar, garden, search, onboarding, settings, reminder.
+6. Packaging and signing for all three platforms.
 
 ---
 
