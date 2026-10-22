@@ -15,7 +15,8 @@ function lookOf(
   if (!day.inMonth) {
     return "outside";
   }
-  if (entry) {
+  // A day ahead can't hold writing yet; only today and the past show a cover
+  if (entry && day.key <= today) {
     return "written";
   }
   // Today stays open until it's written; it never reads as missed
