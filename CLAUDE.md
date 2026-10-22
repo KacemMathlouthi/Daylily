@@ -455,6 +455,12 @@ a comma, a middle dot (·) or two sentences instead.
 | `cornflower` | `#4A72D8` | Links, sparingly |
 | `soil` | `#8A5A3C` | Bare days, earth |
 
+**Where tokens live.** Colours are CSS variables in `packages/ui/src/tokens/tokens.css` (light and dark). The same file's
+`@theme` block holds the scales, which become Tailwind utilities: type (`text-ui`, `text-lead`, `text-display`…,
+plus fluid `text-fluid-*`), tracking, leading, radii (`rounded-row`, `rounded-panel`…) and shadows (`shadow-card`,
+`shadow-press-ink`…). The website's painted backgrounds are named utilities in `apps/web/app/globals.css`
+(`bg-hero-sky`, `bg-garden-glow`…). Components use these names only: no hex values, one-off sizes or shadows.
+
 Text and surfaces use a graded ink scale rather than opacity: `ink`, `ink-2` (writing), `ink-soft`, `ink-muted`,
 `ink-subtle`, `ink-faint`, `ink-ghost`, plus `ghost` for ghost prompts, `line` for hairlines, and `paper-sunk` /
 `paper-tint` for sunken and tinted surfaces. All live in `packages/ui/src/tokens/tokens.css`.
