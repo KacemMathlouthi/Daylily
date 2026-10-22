@@ -4,10 +4,11 @@ import {
   HoverCardTrigger,
 } from "@daylily/ui/primitives/hover-card";
 import type { ReactElement } from "react";
+import { dateFormat } from "../../lib/format";
 import { fromKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
-const LONG_DATE = new Intl.DateTimeFormat("en", {
+const LONG_DATE = dateFormat({
   day: "numeric",
   month: "long",
   weekday: "long",

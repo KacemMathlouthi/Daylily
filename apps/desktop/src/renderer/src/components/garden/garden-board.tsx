@@ -7,11 +7,12 @@ import {
   type Ref,
   useCallback,
 } from "react";
+import { dateFormat } from "../../lib/format";
 import type { GardenGrid } from "../../lib/garden";
 import type { MockDay } from "../../mock/journal";
 import { DayPeek } from "./day-peek";
 
-const MONTH_SHORT = new Intl.DateTimeFormat("en", { month: "short" });
+const MONTH_SHORT = dateFormat({ month: "short" });
 /** The largest flower cell: a year fits at 22px; a season's few weeks grow bigger. */
 const YEAR_CELL = 22;
 const SEASON_CELL = 32;

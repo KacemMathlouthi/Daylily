@@ -8,6 +8,7 @@ import {
 } from "@daylily/ui/primitives/select";
 import { Switch } from "@daylily/ui/primitives/switch";
 import { useCallback, useState } from "react";
+import { dateFormat } from "../../lib/format";
 import {
   SettingsGroup,
   SettingsHeading,
@@ -15,7 +16,7 @@ import {
   SettingsRows,
 } from "./parts";
 
-const TIME = new Intl.DateTimeFormat("en", {
+const TIME = dateFormat({
   hour: "numeric",
   minute: "2-digit",
 });

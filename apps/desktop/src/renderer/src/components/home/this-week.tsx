@@ -1,10 +1,11 @@
 import { cn } from "@daylily/ui/lib/cn";
 import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
+import { dateFormat } from "../../lib/format";
 import { type DayKey, fromKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
-const WEEKDAY = new Intl.DateTimeFormat("en", { weekday: "short" });
+const WEEKDAY = dateFormat({ weekday: "short" });
 
 /** The six days before today and today's open page, as small covers. */
 export function ThisWeek({

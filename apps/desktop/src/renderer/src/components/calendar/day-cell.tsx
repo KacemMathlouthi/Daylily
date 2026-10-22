@@ -1,8 +1,9 @@
 import { cn } from "@daylily/ui/lib/cn";
+import { dateFormat } from "../../lib/format";
 import type { CalendarDay, DayKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
-const MONTH_SHORT = new Intl.DateTimeFormat("en", { month: "short" });
+const MONTH_SHORT = dateFormat({ month: "short" });
 
 /** Bare soil for missed days, a cover for written ones, an open frame for days to come. */
 type Look = "outside" | "written" | "resting" | "future";
