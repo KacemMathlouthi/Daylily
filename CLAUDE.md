@@ -184,8 +184,9 @@ app: daylily/0.1.0
 - `words` and `updated` are rewritten on every save. `created` is set once.
 - Unknown fields are preserved on save. Users and other tools may add their own.
 
-**Settings are split.** Journal preferences (reminder time, theme) live in `.daylily/config.json`. Machine-local
-state (journal path, window size) lives in the app data directory. Secrets, such as future API keys, go in the OS
+**Settings are split.** Journal preferences (reminder time) live in `.daylily/config.json`. Machine-local
+state (journal path, window size, theme, the sidebar's collapsed state) lives on the device, since each
+screen may want its own. Secrets, such as future API keys, go in the OS
 keychain and **never** into the journal folder.
 
 ### 3.3 The day boundary and sealing
