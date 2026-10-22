@@ -13,7 +13,6 @@ import {
   gardenStats,
   rangeDates,
 } from "../lib/garden";
-import { fromKey } from "../lib/month";
 import { useToday } from "../lib/use-today";
 import { MOCK_DAYS } from "../mock/journal";
 
@@ -127,7 +126,7 @@ function GardenScreen() {
       </header>
 
       <GardenBoard
-        currentMonth={MONTH_SHORT.format(fromKey(today))}
+        currentMonth={today.slice(0, 7)}
         days={MOCK_DAYS}
         grid={grid}
         ref={board}

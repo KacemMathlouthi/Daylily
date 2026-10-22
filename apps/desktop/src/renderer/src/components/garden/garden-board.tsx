@@ -31,6 +31,7 @@ export function GardenBoard({
 }: {
   grid: GardenGrid;
   days: ReadonlyMap<string, MockDay>;
+  /** `YYYY-MM`, so only this year's month is marked in a view spanning years. */
   currentMonth: string;
   ref?: Ref<HTMLElement>;
 }) {
@@ -60,11 +61,12 @@ export function GardenBoard({
       <div className="grid justify-center" style={columns}>
         {grid.months.map(({ column, date }) => {
           const label = MONTH_SHORT.format(date);
+          const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
           return (
             <span
               className={cn(
                 "whitespace-nowrap text-meta leading-3.5",
-                label === currentMonth
+                month === currentMonth
                   ? "font-semibold text-ink"
                   : "text-ink-faint"
               )}
