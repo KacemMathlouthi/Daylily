@@ -12,7 +12,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-21 |
+| **Last updated** | 2026-10-22 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -82,7 +82,11 @@ The full picture, beyond v1. What ships first is in [§3](#3-v1-specification).
   *"what do you want to do about it?"*, *"who else was there?"*
 - They're **questions, never sentences you can accept**. You can't tab-complete or insert them. They vanish the
   moment you type.
-- Without AI, a small curated set rotates. With AI on, they react to what you just wrote.
+- Without AI, a small curated set rotates, picked at random and never the same twice in a row: *…and how did
+  that feel?*, *…what made you notice it?*, *…who else was there?*, *…what do you want to do about it?*,
+  *…what surprised you today?*, *…is there more to that?*, *…what would you tell a friend?*, *…what will you
+  remember from today?* With AI on, they react to what you just wrote.
+- They appear only at the end of a line, so a question never covers words after the cursor.
 - Prior-art check (Oct 2026): no app shows *inline, automatic, on-pause* reflective prompts. Day One's "Go Deeper"
   needs a tap.
 
@@ -280,7 +284,8 @@ packages/ui/         the shared UI, used by every app
   src/tokens/          design tokens as CSS variables (light and dark)
   src/styles/          globals.css: Tailwind setup, tokens mapped to utilities
   src/primitives/      accessible building blocks on Base UI (shadcn-generated, then owned)
-  src/components/      Daylily components: Flower, Garden, DayCover, Logo…
+  src/components/      Daylily components: Flower, Garden, DayCover, Logo, the page editor's view and toolbar…
+  src/editor/          the journal page editor on Tiptap: markdown in and out, ghost prompts, word counts
 packages/core/       later: pure domain logic (days, sealing, hashing, frontmatter, flowers)
 brand/               brand and product assets
 ```
@@ -530,11 +535,12 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Launch screen: the bloom, a greeting by time of day and a quote, over mocked loading until storage exists |
 | 2026-10-22 | Light and dark themes from a sidebar toggle; the sidebar folds into an icon rail; the month calendar on sample days |
 | 2026-10-22 | Home and garden screens on a year and a half of sample days; Settings with five sections, designed in Paper first |
+| 2026-10-22 | Today's page: a shared markdown editor with ghost prompts and a selection toolbar, title, gallery or own cover, focus mode; held in memory until storage exists |
 
 ### Next
 1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
 2. Filesystem storage adapter with atomic writes and folder watching.
-3. Today's page: editor, title, cover, autosave.
+3. Today's page: autosave to the day's file, copying covers into the day folder.
 4. Sealing in the running app, then the sealed day view.
 5. Calendar, garden, search, onboarding, settings, reminder.
 6. Packaging and signing for all three platforms.
@@ -571,5 +577,4 @@ writes.* The garden is the expected visual layer, not a moat. We'd be second to 
 - **Domain and trademark:** buy `daylily.so`; check whether `daylily.app` can be bought; run a USPTO/EUIPO trademark
   search.
 - **Cover gallery:** how many covers ship with the app, and how they're licensed.
-- **Curated nudges:** the exact set of offline questions and how they rotate.
 - **Codexes:** when, if ever, and whether they're the paid feature.
