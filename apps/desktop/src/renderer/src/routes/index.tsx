@@ -84,7 +84,8 @@ function HomeScreen() {
   const { grid, stats, week } = useGlance(today);
   const yearAgo = fromKey(today);
   yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-  const memory = MOCK_DAYS.get(dayKey(yearAgo));
+  const memoryKey = dayKey(yearAgo);
+  const memory = MOCK_DAYS.get(memoryKey);
 
   return (
     <Page
@@ -134,7 +135,7 @@ function HomeScreen() {
         }
       >
         <GardenGlance grid={grid} stats={stats} />
-        {memory ? <OnThisDay day={memory} /> : null}
+        {memory ? <OnThisDay day={memory} dayKey={memoryKey} /> : null}
       </div>
 
       <ThisWeek days={week} entries={MOCK_DAYS} />

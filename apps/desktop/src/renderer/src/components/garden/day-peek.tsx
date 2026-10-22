@@ -3,6 +3,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@daylily/ui/primitives/hover-card";
+import { Link } from "@tanstack/react-router";
 import type { ReactElement } from "react";
 import { dateFormat } from "../../lib/format";
 import { fromKey } from "../../lib/month";
@@ -16,8 +17,8 @@ const LONG_DATE = dateFormat({
 const NUMBER = new Intl.NumberFormat("en");
 
 /**
- * Paper's peek: hover a flower to see its day's cover, date, length and title.
- * Paper's "Open day →" comes back with the sealed day view, when there's a day to open.
+ * Paper's peek: hover a flower to see its day's cover, date, length and title;
+ * click it to open the day.
  */
 export function DayPeek({
   dayKey,
@@ -30,7 +31,20 @@ export function DayPeek({
 }) {
   return (
     <HoverCard>
-      <HoverCardTrigger closeDelay={80} delay={160} render={cell} />
+      <HoverCardTrigger
+        closeDelay={80}
+        delay={160}
+        render={
+          <Link
+            aria-label={`${day.title}, ${LONG_DATE.format(fromKey(dayKey))}`}
+            className="block rounded-full"
+            params={{ key: dayKey }}
+            to="/day/$key"
+          />
+        }
+      >
+        {cell}
+      </HoverCardTrigger>
       <HoverCardContent
         className="flex w-75 gap-3 rounded-xl bg-ink p-2.5 text-on-ink shadow-toast ring-0"
         side="top"
@@ -50,6 +64,9 @@ export function DayPeek({
           </span>
           <span className="truncate font-display text-lead text-on-ink leading-5.5">
             {day.title}
+          </span>
+          <span className="pt-0.5 font-medium text-on-ink-muted text-tag leading-3.5">
+            Open day →
           </span>
         </div>
       </HoverCardContent>
