@@ -269,7 +269,7 @@ keychain and **never** into the journal folder.
 ### 4.3 Repo layout
 
 ```
-apps/web/            Next.js landing page (later: docs, published codexes, accounts)
+apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
 apps/desktop/        later: Electron main, preload and renderer
 packages/ui/         the shared UI, used by every app
   src/tokens/          design tokens as CSS variables (light and dark)
@@ -459,10 +459,14 @@ hand-printed mark is for the app icon and large uses (`brand/landing/spots/mark-
 ### Paper file: "Daylily — Landing"
 The design source of truth. Open it in Paper and use the Paper MCP to read exact values when implementing.
 
+**Design first, in Paper.** Every visual change (layout, position, colour, a new page or state) is made in Paper
+and agreed with the owner before it is implemented in code. Code then follows Paper exactly. When code and Paper
+drift, sync Paper back to what was agreed.
+
 | Page | Contents |
 |---|---|
 | v1 | First landing page draft (superseded) |
-| v2 Landing | The current landing page |
+| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 04 Sealed day · 05 Calendar · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 
@@ -498,6 +502,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-21 | v1 product decisions recorded; this file became the project manifesto |
 | 2026-10-22 | Monorepo set up: pnpm, Turborepo, Ultracite, knip, Lefthook, CI; `packages/ui` and `apps/web` |
 | 2026-10-22 | Landing page built in Next.js from the Paper design, with live product parts and Motion; static `site/` export removed |
+| 2026-10-22 | Sticky header with section links, deeper buttons, Manifesto and Download pages; designed in Paper first |
 
 ### Next
 1. Scaffold the Electron app in `apps/desktop` on the same packages, with tests.
