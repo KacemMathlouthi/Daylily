@@ -6,7 +6,8 @@
     "./globals.css": "./src/styles/globals.css",
     "./primitives/*": "./src/primitives/*.tsx",
     "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./hooks/*": "./src/hooks/*.ts",
+    "./lib/*": "./src/lib/*.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
