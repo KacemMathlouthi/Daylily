@@ -5,9 +5,9 @@ import { cn } from "cn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ButtonLink } from "@/components/site/button-link";
 import { GithubMark } from "./github-mark";
 import { GITHUB_URL, NAV_LINKS } from "./links";
-import { PillLink } from "./pill-button";
 
 const SCROLLED_AFTER_PX = 24;
 const LANDING_SECTIONS = ["features", "garden", "calendar"];
@@ -65,7 +65,7 @@ export function Header() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-soft",
         scrolled
-          ? "border-ink/8 bg-paper-raised/78 shadow-[0_8px_24px_rgba(36,27,21,0.05)] backdrop-blur-[18px]"
+          ? "border-ink/8 bg-paper-raised/78 shadow-header backdrop-blur-[18px]"
           : "border-transparent"
       )}
     >
@@ -79,8 +79,8 @@ export function Header() {
           <DaylilyMark className="text-ink" size={22} />
           <span
             className={cn(
-              "font-display text-ink tracking-[-0.01em] transition-[font-size] duration-300 ease-soft",
-              scrolled ? "text-[26px] leading-7" : "text-3xl leading-7.5"
+              "font-display text-ink tracking-snug transition-[font-size] duration-300 ease-soft",
+              scrolled ? "text-title-xs leading-7" : "text-3xl leading-7.5"
             )}
           >
             Daylily
@@ -111,17 +111,17 @@ export function Header() {
         </nav>
 
         <div className="flex items-center justify-end gap-2 md:w-55">
-          <PillLink
+          <ButtonLink
             aria-label="Daylily on GitHub"
             href={GITHUB_URL}
-            size="icon"
-            tone="paper"
+            size="pill-icon"
+            variant="paper"
           >
             <GithubMark />
-          </PillLink>
-          <PillLink href="/download" size="md">
+          </ButtonLink>
+          <ButtonLink href="/download" size="pill-md" variant="ink">
             Download
-          </PillLink>
+          </ButtonLink>
         </div>
       </div>
     </header>

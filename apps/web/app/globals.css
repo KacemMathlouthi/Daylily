@@ -1,0 +1,80 @@
+@import "@daylily/ui/globals.css";
+
+/*
+ * The website's painted backgrounds. Each is art direction taken from the Paper
+ * landing; they live here, named, instead of inside components.
+ */
+
+@utility bg-hero-sky {
+  background-image: linear-gradient(
+    180deg,
+    #b4cfec 0%,
+    #c6daec 22%,
+    #d9e2e6 40%,
+    #e8e2d6 52%,
+    #ebdcc6 62%
+  );
+}
+
+@utility bg-ghost-glow {
+  background-image:
+    radial-gradient(ellipse 70% 80% at 85% 100%, #f9d9b6 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 10% 110%, #f6e3e8 0%, transparent 70%);
+}
+
+@utility bg-mist-glow {
+  background-image: radial-gradient(
+    ellipse 80% 60% at 50% 120%,
+    #dce7ee 0%,
+    transparent 70%
+  );
+}
+
+@utility bg-garden-glow {
+  background-image:
+    linear-gradient(
+      180deg,
+      var(--paper-raised) 0%,
+      transparent 22%,
+      transparent 78%,
+      var(--paper-raised) 100%
+    ),
+    radial-gradient(ellipse 45% 38% at 16% 38%, #fbe1c4 0%, transparent 70%),
+    radial-gradient(ellipse 40% 36% at 86% 70%, #f7dae2 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 58% 22%, #e4edda 0%, transparent 70%);
+}
+
+@utility bg-dawn-glow {
+  background-image: radial-gradient(
+    ellipse 60% 40% at 50% 0%,
+    #f9e3c8 0%,
+    transparent 70%
+  );
+}
+
+@utility bg-dusk-fade {
+  background-image: linear-gradient(
+    180deg,
+    var(--paper-raised) 0%,
+    #f8eee2 30%,
+    #f6e7d5 48%
+  );
+}
+
+/* Fades the top of a painting into the page */
+@utility mask-fade-top {
+  mask-image: linear-gradient(transparent 0%, rgb(0 0 0 / 0.6) 14%, black 26%);
+}
+
+/* The giant footer wordmark: warm white ink that thins out towards the meadow */
+@utility text-wordmark-ink {
+  color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    #fffbf5 8%,
+    rgb(255 246 235 / 0.85) 55%,
+    rgb(255 241 224 / 0.6) 88%
+  );
+  background-clip: text;
+  filter: drop-shadow(0 1.2vw 2.4vw rgb(90 45 20 / 0.2));
+}

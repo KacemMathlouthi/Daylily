@@ -12,6 +12,9 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Lint, typecheck and build don't run Electron, so skip its binary download
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v6

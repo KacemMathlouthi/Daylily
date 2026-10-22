@@ -12,8 +12,8 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@daylily/ui/components",
-    "hooks": "@/hooks",
-    "lib": "@/lib",
+    "hooks": "@daylily/ui/hooks",
+    "lib": "@daylily/ui/lib",
     "utils": "@daylily/ui/lib/utils",
     "ui": "@daylily/ui/primitives"
   },

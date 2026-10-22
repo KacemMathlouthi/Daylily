@@ -115,9 +115,9 @@ function DayCell({ day, index }: { day: Day; index: number }) {
       {"cover" in day ? (
         <div
           className={cn(
-            "group relative h-27 overflow-clip rounded-[9px]",
+            "group relative h-27 overflow-clip rounded-tile",
             isToday &&
-              "shadow-[0_0_0_2px_var(--paper-page),0_0_0_3.5px_var(--daylily)]"
+              "ring-[1.5px] ring-daylily ring-offset-2 ring-offset-paper-page"
           )}
         >
           <Image
@@ -131,14 +131,14 @@ function DayCell({ day, index }: { day: Day; index: number }) {
       ) : (
         <div
           className={cn(
-            "flex h-27 items-center justify-center rounded-[9px]",
+            "flex h-27 items-center justify-center rounded-tile",
             "resting" in day
-              ? "bg-[#f6f1e8]"
-              : "border border-[#e6dccd] border-dashed"
+              ? "bg-paper-sunk"
+              : "border border-line-strong border-dashed"
           )}
         >
           {"resting" in day ? (
-            <span className="size-1.75 rounded-full bg-[#b08a6a]" />
+            <span className="size-1.75 rounded-full bg-soil-soft" />
           ) : null}
         </div>
       )}
@@ -153,12 +153,12 @@ function DayCell({ day, index }: { day: Day; index: number }) {
           {day.date}
         </span>
         {"title" in day ? (
-          <span className="truncate font-display text-[17px] text-ink leading-5">
+          <span className="truncate font-display text-body text-ink leading-5">
             {day.title}
           </span>
         ) : null}
         {"resting" in day ? (
-          <span className="text-[12.5px] text-ink-faint">Resting</span>
+          <span className="text-caption text-ink-faint">Resting</span>
         ) : null}
       </div>
     </Reveal>
@@ -174,26 +174,26 @@ export function Calendar() {
       <div className="flex w-full max-w-328 flex-col gap-14">
         <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="flex flex-col gap-4">
-            <p className="font-medium text-[13px] text-daylily">The calendar</p>
-            <h2 className="font-display text-[48px] text-ink leading-none tracking-[-0.03em] md:text-[80px]">
+            <p className="font-medium text-daylily text-ui">The calendar</p>
+            <h2 className="font-display text-5xl text-ink leading-none tracking-display md:text-display-xl">
               A photo album
               <br />
               of your life.
             </h2>
           </div>
-          <p className="max-w-110 text-[17px] text-ink-muted leading-7.25 md:text-lg">
+          <p className="max-w-110 text-body text-ink-muted leading-7.25 md:text-lg">
             Each day keeps a title and one cover, painted from its words only
             when you ask, or a photo of your own. Scroll back and remember how
             it looked.
           </p>
         </Reveal>
 
-        <div className="overflow-x-auto rounded-[20px] border border-line bg-paper-page shadow-[0_30px_70px_#78461e1a]">
+        <div className="overflow-x-auto rounded-panel border border-line bg-paper-page shadow-panel">
           <div className="flex min-w-232 flex-col gap-3.5 px-7 pt-6 pb-7">
             <div className="flex items-center justify-between pb-1.5">
               <h3 className="flex items-baseline gap-2.5 font-display text-3xl">
                 <span className="text-ink">October</span>
-                <span className="text-[#b5a493]">2026</span>
+                <span className="text-on-ink-muted">2026</span>
               </h3>
               <div
                 aria-hidden="true"
@@ -202,7 +202,7 @@ export function Calendar() {
                 <span className="flex size-7.5 items-center justify-center rounded-lg border border-line">
                   <ChevronLeft size={14} strokeWidth={2} />
                 </span>
-                <span className="flex h-7.5 items-center rounded-lg border border-line px-3 font-medium text-[12.5px] text-ink">
+                <span className="flex h-7.5 items-center rounded-lg border border-line px-3 font-medium text-caption text-ink">
                   Today
                 </span>
                 <span className="flex size-7.5 items-center justify-center rounded-lg border border-line">
@@ -213,7 +213,7 @@ export function Calendar() {
             <div className="grid grid-cols-7 gap-x-3">
               {WEEKDAYS.map((weekday) => (
                 <span
-                  className="font-semibold text-[11.5px] text-ink-faint uppercase tracking-[0.06em]"
+                  className="font-semibold text-ink-faint text-meta uppercase tracking-caps"
                   key={weekday}
                 >
                   {weekday}

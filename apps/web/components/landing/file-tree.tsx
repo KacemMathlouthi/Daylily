@@ -19,7 +19,7 @@ const DAYS: Day[] = [
 const ROW =
   "flex h-7 w-full items-center gap-2 rounded-md pr-2 text-left transition-colors duration-200";
 
-const FOLDER_ICON = "shrink-0 fill-[#e9c77e] text-[#e9c77e]";
+const FOLDER_ICON = "shrink-0 fill-saffron-soft text-saffron-soft";
 
 /** A slice of the journal folder; each day opens to show the files it really holds. */
 export function FileTree() {
@@ -39,7 +39,7 @@ export function FileTree() {
   }, []);
 
   return (
-    <div className="relative z-10 flex w-full max-w-90 flex-col rounded-[14px] border border-ink/6 bg-paper-page p-2.5 font-mono text-[12.5px] shadow-[0_16px_36px_#78461e1a]">
+    <div className="relative z-10 flex w-full max-w-90 flex-col rounded-xl border border-ink/6 bg-paper-page p-2.5 font-mono text-caption shadow-card">
       <div className="flex h-7 items-center gap-2 px-2 text-ink">
         <Folder className={FOLDER_ICON} size={14} />
         journal/2026/10
@@ -102,7 +102,9 @@ function DayFiles({ day }: { day: Day }) {
         className={cn(
           ROW,
           "cursor-default pl-13",
-          today ? "bg-[#fbf1e6] text-ink" : "text-ink-muted hover:bg-ink/[0.05]"
+          today
+            ? "bg-daylily-wash text-ink"
+            : "text-ink-muted hover:bg-ink/[0.05]"
         )}
       >
         <FileText
@@ -112,7 +114,7 @@ function DayFiles({ day }: { day: Day }) {
         />
         <span className="grow">{day.date}.md</span>
         {today ? (
-          <span className="font-sans font-semibold text-[11px] text-daylily-deep">
+          <span className="font-sans font-semibold text-daylily-deep text-tag">
             today
           </span>
         ) : (

@@ -10,6 +10,8 @@
   --paper-page: #fffdf9;
   --paper-sunk: #f6f2eb;
   --paper-tint: #f3eee6;
+  --paper-press: #ede6da;
+  --line-strong: #e6dccd;
   --line: #ece4d8;
   --ink: #241b15;
   --ink-2: #3a2e26;
@@ -21,11 +23,26 @@
   --ghost: #bfaf9e;
   --daylily: #e8642b;
   --daylily-deep: #c4551f;
+  --daylily-ink: #a8481a;
+  --daylily-wash: #fbf1e6;
+  --daylily-wash-line: #f3dcc4;
   --saffron: #f4b630;
   --petal: #f08bb0;
   --moss: #4f6b3a;
   --cornflower: #4a72d8;
   --soil: #8a5a3c;
+  --soil-soft: #b08a6a;
+  --saffron-soft: #e9c77e;
+
+  /* Text on ink surfaces (the dark cards) */
+  --on-ink: #fbf8f3;
+  --on-ink-2: #e9e0d2;
+  --on-ink-muted: #b5a493;
+
+  /* macOS window controls, drawn in product mock-ups */
+  --traffic-close: #ee6a5f;
+  --traffic-minimize: #f5be4f;
+  --traffic-zoom: #62c655;
 
   /* Type: next/font (web) or @fontsource (desktop) provide the --font-face-* variables */
   --font-display: var(--font-face-display, "Instrument Serif"), Georgia, serif;
@@ -49,6 +66,8 @@
   --paper-page: #2a201a;
   --paper-sunk: #18110d;
   --paper-tint: #241b15;
+  --paper-press: #33281f;
+  --line-strong: #4a3d33;
   --line: #3a2e26;
   --ink: #f4eee3;
   --ink-2: #e9e0d2;
@@ -59,6 +78,12 @@
   --ink-ghost: #5c4e43;
   --ghost: #6e6054;
   --daylily-deep: #f0875a;
+  --daylily-ink: #f0875a;
+  --daylily-wash: #3a2418;
+  --daylily-wash-line: #5a3420;
+  --on-ink: #241b15;
+  --on-ink-2: #3a2e26;
+  --on-ink-muted: #6e6054;
 
   --destructive: #e07a63;
 }
@@ -84,4 +109,99 @@
   --border: var(--line);
   --input: color-mix(in oklch, var(--ink) 16%, transparent);
   --ring: var(--daylily);
+
+  /* The app sidebar: sunken paper, a soft fill for the current place */
+  --sidebar: var(--paper-sunk);
+  --sidebar-foreground: var(--ink-soft);
+  --sidebar-accent: var(--paper-press);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--daylily);
+}
+
+/*
+ * Scales. These become Tailwind utilities (text-ui, tracking-display, rounded-row,
+ * shadow-card…), so components never carry one-off sizes, spacing or shadows.
+ */
+@theme {
+  /* Type: UI sizes from the Paper screens, then display sizes */
+  --text-tag-xs: 10.5px;
+  --text-tag: 11px;
+  --text-meta: 11.5px;
+  --text-caption: 12.5px;
+  --text-ui: 13px;
+  --text-ui-lg: 13.5px;
+  --text-body-sm: 15px;
+  --text-body: 17px;
+  --text-lead: 19px;
+  --text-lede: 21px;
+  --text-title-xs: 26px;
+  --text-title-sm: 30px;
+  --text-title: 34px;
+  --text-display-xs: 40px;
+  --text-display-sm: 44px;
+  --text-display: 56px;
+  --text-display-lg: 64px;
+  --text-display-xl: 80px;
+
+  /* Fluid display sizes that scale with the viewport */
+  --text-fluid-statement: clamp(40px, 6.7vw, 96px);
+  --text-fluid-page: clamp(48px, 7.2vw, 104px);
+  --text-fluid-closing: clamp(56px, 7.8vw, 112px);
+  --text-fluid-hero: clamp(56px, 9.45vw, 136px);
+  --text-fluid-wordmark: 31.95vw;
+
+  --tracking-wordmark: -0.045em;
+  --tracking-display-tight: -0.035em;
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.025em;
+  --tracking-heading-sm: -0.02em;
+  --tracking-title: -0.015em;
+  --tracking-snug: -0.01em;
+  --tracking-label: 0.02em;
+  --tracking-eyebrow: 0.04em;
+  --tracking-caps: 0.06em;
+
+  --leading-wordmark: 0.87;
+  --leading-display-tight: 0.91;
+  --leading-display: 0.96;
+  --leading-heading: 1.03;
+  --leading-heading-loose: 1.04;
+
+  --radius-row: 7px;
+  --radius-tile: 9px;
+  --radius-panel: 20px;
+  --radius-card-lg: 28px;
+
+  --shadow-hairline: 0 1px 2px rgb(36 27 21 / 0.08);
+  --shadow-header: 0 8px 24px rgb(36 27 21 / 0.05);
+  --shadow-card: 0 16px 36px rgb(120 70 30 / 0.1);
+  --shadow-card-lift:
+    0 1px 2px rgb(36 27 21 / 0.04), 0 18px 40px rgb(120 70 30 / 0.1);
+  --shadow-tile: 0 24px 56px rgb(120 70 30 / 0.08);
+  --shadow-panel: 0 30px 70px rgb(120 70 30 / 0.1);
+  --shadow-panel-glass:
+    inset 0 1px 0 rgb(255 255 255 / 0.9), 0 30px 70px rgb(120 70 30 / 0.14);
+  --shadow-toast: 0 18px 40px rgb(36 27 21 / 0.28);
+  --shadow-sheet: 0 20px 40px rgb(0 0 0 / 0.35);
+  --shadow-window:
+    inset 0 1px 0 rgb(255 255 255 / 0.9), 0 2px 4px rgb(36 27 21 / 0.04),
+    0 24px 48px rgb(36 27 21 / 0.1), 0 60px 120px rgb(80 50 20 / 0.16);
+
+  /* Buttons have weight instead of lift: a soft gradient, a light top edge, a darker lip */
+  --shadow-press-ink:
+    inset 0 1px 0 rgb(255 255 255 / 0.16), inset 0 -2px 0 rgb(0 0 0 / 0.28),
+    0 1px 1px rgb(36 27 21 / 0.25), 0 6px 14px rgb(36 27 21 / 0.22);
+  --shadow-press-ink-hover:
+    inset 0 1px 0 rgb(255 255 255 / 0.2), inset 0 -2px 0 rgb(0 0 0 / 0.28),
+    0 1px 1px rgb(36 27 21 / 0.25), 0 8px 18px rgb(36 27 21 / 0.26);
+  --shadow-press-ink-down:
+    inset 0 2px 4px rgb(0 0 0 / 0.4), 0 1px 1px rgb(36 27 21 / 0.2);
+  --shadow-press-paper:
+    inset 0 1px 0 #fff, inset 0 -2px 0 rgb(120 90 60 / 0.08),
+    0 1px 1px rgb(36 27 21 / 0.08), 0 6px 14px rgb(36 27 21 / 0.08);
+  --shadow-press-paper-hover:
+    inset 0 1px 0 #fff, inset 0 -2px 0 rgb(120 90 60 / 0.08),
+    0 1px 1px rgb(36 27 21 / 0.1), 0 8px 18px rgb(36 27 21 / 0.11);
+  --shadow-press-paper-down: inset 0 2px 4px rgb(120 90 60 / 0.16);
 }

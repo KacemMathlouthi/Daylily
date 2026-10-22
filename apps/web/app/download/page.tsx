@@ -1,13 +1,14 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
+import { Button } from "@daylily/ui/primitives/button";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { AppleLogo } from "@/components/site/apple-logo";
+import { ButtonLink } from "@/components/site/button-link";
 import { Footer } from "@/components/site/footer";
 import { GithubMark } from "@/components/site/github-mark";
 import { HeaderSpacer } from "@/components/site/header-spacer";
 import { GITHUB_URL } from "@/components/site/links";
 import { Reveal } from "@/components/site/motion";
-import { PillButton, PillLink } from "@/components/site/pill-button";
 
 export const metadata: Metadata = {
   description:
@@ -104,20 +105,20 @@ function DownloadHero() {
         width={256}
       />
       <div className="flex flex-col items-center gap-4.5">
-        <h1 className="font-display text-[clamp(52px,7.2vw,104px)] text-ink leading-[0.96] tracking-[-0.035em]">
+        <h1 className="font-display text-fluid-page text-ink leading-display tracking-display-tight">
           Daylily for your desk.
         </h1>
-        <p className="max-w-140 text-[17px] text-ink-soft leading-7.5 md:text-[19px]">
+        <p className="max-w-140 text-body text-ink-soft leading-7.5 md:text-lead">
           One page a day, on macOS, Windows and Linux. No account, no cloud.
           Your journal is a folder on your machine.
         </p>
       </div>
       <div className="flex flex-col items-center gap-4 pt-2">
-        <PillButton>
+        <Button size="pill-lg" variant="ink">
           <AppleLogo />
           Download for Mac
-        </PillButton>
-        <p className="text-[13px] text-ink-muted">
+        </Button>
+        <p className="text-ink-muted text-ui">
           Version {VERSION} · October 20, 2026 · Universal for Apple silicon and
           Intel · 112 MB
         </p>
@@ -128,7 +129,7 @@ function DownloadHero() {
 
 function PlatformCard({ platform }: { platform: (typeof PLATFORMS)[number] }) {
   return (
-    <div className="flex w-full flex-col gap-6 rounded-3xl border border-line bg-paper-page p-8 shadow-[0_24px_56px_#78461e14]">
+    <div className="flex w-full flex-col gap-6 rounded-3xl border border-line bg-paper-page p-8 shadow-tile">
       <div className="flex items-center gap-4">
         <Image
           alt=""
@@ -138,10 +139,10 @@ function PlatformCard({ platform }: { platform: (typeof PLATFORMS)[number] }) {
           width={256}
         />
         <div className="flex flex-col gap-0.5">
-          <h2 className="font-display text-[34px] text-ink leading-9.5 tracking-[-0.015em]">
+          <h2 className="font-display text-ink text-title leading-9.5 tracking-title">
             {platform.name}
           </h2>
-          <p className="text-[13.5px] text-ink-subtle">{platform.requires}</p>
+          <p className="text-ink-subtle text-ui-lg">{platform.requires}</p>
         </div>
       </div>
       <ul className="flex grow flex-col gap-3.5 border-line border-t pt-4">
@@ -151,20 +152,20 @@ function PlatformCard({ platform }: { platform: (typeof PLATFORMS)[number] }) {
             key={file.file}
           >
             <div className="flex min-w-0 flex-col gap-0.75">
-              <span className="font-medium text-[15px] text-ink">
+              <span className="font-medium text-body-sm text-ink">
                 {file.kind}
               </span>
               <span className="truncate font-mono text-ink-subtle text-xs">
                 {file.file} · {file.size}
               </span>
             </div>
-            <PillButton size="sm" tone="paper">
+            <Button size="pill-sm" variant="paper">
               Download
-            </PillButton>
+            </Button>
           </li>
         ))}
       </ul>
-      <p className="font-mono text-[11px] text-ink-faint">
+      <p className="font-mono text-ink-faint text-tag">
         SHA-256 {platform.checksum}
       </p>
     </div>
@@ -176,8 +177,8 @@ function ReleaseNotes() {
     <section className="border-line border-t px-5 pt-24 pb-30 md:px-30">
       <div className="mx-auto flex max-w-300 flex-col gap-12 lg:flex-row lg:gap-30">
         <Reveal className="flex flex-col gap-3.5 lg:w-105 lg:shrink-0">
-          <p className="font-medium text-[13px] text-daylily">What’s in 0.1</p>
-          <h2 className="font-display text-[44px] text-ink leading-[1.04] tracking-[-0.025em] md:text-[56px]">
+          <p className="font-medium text-daylily text-ui">What’s in 0.1</p>
+          <h2 className="font-display text-display-sm text-ink leading-heading-loose tracking-heading md:text-display">
             The human core, first.
           </h2>
           <p className="text-base text-ink-muted leading-6.5">
@@ -196,10 +197,10 @@ function ReleaseNotes() {
                 size={18}
               />
               <div className="flex flex-col gap-1">
-                <h3 className="font-display text-[26px] text-ink leading-7.5">
+                <h3 className="font-display text-ink text-title-xs leading-7.5">
                   {note.title}
                 </h3>
-                <p className="text-[15px] text-ink-muted leading-6">
+                <p className="text-body-sm text-ink-muted leading-6">
                   {note.body}
                 </p>
               </div>
@@ -214,21 +215,21 @@ function ReleaseNotes() {
 function BuildFromSource() {
   return (
     <section className="px-4 md:px-16">
-      <Reveal className="mx-auto flex max-w-328 flex-col items-start justify-between gap-8 rounded-[28px] bg-ink px-6 py-12 md:flex-row md:items-center md:px-16 md:py-14">
+      <Reveal className="mx-auto flex max-w-328 flex-col items-start justify-between gap-8 rounded-card-lg bg-ink px-6 py-12 md:flex-row md:items-center md:px-16 md:py-14">
         <div className="flex max-w-140 flex-col gap-3">
-          <p className="font-medium text-[13px] text-saffron">Open source</p>
-          <h2 className="font-display text-[40px] text-paper-raised leading-12 tracking-[-0.02em] md:text-[44px]">
+          <p className="font-medium text-saffron text-ui">Open source</p>
+          <h2 className="font-display text-display-xs text-on-ink leading-12 tracking-heading-sm md:text-display-sm">
             Build it yourself.
           </h2>
-          <p className="text-[#b5a493] text-[15px] leading-6">
+          <p className="text-body-sm text-on-ink-muted leading-6">
             Every line is on GitHub under AGPL-3.0, with instructions to build
             Daylily from source.
           </p>
         </div>
-        <PillLink href={GITHUB_URL} tone="paper">
+        <ButtonLink href={GITHUB_URL} size="pill-lg" variant="paper">
           <GithubMark />
           View on GitHub
-        </PillLink>
+        </ButtonLink>
       </Reveal>
     </section>
   );
@@ -237,7 +238,7 @@ function BuildFromSource() {
 export default function DownloadPage() {
   return (
     <>
-      <main className="bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,#f9e3c8_0%,transparent_70%)] bg-paper-raised bg-no-repeat pb-10">
+      <main className="bg-dawn-glow bg-paper-raised bg-no-repeat pb-10">
         <HeaderSpacer />
         <DownloadHero />
         <div className="mx-auto grid max-w-328 gap-5 px-4 pb-30 md:grid-cols-3 md:px-0">

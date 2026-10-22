@@ -1,0 +1,22 @@
+appId: app.daylily.desktop
+productName: Daylily
+copyright: Copyright © 2026 Daylily
+directories:
+  output: release
+  buildResources: resources
+# The app is fully bundled by electron-vite; nothing else needs to ship
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: resources/icon.png
+    to: icon.png
+win:
+  icon: resources/icon.ico
+  target:
+    - target: portable
+      arch: [x64]
+  # Editing the .exe (icon, version info) needs Wine on Linux; the CI Windows build will do it
+  signAndEditExecutable: false
+portable:
+  artifactName: Daylily-${version}-portable.exe

@@ -15,16 +15,16 @@ export function AppWindow({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-clip rounded-[14px] border border-ink/10 bg-paper-page shadow-[inset_0_1px_0_#ffffffe6,0_2px_4px_#241b150a,0_24px_48px_#241b151a,0_60px_120px_#50321429]",
+        "flex flex-col overflow-clip rounded-xl border border-ink/10 bg-paper-page shadow-window",
         className
       )}
       {...props}
     >
       <div className="flex h-10 shrink-0 items-center justify-between border-line border-b bg-paper-sunk px-3.5">
         <div aria-hidden="true" className="flex flex-1 gap-2">
-          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-[#ee6a5f]" />
-          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-[#f5be4f]" />
-          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-[#62c655]" />
+          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-traffic-close" />
+          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-traffic-minimize" />
+          <span className="size-3 rounded-full border-[0.5px] border-black/12 bg-traffic-zoom" />
         </div>
         <span className="font-medium text-ink-subtle text-xs">{title}</span>
         <div className="flex-1" />
