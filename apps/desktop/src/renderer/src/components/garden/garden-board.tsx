@@ -1,12 +1,7 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { Garden } from "@daylily/ui/components/garden";
 import { cn } from "@daylily/ui/lib/cn";
-import {
-  type CSSProperties,
-  type ReactElement,
-  type Ref,
-  useCallback,
-} from "react";
+import { type CSSProperties, type ReactElement, useCallback } from "react";
 import { dateFormat } from "../../lib/format";
 import type { GardenGrid } from "../../lib/garden";
 import type { MockDay } from "../../mock/journal";
@@ -26,13 +21,11 @@ export function GardenBoard({
   grid,
   days,
   currentMonth,
-  ref,
 }: {
   grid: GardenGrid;
   days: ReadonlyMap<string, MockDay>;
   /** `YYYY-MM`, so only the current month is marked, and only in its own year. */
   currentMonth: string;
-  ref?: Ref<HTMLElement>;
 }) {
   const columns = {
     gridTemplateColumns: `repeat(${grid.columns}, minmax(0, ${CELL}px))`,
@@ -52,10 +45,7 @@ export function GardenBoard({
   );
 
   return (
-    <section
-      className="flex min-w-0 grow flex-col gap-3 rounded-2xl border border-line bg-paper-page/90 px-6 pt-5.5 pb-5 shadow-card"
-      ref={ref}
-    >
+    <section className="flex min-w-0 grow flex-col gap-3 rounded-2xl border border-line bg-paper-page/90 px-6 pt-5.5 pb-5 shadow-card">
       <div className="grid justify-center" style={columns}>
         {grid.months.map(({ column, date }) => {
           const label = MONTH_SHORT.format(date);
