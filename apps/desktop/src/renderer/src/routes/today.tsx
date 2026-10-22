@@ -92,6 +92,7 @@ function TodayScreen() {
   const { chrome, focused, setFocused } = useFocusChrome();
   const [notice, setNotice] = useNotice();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [promptSlot, setPromptSlot] = useState<HTMLDivElement | null>(null);
 
   const write = useCallback(
     ({ markdown, words }: PageChange) => {
@@ -167,10 +168,16 @@ function TodayScreen() {
             onTitle={retitle}
             onWrite={write}
             page={page}
+            promptSlot={promptSlot}
             sealed={sealed}
           />
         </article>
       </div>
+      {/* Sticks above the status bar, centred on the page column */}
+      <div
+        className="pointer-events-none sticky bottom-13 z-20 flex justify-center *:pointer-events-auto"
+        ref={setPromptSlot}
+      />
       <StatusBar
         className={chrome}
         dot={blank ? "bg-ink-ghost" : "bg-saffron"}

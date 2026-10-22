@@ -2,6 +2,7 @@ import { type Editor, useEditor } from "@tiptap/react";
 import { useEffect, useRef } from "react";
 import { countWords, pageExtensions } from "./extensions";
 import type { GhostPromptsOptions } from "./ghost-prompts";
+import type { MarkdownPaste } from "./markdown-paste";
 
 export interface PageChange {
   markdown: string;
@@ -20,6 +21,8 @@ export interface UsePageEditorOptions {
     className?: string;
   };
   onChange?: (change: PageChange) => void;
+  /** Told when pasted text looks like markdown, so the page can offer to format it. */
+  onMarkdownPaste?: (paste: MarkdownPaste) => void;
   placeholder?: string;
 }
 
@@ -43,9 +46,12 @@ export function usePageEditor({
   ghostPrompts,
   autofocus = false,
   onChange,
+  onMarkdownPaste,
 }: UsePageEditorOptions) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const onPasteRef = useRef(onMarkdownPaste);
+  onPasteRef.current = onMarkdownPaste;
   const hasGhostPrompts = ghostPrompts !== undefined;
 
   const editor = useEditor({
@@ -53,9 +59,13 @@ export function usePageEditor({
     content,
     contentType: "markdown",
     editable,
+    // Pasted text stays as written; the paste prompt offers formatting instead
+    enablePasteRules: false,
     extensions: pageExtensions({
       ...(placeholder ? { placeholder } : {}),
       ...(ghostPrompts ? { ghostPrompts } : {}),
+      // Always installed, so a callback given later still works; without one it does nothing
+      markdownPaste: { onPaste: (paste) => onPasteRef.current?.(paste) },
     }),
     // The editor is created in the browser only; nothing renders on a server
     immediatelyRender: true,

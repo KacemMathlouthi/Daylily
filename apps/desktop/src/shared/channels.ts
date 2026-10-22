@@ -5,6 +5,7 @@
  */
 export const CHANNELS = {
   appInfo: "app:info",
+  appReady: "app:ready",
   pickCover: "cover:pick",
   saveGardenImage: "garden:save-image",
 } as const;
@@ -14,14 +15,6 @@ export interface AppInfo {
   /** A first name from the OS account, for greetings; null when it doesn't read as one. */
   userName: string | null;
   version: string;
-}
-
-/** A region of the window in CSS pixels, as getBoundingClientRect reports it. */
-export interface CaptureRect {
-  height: number;
-  width: number;
-  x: number;
-  y: number;
 }
 
 /** An image chosen from the computer, held in memory until days are saved as files. */
@@ -36,14 +29,16 @@ export interface PickedImage {
 export interface DaylilyApi {
   app: {
     info: () => Promise<AppInfo>;
+    /** Tells the main process the app has painted, so the splash can hand over. */
+    ready: () => void;
   };
   cover: {
     /** Opens the system's file picker for one image. Null if cancelled. */
     pick: () => Promise<PickedImage | null>;
   };
   garden: {
-    /** Asks where to save, then writes that region of the window as a PNG. False if cancelled. */
-    saveImage: (rect: CaptureRect, name: string) => Promise<boolean>;
+    /** Asks where to save, then writes the garden's share card. False if cancelled. */
+    saveImage: (png: Uint8Array, name: string) => Promise<boolean>;
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;

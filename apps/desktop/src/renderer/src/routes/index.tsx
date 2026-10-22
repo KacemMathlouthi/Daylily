@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { useMemo } from "react";
-import dusk from "../assets/dusk.jpg";
 import { GardenGlance } from "../components/home/garden-glance";
 import { OnThisDay } from "../components/home/on-this-day";
 import { ThisWeek } from "../components/home/this-week";
@@ -89,20 +88,11 @@ function HomeScreen() {
 
   return (
     <Page
-      backdrop={
-        <img
-          alt=""
-          className="mask-[linear-gradient(black,black_45%,transparent)] pointer-events-none absolute inset-x-0 top-0 h-82.5 w-full object-cover object-[center_62%]"
-          height={941}
-          src={dusk}
-          width={1672}
-        />
-      }
       className="gap-7 pt-17.5"
       corner={
         <Link
           aria-label="Reminders"
-          className="light flex size-7.5 items-center justify-center rounded-md bg-paper-page/60 text-ink-soft backdrop-blur-md transition-colors hover:bg-paper-page/85 hover:text-ink"
+          className="flex size-7.5 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-paper-tint hover:text-ink"
           search={{ section: "reminders" }}
           to="/settings"
         >
@@ -111,8 +101,7 @@ function HomeScreen() {
       }
       narrow
     >
-      {/* Light in both themes: it sits on the meadow, which keeps its daylight colours */}
-      <header className="light flex flex-col gap-1.5">
+      <header className="flex flex-col gap-1.5">
         <p className="font-medium text-ink-soft text-ui">
           {/* The journal's day, which turns at 4am, and the clock's time */}
           {DATE.format(fromKey(today))} · {TIME.format(now).toLowerCase()}

@@ -1,11 +1,13 @@
 import { Button } from "@daylily/ui/primitives/button";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Share } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import meadow from "../assets/meadow.jpg";
 import { OUTLINED } from "../components/controls";
 import { hourSpan } from "../components/garden/format";
 import { GardenBoard } from "../components/garden/garden-board";
+import { renderShareCard } from "../components/garden/share-card";
 import { YearList } from "../components/garden/year-list";
 import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
@@ -25,7 +27,11 @@ function GardenScreen() {
   const today = useToday();
   const years = useMemo(() => gardenYears(MOCK_DAYS.keys(), today), [today]);
   const [year, setYear] = useState(() => Number(today.slice(0, 4)));
-  const board = useRef<HTMLElement>(null);
+  const { data: info } = useQuery({
+    queryFn: () => window.daylily.app.info(),
+    queryKey: ["app", "info"],
+  });
+  const isThisYear = year === Number(today.slice(0, 4));
 
   const { grid, stats } = useMemo(() => {
     const built = gardenGrid(
@@ -37,22 +43,23 @@ function GardenScreen() {
     return { grid: built, stats: gardenStats(built, MOCK_DAYS) };
   }, [year, today]);
 
-  const saveImage = useCallback(() => {
-    const rect = board.current?.getBoundingClientRect();
-    if (rect) {
-      window.daylily.garden.saveImage(
-        { height: rect.height, width: rect.width, x: rect.left, y: rect.top },
-        `Daylily garden ${year}`
-      );
-    }
-  }, [year]);
+  const saveImage = useCallback(async () => {
+    const png = await renderShareCard({
+      currentMonth: today.slice(0, 7),
+      flowers: stats.flowers,
+      fullestMonth: stats.fullestMonth,
+      grid,
+      isThisYear,
+      title: info?.userName ? `${info.userName}’s garden` : "My garden",
+      words: stats.words,
+      year,
+    });
+    await window.daylily.garden.saveImage(png, `Daylily garden ${year}`);
+  }, [grid, info?.userName, isThisYear, stats, today, year]);
 
   const tiles = [
     {
-      label:
-        year === Number(today.slice(0, 4))
-          ? "flowers this year"
-          : `flowers in ${year}`,
+      label: isThisYear ? "flowers this year" : `flowers in ${year}`,
       value: NUMBER.format(stats.flowers),
     },
     { label: "words, every one yours", value: NUMBER.format(stats.words) },
@@ -106,7 +113,6 @@ function GardenScreen() {
           currentMonth={today.slice(0, 7)}
           days={MOCK_DAYS}
           grid={grid}
-          ref={board}
         />
         <YearList onSelect={setYear} selected={year} years={years} />
       </div>

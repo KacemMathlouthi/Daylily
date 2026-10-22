@@ -5,19 +5,22 @@ import {
   app,
   BrowserWindow,
   dialog,
+  type IpcMainEvent,
   type IpcMainInvokeEvent,
   ipcMain,
+  nativeImage,
+  type WebContents,
 } from "electron";
 import { CHANNELS } from "../shared/channels";
 import {
   appInfoSchema,
-  captureRectSchema,
   imageNameSchema,
   pickedImageSchema,
+  pngSchema,
 } from "../shared/schemas";
 
 /** Only answer requests that come from our own renderer, never from other frames. */
-function isTrustedSender(event: IpcMainInvokeEvent) {
+function isTrustedSender(event: IpcMainEvent | IpcMainInvokeEvent) {
   const url = event.senderFrame?.url ?? "";
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   return (
@@ -38,6 +41,26 @@ function handle<T>(
   });
 }
 
+/**
+ * Calls `onReady` once the app in `contents` says it has painted. Returns a way
+ * to stop listening, which also happens on its own if the window goes away.
+ */
+export function whenAppReady(contents: WebContents, onReady: () => void) {
+  const stop = () => {
+    ipcMain.off(CHANNELS.appReady, listener);
+    contents.off("destroyed", stop);
+  };
+  const listener = (event: IpcMainEvent) => {
+    if (event.sender === contents && isTrustedSender(event)) {
+      stop();
+      onReady();
+    }
+  };
+  ipcMain.on(CHANNELS.appReady, listener);
+  contents.once("destroyed", stop);
+  return stop;
+}
+
 const NAME_SEPARATORS = /[\s._-]+/;
 const LETTERS_ONLY = /^\p{L}{2,}$/u;
 
@@ -49,6 +72,9 @@ function firstName(username: string): string | null {
   }
   return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
+
+/** The share card is 2160 square; anything far beyond that isn't one. */
+const MAX_IMAGE_SIDE = 8192;
 
 /** The image types a cover can be, by extension. */
 const COVER_TYPES: Record<string, string> = {
@@ -102,20 +128,19 @@ export function registerIpc() {
     });
   });
 
-  handle(CHANNELS.saveGardenImage, async (event, rawRect, rawName) => {
-    const rect = captureRectSchema.parse(rawRect);
+  handle(CHANNELS.saveGardenImage, async (event, rawPng, rawName) => {
+    const png = pngSchema.parse(rawPng);
     const name = imageNameSchema.parse(rawName);
+    // Decode it: only a real image of a sensible size is written as a .png
+    const image = nativeImage.createFromBuffer(Buffer.from(png));
+    const { width, height } = image.getSize();
+    if (image.isEmpty() || width > MAX_IMAGE_SIDE || height > MAX_IMAGE_SIDE) {
+      throw new Error("Rejected an image that is not a share card");
+    }
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) {
       return false;
     }
-
-    const image = await event.sender.capturePage({
-      height: Math.round(rect.height),
-      width: Math.round(rect.width),
-      x: Math.round(rect.x),
-      y: Math.round(rect.y),
-    });
     const { canceled, filePath } = await dialog.showSaveDialog(window, {
       defaultPath: join(app.getPath("pictures"), `${name}.png`),
       filters: [{ extensions: ["png"], name: "PNG image" }],
@@ -123,7 +148,7 @@ export function registerIpc() {
     if (canceled || !filePath) {
       return false;
     }
-    await writeFile(filePath, image.toPNG());
+    await writeFile(filePath, png);
     return true;
   });
 }

@@ -1,8 +1,11 @@
 import { type AnyExtension, Extension } from "@tiptap/core";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
 import { Placeholder } from "@tiptap/extensions";
 import { Markdown } from "@tiptap/markdown";
 import { StarterKit } from "@tiptap/starter-kit";
+import { CodeBlock } from "./code-block";
 import { GhostPrompts, type GhostPromptsOptions } from "./ghost-prompts";
+import { MarkdownPaste, type MarkdownPasteOptions } from "./markdown-paste";
 
 /** Enter on an empty last line of a quote steps out of it, as it does in a list. */
 const QuoteExit = Extension.create({
@@ -26,9 +29,14 @@ const QuoteExit = Extension.create({
 export interface PageExtensionsOptions {
   /** Nudges while writing; leave out for pages that are only read. */
   ghostPrompts?: Partial<GhostPromptsOptions>;
+  /** Offers to format pasted markdown; leave out for pages that are only read. */
+  markdownPaste?: MarkdownPasteOptions;
   /** Faint text on an empty page, such as "How was your day?". */
   placeholder?: string;
 }
+
+/** Links that are safe to hand to the system browser. */
+const SAFE_LINK = /^(https?:\/\/|mailto:)/i;
 
 /**
  * What a journal page can hold: the markdown a person would write by hand, and
@@ -38,22 +46,33 @@ export interface PageExtensionsOptions {
 export function pageExtensions({
   placeholder,
   ghostPrompts,
+  markdownPaste,
 }: PageExtensionsOptions = {}): AnyExtension[] {
   const extensions: AnyExtension[] = [
     StarterKit.configure({
-      code: false,
+      // Replaced by the highlighted one below
       codeBlock: false,
       heading: { levels: [2, 3] },
-      // Links would navigate the app window; they come back with a safe opener
-      link: false,
+      // Clicks open in the system browser: the app's window handler sends them there
+      link: {
+        autolink: true,
+        isAllowedUri: (url) => SAFE_LINK.test(url),
+        openOnClick: true,
+      },
       // Not markdown, so it wouldn't survive the file
       underline: false,
     }),
+    CodeBlock,
+    TaskList,
+    TaskItem.configure({ nested: true }),
     Markdown,
     QuoteExit,
   ];
   if (placeholder) {
     extensions.push(Placeholder.configure({ placeholder }));
+  }
+  if (markdownPaste) {
+    extensions.push(MarkdownPaste.configure(markdownPaste));
   }
   if (ghostPrompts) {
     extensions.push(GhostPrompts.configure(ghostPrompts));

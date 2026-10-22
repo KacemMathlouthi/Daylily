@@ -26,18 +26,18 @@ const COLOR_CLASS: Record<FlowerColor, string> = {
   saffron: "text-saffron",
 };
 
-/** Longer days grow bigger blooms, as a share of the cell. */
-function bloomSize(words: number) {
+/** Longer days grow bigger blooms: the share of its cell a flower fills. */
+export function bloomScale(words: number) {
   if (words < 150) {
-    return "62%";
+    return 0.62;
   }
   if (words < 400) {
-    return "76%";
+    return 0.76;
   }
   if (words < 700) {
-    return "88%";
+    return 0.88;
   }
-  return "98%";
+  return 0.98;
 }
 
 interface GardenProps {
@@ -103,7 +103,7 @@ export function Garden({
                 style={{
                   ...delay,
                   height: "auto",
-                  width: bloomSize(day.words),
+                  width: `${bloomScale(day.words) * 100}%`,
                 }}
               />
             ) : null}

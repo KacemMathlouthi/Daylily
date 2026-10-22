@@ -1,4 +1,5 @@
 import { Radio } from "@base-ui/react/radio";
+import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { cn } from "@daylily/ui/lib/cn";
 import { RadioGroup } from "@daylily/ui/primitives/radio-group";
 import { useCallback } from "react";
@@ -11,61 +12,25 @@ const OPTIONS: { label: string; value: ThemePreference }[] = [
   { label: "Match the system", value: "system" },
 ];
 
-/** A tiny app window in a theme's own tokens: sidebar, a title, two lines, three flowers. */
-function Window({
-  theme,
-  half = false,
-}: {
-  theme: "light" | "dark";
-  half?: boolean;
-}) {
-  return (
-    <div className={cn(theme, "flex grow bg-paper-page")}>
-      {half && theme === "dark" ? null : (
-        <div
-          className={cn(
-            "flex shrink-0 flex-col gap-1.5 border-line border-r bg-paper-sunk px-2 py-2.5",
-            half ? "w-6.5" : "w-13"
-          )}
-        >
-          {half
-            ? null
-            : [28, 22, 26].map((width) => (
-                <span
-                  className="h-1.25 rounded-full bg-line-strong"
-                  key={width}
-                  style={{ width }}
-                />
-              ))}
-        </div>
-      )}
-      <div className="flex grow flex-col gap-1.75 px-3 py-3.5">
-        <span className="h-2 w-[60%] rounded-full bg-ink" />
-        <span className="h-1.25 w-[90%] rounded-full bg-line-strong" />
-        <span className="h-1.25 w-[72%] rounded-full bg-line-strong" />
-        {half ? null : (
-          <span className="flex gap-1 pt-1">
-            <span className="size-1.75 rounded-full bg-daylily" />
-            <span className="size-1.75 rounded-full bg-petal" />
-            <span className="size-1.75 rounded-full bg-saffron" />
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
+/** The mark on a theme's own paper; "match the system" splits the card down the middle. */
 function Preview({ value }: { value: ThemePreference }) {
   return (
-    <div className="flex h-24 overflow-hidden rounded-md border border-line">
+    <div className="relative flex h-24 items-center justify-center overflow-hidden rounded-md border border-line">
       {value === "system" ? (
-        <>
-          <Window half theme="light" />
-          <Window half theme="dark" />
-        </>
+        <span className="absolute inset-0 flex">
+          <span className="light grow bg-paper-page" />
+          <span className="dark grow bg-paper" />
+        </span>
       ) : (
-        <Window theme={value} />
+        <span
+          className={cn(
+            value,
+            "absolute inset-0",
+            value === "dark" ? "bg-paper" : "bg-paper-page"
+          )}
+        />
       )}
+      <DaylilyMark className="relative text-daylily" size={36} />
     </div>
   );
 }

@@ -5,13 +5,14 @@ import { CHANNELS, type DaylilyApi } from "../shared/channels";
 const api: DaylilyApi = {
   app: {
     info: () => ipcRenderer.invoke(CHANNELS.appInfo),
+    ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
   cover: {
     pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
   },
   garden: {
-    saveImage: (rect, name) =>
-      ipcRenderer.invoke(CHANNELS.saveGardenImage, rect, name),
+    saveImage: (png, name) =>
+      ipcRenderer.invoke(CHANNELS.saveGardenImage, png, name),
   },
   platform: process.platform,
 };

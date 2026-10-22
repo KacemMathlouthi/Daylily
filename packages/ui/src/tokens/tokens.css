@@ -35,6 +35,14 @@
   --soil-soft: #b08a6a;
   --saffron-soft: #e9c77e;
 
+  /* Code on a page: warm and quiet, from the same palette */
+  --code-keyword: #a8481a;
+  --code-string: #4f6b3a;
+  --code-number: #8a5a3c;
+  --code-title: #3f5fb3;
+  /* Quieter than the code, still 4.5:1 on the code block */
+  --code-comment: #7a6a5d;
+
   /* Text on ink surfaces (the dark cards) */
   --on-ink: #fbf8f3;
   --on-ink-2: #e9e0d2;
@@ -89,6 +97,12 @@
   --on-ink-muted: #6e6054;
 
   --destructive: #e07a63;
+
+  --code-keyword: #f0875a;
+  --code-string: #a3c283;
+  --code-number: #d4a274;
+  --code-title: #92aef2;
+  --code-comment: #8c7d70;
 }
 
 /* Declared on each so a nested .dark or .light recomputes the roles from its own palette */
@@ -140,6 +154,9 @@
   /* The writing page: Newsreader with room between the lines */
   --text-writing: 18px;
   --text-writing--line-height: 31px;
+  /* Code on a page, a step smaller than the writing */
+  --text-code: 13.5px;
+  --text-code--line-height: 21px;
   --text-lead: 19px;
   --text-lede: 21px;
   --text-title-2xs: 24px;
