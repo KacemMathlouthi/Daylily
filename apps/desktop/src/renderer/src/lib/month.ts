@@ -8,7 +8,7 @@ export interface CalendarDay {
 }
 
 /** A day runs 04:00 to 04:00, so writing at 1am still belongs to the day being lived. */
-const DAY_STARTS_AT_HOUR = 4;
+export const DAY_STARTS_AT_HOUR = 4;
 
 function dayKey(date: Date): DayKey {
   const month = String(date.getMonth() + 1).padStart(2, "0");

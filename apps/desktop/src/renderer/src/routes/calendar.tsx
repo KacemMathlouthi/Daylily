@@ -5,7 +5,8 @@ import {
   type MonthStats,
 } from "../components/calendar/calendar-header";
 import { DayCell } from "../components/calendar/day-cell";
-import { type DayKey, monthWeeks, todayKey } from "../lib/month";
+import { type DayKey, monthWeeks } from "../lib/month";
+import { useToday } from "../lib/use-today";
 import { MOCK_DAYS } from "../mock/journal";
 
 export const Route = createFileRoute("/calendar")({
@@ -33,7 +34,7 @@ function statsFor(weeks: ReturnType<typeof monthWeeks>, today: DayKey) {
 
 /** Paper's "05 Calendar": a month of covers, bare soil for days that rested. */
 function CalendarScreen() {
-  const [today] = useState(() => todayKey(new Date()));
+  const today = useToday();
   const [shown, setShown] = useState(() => {
     const [year, month] = today.split("-").map(Number) as [number, number];
     return { month: month - 1, year };
