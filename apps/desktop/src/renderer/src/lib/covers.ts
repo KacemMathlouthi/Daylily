@@ -46,3 +46,9 @@ export function coverUrl(cover: Cover) {
     ? (GALLERY.find((item) => item.id === cover.id)?.url ?? "")
     : cover.url;
 }
+
+export function coverLabel(cover: Cover) {
+  return cover.source === "gallery"
+    ? (GALLERY.find((item) => item.id === cover.id)?.label ?? "Today’s cover")
+    : cover.name;
+}
