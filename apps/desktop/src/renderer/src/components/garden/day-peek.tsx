@@ -14,7 +14,10 @@ const LONG_DATE = new Intl.DateTimeFormat("en", {
 });
 const NUMBER = new Intl.NumberFormat("en");
 
-/** Paper's peek: hover a flower to see its day's cover, date, length and title. */
+/**
+ * Paper's peek: hover a flower to see its day's cover, date, length and title.
+ * Paper's "Open day →" comes back with the sealed day view, when there's a day to open.
+ */
 export function DayPeek({
   dayKey,
   day,
@@ -46,9 +49,6 @@ export function DayPeek({
           </span>
           <span className="truncate font-display text-lead text-on-ink leading-5.5">
             {day.title}
-          </span>
-          <span className="text-meta text-on-ink-muted leading-3.5">
-            Open day →
           </span>
         </div>
       </HoverCardContent>
