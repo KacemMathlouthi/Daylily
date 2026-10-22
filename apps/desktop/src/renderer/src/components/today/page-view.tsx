@@ -1,11 +1,19 @@
 import { FormatToolbar } from "@daylily/ui/components/format-toolbar";
 import { PageContent } from "@daylily/ui/components/page-content";
+import { PastePrompt } from "@daylily/ui/components/paste-prompt";
+import type { MarkdownPaste } from "@daylily/ui/editor/markdown-paste";
 import {
   type PageChange,
   usePageEditor,
 } from "@daylily/ui/editor/use-page-editor";
 import { cn } from "@daylily/ui/lib/cn";
-import { type ChangeEvent, type KeyboardEvent, useCallback } from "react";
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  useCallback,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { coverLabel, coverUrl } from "../../lib/covers";
 import type { TodayPage } from "../../lib/today-page";
 import { DayCover } from "../day/day-cover";
@@ -26,6 +34,7 @@ export function PageView({
   onWrite,
   onTitle,
   onChooseCover,
+  promptSlot,
 }: {
   page: TodayPage;
   /** At 4am the page seals in place: the ink settles and it stops taking input. */
@@ -34,13 +43,18 @@ export function PageView({
   onWrite: (change: PageChange) => void;
   onTitle: (title: string) => void;
   onChooseCover: () => void;
+  /** Where the paste prompt sits: above the status bar, centred on the page. */
+  promptSlot: HTMLElement | null;
 }) {
+  const [paste, setPaste] = useState<MarkdownPaste | null>(null);
+  const donePasting = useCallback(() => setPaste(null), []);
   const editor = usePageEditor({
     autofocus: true,
     content: page.markdown,
     editable: !sealed,
     ghostPrompts: { enabled: ghostPrompts, prompts: NUDGES },
     onChange: onWrite,
+    onMarkdownPaste: setPaste,
     placeholder: "How was your day?",
   });
 
@@ -89,6 +103,12 @@ export function PageView({
         />
         <FormatToolbar editor={editor} />
       </div>
+      {paste && promptSlot
+        ? createPortal(
+            <PastePrompt editor={editor} onDone={donePasting} paste={paste} />,
+            promptSlot
+          )
+        : null}
     </>
   );
 }
