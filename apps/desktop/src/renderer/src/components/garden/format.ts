@@ -1,4 +1,6 @@
-const HOUR = new Intl.DateTimeFormat("en", { hour: "numeric" });
+import { dateFormat } from "../../lib/format";
+
+const HOUR = dateFormat({ hour: "numeric" });
 
 function hourParts(hour: number) {
   const parts = HOUR.formatToParts(new Date(2000, 0, 1, hour));

@@ -1,9 +1,15 @@
+import { Link } from "@tanstack/react-router";
+import type { DayKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
 /** A day from a year ago, offered back: its cover, title and first line. */
-export function OnThisDay({ day }: { day: MockDay }) {
+export function OnThisDay({ dayKey, day }: { dayKey: DayKey; day: MockDay }) {
   return (
-    <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-paper-page px-3.5 pt-3.5 pb-4.5">
+    <Link
+      className="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-paper-page px-3.5 pt-3.5 pb-4.5 transition-colors duration-200 hover:border-line-strong"
+      params={{ key: dayKey }}
+      to="/day/$key"
+    >
       <img
         alt=""
         className="h-28 w-full rounded-lg object-cover"
@@ -24,6 +30,6 @@ export function OnThisDay({ day }: { day: MockDay }) {
           </p>
         ) : null}
       </div>
-    </section>
+    </Link>
   );
 }

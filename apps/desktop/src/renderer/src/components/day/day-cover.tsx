@@ -1,19 +1,22 @@
 import { ImageIcon } from "lucide-react";
-import { type Cover, coverUrl, GALLERY } from "../../lib/covers";
 
 /**
- * The day's picture over the page, or a soft invitation to add one
- * (Paper: "03 Writing" and "03a Today · blank"). Both open the cover picker.
+ * The day's picture over the page (Paper: "03 Writing", "04a Sealed day"). While
+ * writing, `onChoose` opens the cover picker: from the "Change cover" chip, or
+ * from the soft "Add a cover" invitation when there's none yet ("03a").
  */
-export function PageCover({
-  cover,
+export function DayCover({
+  url,
+  label,
   onChoose,
 }: {
-  cover: Cover | null;
-  onChoose: () => void;
+  url: string | null;
+  /** What the picture shows, for screen readers. */
+  label: string;
+  onChoose?: () => void;
 }) {
-  if (!cover) {
-    return (
+  if (!url) {
+    return onChoose ? (
       <button
         className="flex h-30 w-full flex-col items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-line-strong border-dashed bg-paper-raised transition-colors duration-200 hover:bg-paper-sunk"
         onClick={onChoose}
@@ -27,31 +30,28 @@ export function PageCover({
           From the gallery or your computer. One picture for the whole day.
         </span>
       </button>
-    );
+    ) : null;
   }
-
-  const label =
-    cover.source === "gallery"
-      ? GALLERY.find((item) => item.id === cover.id)?.label
-      : cover.name;
 
   return (
     <div className="relative h-42.5 overflow-hidden rounded-xl bg-paper-sunk">
       <img
-        alt={label ?? "Today’s cover"}
+        alt={label}
         className="size-full object-cover"
         height={170}
-        src={coverUrl(cover)}
+        src={url}
         width={680}
       />
-      {/* Always the dark chip: it sits on a photo, whatever the theme */}
-      <button
-        className="light absolute right-2.5 bottom-2.5 rounded-row bg-ink/55 px-2.5 py-1.25 font-medium text-meta text-on-ink backdrop-blur-sm transition-colors duration-200 hover:bg-ink/70"
-        onClick={onChoose}
-        type="button"
-      >
-        Change cover
-      </button>
+      {onChoose ? (
+        // Always the dark chip: it sits on a photo, whatever the theme
+        <button
+          className="light absolute right-2.5 bottom-2.5 rounded-row bg-ink/55 px-2.5 py-1.25 font-medium text-meta text-on-ink backdrop-blur-sm transition-colors duration-200 hover:bg-ink/70"
+          onClick={onChoose}
+          type="button"
+        >
+          Change cover
+        </button>
+      ) : null}
     </div>
   );
 }

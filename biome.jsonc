@@ -59,6 +59,13 @@
       // The desktop app is not a Next.js app, so there is no next/image to prefer
       "includes": ["apps/desktop/**"],
       "linter": { "rules": { "performance": { "noImgElement": "off" } } }
+    },
+    {
+      // TanStack Router reads paths from file names: day.$key.tsx is /day/$key
+      "includes": ["apps/desktop/src/renderer/src/routes/**"],
+      "linter": {
+        "rules": { "style": { "useFilenamingConvention": "off" } }
+      }
     }
   ]
 }

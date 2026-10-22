@@ -1,8 +1,9 @@
 import { Button } from "@daylily/ui/primitives/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { dateFormat } from "../../lib/format";
 import { OUTLINED, Segmented } from "../controls";
 
-const MONTH_NAME = new Intl.DateTimeFormat("en", { month: "long" });
+const MONTH_NAME = dateFormat({ month: "long" });
 const NUMBER = new Intl.NumberFormat("en");
 
 const VIEWS = [

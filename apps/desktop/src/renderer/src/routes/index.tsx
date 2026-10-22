@@ -8,6 +8,7 @@ import { OnThisDay } from "../components/home/on-this-day";
 import { ThisWeek } from "../components/home/this-week";
 import { TodayCard } from "../components/home/today-card";
 import { Page } from "../components/page";
+import { dateFormat } from "../lib/format";
 import { gardenGrid } from "../lib/garden";
 import { greetingFor } from "../lib/greeting";
 import { type DayKey, dayKey, fromKey } from "../lib/month";
@@ -23,16 +24,16 @@ export const Route = createFileRoute("/")({
 /** Home's garden shows the last half year, a week per column. */
 const GLANCE_WEEKS = 26;
 
-const DATE = new Intl.DateTimeFormat("en", {
+const DATE = dateFormat({
   day: "numeric",
   month: "long",
   weekday: "long",
 });
-const TIME = new Intl.DateTimeFormat("en", {
+const TIME = dateFormat({
   hour: "numeric",
   minute: "2-digit",
 });
-const MONTH = new Intl.DateTimeFormat("en", { month: "long" });
+const MONTH = dateFormat({ month: "long" });
 
 function shift(key: DayKey, days: number) {
   const date = fromKey(key);
@@ -83,7 +84,8 @@ function HomeScreen() {
   const { grid, stats, week } = useGlance(today);
   const yearAgo = fromKey(today);
   yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-  const memory = MOCK_DAYS.get(dayKey(yearAgo));
+  const memoryKey = dayKey(yearAgo);
+  const memory = MOCK_DAYS.get(memoryKey);
 
   return (
     <Page
@@ -133,7 +135,7 @@ function HomeScreen() {
         }
       >
         <GardenGlance grid={grid} stats={stats} />
-        {memory ? <OnThisDay day={memory} /> : null}
+        {memory ? <OnThisDay day={memory} dayKey={memoryKey} /> : null}
       </div>
 
       <ThisWeek days={week} entries={MOCK_DAYS} />

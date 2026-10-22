@@ -1,8 +1,11 @@
 import { cn } from "@daylily/ui/lib/cn";
+import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+import { dateFormat } from "../../lib/format";
 import type { CalendarDay, DayKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
-const MONTH_SHORT = new Intl.DateTimeFormat("en", { month: "short" });
+const MONTH_SHORT = dateFormat({ month: "short" });
 
 /** Bare soil for missed days, a cover for written ones, an open frame for days to come. */
 type Look = "outside" | "written" | "resting" | "future";
@@ -21,6 +24,36 @@ function lookOf(
   }
   // Today stays open until it's written; it never reads as missed
   return day.key < today ? "resting" : "future";
+}
+
+/** Past days open as sealed or rested pages, today opens the writing page. */
+function DayLink({
+  look,
+  dayKey,
+  isToday,
+  children,
+}: {
+  look: Look;
+  dayKey: DayKey;
+  isToday: boolean;
+  children: ReactNode;
+}) {
+  const className = "group flex min-w-0 flex-col gap-1.75 rounded-md";
+  if (isToday) {
+    return (
+      <Link className={className} to="/today">
+        {children}
+      </Link>
+    );
+  }
+  if (look === "written" || look === "resting") {
+    return (
+      <Link className={className} params={{ key: dayKey }} to="/day/$key">
+        {children}
+      </Link>
+    );
+  }
+  return <div className="flex min-w-0 flex-col gap-1.75">{children}</div>;
 }
 
 /** One day in the month grid, as in Paper's "05 Calendar". */
@@ -42,10 +75,10 @@ export function DayCell({
       : String(day.day);
 
   return (
-    <div className="flex min-w-0 flex-col gap-1.75">
+    <DayLink dayKey={day.key} isToday={isToday} look={look}>
       <div
         className={cn(
-          "flex aspect-19/12 w-full items-center justify-center overflow-hidden rounded-md",
+          "flex aspect-19/12 w-full items-center justify-center overflow-hidden rounded-md transition-[filter] duration-200 group-hover:brightness-105",
           look === "outside" && "bg-paper-sunk/45",
           look === "resting" && "bg-paper-tint",
           look === "future" && "border border-line-strong border-dashed",
@@ -88,6 +121,6 @@ export function DayCell({
           <span className="text-ink-faint text-xs">Resting</span>
         ) : null}
       </div>
-    </div>
+    </DayLink>
   );
 }

@@ -66,9 +66,9 @@ const OCTOBER: [day: string, title: string, words: number][] = [
   ["13", "Home again", 350],
   ["15", "First light", 433],
   ["16", "Fresh flowers", 401],
-  ["18", "Evening walk", 366],
+  ["18", "Evening walk", 54],
   ["19", "On my way", 512],
-  ["20", "The long way home", 352],
+  ["20", "The long way home", 71],
 ];
 
 const TITLES = [

@@ -7,6 +7,7 @@ import { OUTLINED, Segmented } from "../components/controls";
 import { hourSpan } from "../components/garden/format";
 import { GardenBoard } from "../components/garden/garden-board";
 import { Page } from "../components/page";
+import { dateFormat } from "../lib/format";
 import {
   type GardenRange,
   gardenGrid,
@@ -32,8 +33,8 @@ const FLOWERS_LABEL: Record<GardenRange, string> = {
   year: "flowers this year",
 };
 
-const MONTH = new Intl.DateTimeFormat("en", { month: "long" });
-const MONTH_SHORT = new Intl.DateTimeFormat("en", { month: "short" });
+const MONTH = dateFormat({ month: "long" });
+const MONTH_SHORT = dateFormat({ month: "short" });
 const NUMBER = new Intl.NumberFormat("en");
 const FIRST_DAY = [...MOCK_DAYS.keys()].sort()[0] ?? "2025-01-01";
 

@@ -37,10 +37,16 @@ import type { FileRoutesByTo } from "../route-tree.gen";
 
 type AppPath = keyof FileRoutesByTo;
 
-const NAV: { to: AppPath; label: string; icon: LucideIcon }[] = [
+const NAV: {
+  to: AppPath;
+  label: string;
+  icon: LucideIcon;
+  /** Another screen that belongs under this one, such as a sealed day under Calendar. */
+  also?: AppPath;
+}[] = [
   { icon: House, label: "Home", to: "/" },
   { icon: PenLine, label: "Today", to: "/today" },
-  { icon: Calendar, label: "Calendar", to: "/calendar" },
+  { also: "/day/$key", icon: Calendar, label: "Calendar", to: "/calendar" },
   { icon: Sprout, label: "Garden", to: "/garden" },
 ];
 
@@ -55,13 +61,18 @@ function NavItem({
   to,
   label,
   icon: Icon,
+  also,
 }: {
   to: AppPath;
   label: string;
   icon: LucideIcon;
+  also?: AppPath | undefined;
 }) {
   const matchRoute = useMatchRoute();
-  const isActive = Boolean(matchRoute({ fuzzy: to !== "/", to }));
+  const isActive = Boolean(
+    matchRoute({ fuzzy: to !== "/", to }) ||
+      (also && matchRoute({ fuzzy: true, to: also }))
+  );
 
   return (
     <SidebarMenuItem>

@@ -1,16 +1,24 @@
+import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import type { PageChange } from "@daylily/ui/editor/use-page-editor";
 import { cn } from "@daylily/ui/lib/cn";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { DayHeader } from "../components/day/day-header";
+import { PageMenu } from "../components/day/page-menu";
+import { CountdownPill, SealedPill } from "../components/day/seal-pill";
+import { StatusBar, wordCount } from "../components/day/status-bar";
 import { CoverPicker } from "../components/today/cover-picker";
-import { PageMenu } from "../components/today/page-menu";
 import { PageView } from "../components/today/page-view";
-import { type SaveState, StatusBar } from "../components/today/status-bar";
-import { WritingHeader } from "../components/today/writing-header";
 import type { Cover } from "../lib/covers";
-import { useFocusMode } from "../lib/focus-mode";
+import { useFocusChrome } from "../lib/focus-mode";
+import type { DayKey } from "../lib/month";
 import { useGhostPrompts } from "../lib/preferences";
-import { updateTodayPage, useTodayPage } from "../lib/today-page";
+import {
+  type TodayPage,
+  updateTodayPage,
+  useTodayPage,
+} from "../lib/today-page";
+import { useNotice } from "../lib/use-notice";
 import { useNow } from "../lib/use-now";
 import { useToday } from "../lib/use-today";
 
@@ -18,93 +26,90 @@ export const Route = createFileRoute("/today")({
   component: TodayScreen,
 });
 
-const NOTICE_MS = 2500;
-/** In focus mode the bars come back on a mouse move, then fade after this long. */
-const CHROME_IDLE_MS = 2000;
+/**
+ * Paper's "04c Seal at 4am": the ink settles, the sealed page steps back, then a
+ * new one rises in.
+ */
+type Phase = "writing" | "sealing" | "leaving" | "arriving";
+const SETTLE_MS = 600;
+const LEAVE_MS = 500;
+const ARRIVE_MS = 500;
 
-/** A short message in the status bar, such as after copying. */
-function useNotice() {
-  const [notice, setNotice] = useState<string | null>(null);
-  useEffect(() => {
-    if (notice === null) {
-      return;
-    }
-    const timer = setTimeout(() => setNotice(null), NOTICE_MS);
-    return () => clearTimeout(timer);
-  }, [notice]);
-  return [notice, setNotice] as const;
+function isBlank(page: TodayPage) {
+  return page.words === 0 && page.title.trim() === "" && page.cover === null;
 }
 
 /**
- * Focus mode: the sidebar goes (the shell reads the same flag), the bars fade
- * while you type and return when the mouse moves. Esc leaves it, and so does
- * leaving the screen.
+ * The day on screen, which trails today by the length of the seal when the
+ * boundary passes with the page open. A blank page, or reduced motion, turns over
+ * at once.
  */
-function useFocus() {
-  const [focused, setFocused] = useFocusMode();
-  const [chromeVisible, setChromeVisible] = useState(true);
-
-  useEffect(() => () => setFocused(false), [setFocused]);
+function useSealTransition(today: DayKey) {
+  const [shownDay, setShownDay] = useState(today);
+  const [phase, setPhase] = useState<Phase>("writing");
+  const shownPage = useTodayPage(shownDay);
+  const shownBlank = isBlank(shownPage);
 
   useEffect(() => {
-    if (!focused) {
-      setChromeVisible(true);
+    if (today === shownDay) {
       return;
     }
-    setChromeVisible(false);
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const reveal = () => {
-      setChromeVisible(true);
-      clearTimeout(timer);
-      timer = setTimeout(() => setChromeVisible(false), CHROME_IDLE_MS);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !event.defaultPrevented) {
-        setFocused(false);
-        return;
-      }
-      clearTimeout(timer);
-      setChromeVisible(false);
-    };
-    window.addEventListener("mousemove", reveal);
-    window.addEventListener("keydown", onKeyDown);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || shownBlank) {
+      setShownDay(today);
+      return;
+    }
+    setPhase("sealing");
+    const leave = setTimeout(() => setPhase("leaving"), SETTLE_MS);
+    const arrive = setTimeout(() => {
+      setShownDay(today);
+      setPhase("arriving");
+    }, SETTLE_MS + LEAVE_MS);
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener("mousemove", reveal);
-      window.removeEventListener("keydown", onKeyDown);
+      clearTimeout(leave);
+      clearTimeout(arrive);
     };
-  }, [focused, setFocused]);
+  }, [today, shownDay, shownBlank]);
 
-  return { chromeVisible, focused, setFocused };
+  useEffect(() => {
+    if (phase !== "arriving") {
+      return;
+    }
+    const settled = setTimeout(() => setPhase("writing"), ARRIVE_MS);
+    return () => clearTimeout(settled);
+  }, [phase]);
+
+  return { phase, shownDay, shownPage };
 }
 
 /** Paper's "03 Writing" and its states (03a to 03c): today's page, the only one you can write. */
 function TodayScreen() {
   const today = useToday();
   const now = useNow();
-  const page = useTodayPage(today);
+  const { phase, shownDay, shownPage: page } = useSealTransition(today);
+  const sealed = phase === "sealing" || phase === "leaving";
   const [ghostPrompts, setGhostPrompts] = useGhostPrompts();
-  const { chromeVisible, focused, setFocused } = useFocus();
+  const { chrome, focused, setFocused } = useFocusChrome();
   const [notice, setNotice] = useNotice();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const write = useCallback(
     ({ markdown, words }: PageChange) => {
-      updateTodayPage(today, { markdown, words });
+      updateTodayPage(shownDay, { markdown, words });
     },
-    [today]
+    [shownDay]
   );
   const retitle = useCallback(
     (title: string) => {
-      updateTodayPage(today, { title });
+      updateTodayPage(shownDay, { title });
     },
-    [today]
+    [shownDay]
   );
   const recover = useCallback(
     (cover: Cover | null) => {
-      updateTodayPage(today, { cover });
+      updateTodayPage(shownDay, { cover });
     },
-    [today]
+    [shownDay]
   );
   const openPicker = useCallback(() => setPickerOpen(true), []);
 
@@ -118,51 +123,68 @@ function TodayScreen() {
     setNotice("Today’s page is copied as markdown.");
   }, [page.markdown, page.title, setNotice]);
 
-  const isBlank =
-    page.words === 0 && page.title.trim() === "" && page.cover === null;
-  const save: SaveState = isBlank ? "blank" : "unsaved";
-
-  // The bars stay reachable by hover and keyboard while faded
-  const chrome = cn(
-    "transition-opacity duration-400 ease-soft",
-    !chromeVisible && "opacity-0 focus-within:opacity-100 hover:opacity-100"
-  );
+  const blank = isBlank(page);
+  // Until storage exists, words live only in memory, and the bar says so
+  const label =
+    notice ??
+    (blank
+      ? "Today’s page is saved to your journal from the first word."
+      : "Not saved yet: kept in memory until Daylily writes to your journal.");
 
   return (
     <div className="flex grow flex-col">
-      <WritingHeader
+      <DayHeader
         className={chrome}
-        day={today}
+        day={shownDay}
         focused={focused}
         menu={
           <PageMenu
-            ghostPrompts={ghostPrompts}
+            ghostPrompts={{ on: ghostPrompts, onChange: setGhostPrompts }}
             onCopy={copy}
-            onGhostPromptsChange={setGhostPrompts}
           />
         }
-        now={now}
         onFocusChange={setFocused}
+        seal={
+          sealed ? (
+            <SealedPill label="Sealed just now" />
+          ) : (
+            <CountdownPill now={now} />
+          )
+        }
       />
       <div className="flex grow justify-center px-8 pt-3 pb-16">
-        <article className="flex w-full max-w-170 flex-col">
+        <article
+          className={cn(
+            "flex w-full max-w-170 flex-col transition-[opacity,translate] duration-500 ease-soft",
+            phase === "leaving" && "-translate-y-2.5 opacity-0",
+            phase === "arriving" && "motion-safe:animate-rise-in"
+          )}
+        >
           <PageView
             ghostPrompts={ghostPrompts}
-            key={today}
+            key={shownDay}
             onChooseCover={openPicker}
             onTitle={retitle}
             onWrite={write}
             page={page}
+            sealed={sealed}
           />
         </article>
       </div>
       <StatusBar
         className={chrome}
-        ghostPrompts={ghostPrompts}
-        notice={notice}
-        save={save}
-        words={page.words}
-      />
+        dot={blank ? "bg-ink-ghost" : "bg-saffron"}
+        label={label}
+      >
+        <span className="flex items-center gap-1.5">
+          <DaylilyMark
+            className={ghostPrompts ? "text-daylily/50" : "text-ink-ghost"}
+            size={12}
+          />
+          Ghost prompts {ghostPrompts ? "on" : "off"}
+        </span>
+        <span>{wordCount(page.words)}</span>
+      </StatusBar>
       <CoverPicker
         cover={page.cover}
         onChange={recover}

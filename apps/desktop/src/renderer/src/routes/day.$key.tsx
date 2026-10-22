@@ -1,0 +1,95 @@
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useCallback } from "react";
+import { DayArrows } from "../components/day/day-arrows";
+import { DayHeader } from "../components/day/day-header";
+import { PageMenu } from "../components/day/page-menu";
+import { RestedPage } from "../components/day/rested-page";
+import { SealedPill } from "../components/day/seal-pill";
+import { SealedPage } from "../components/day/sealed-page";
+import { StatusBar, wordCount } from "../components/day/status-bar";
+import {
+  journalPath,
+  sealedLabel,
+  useNeighbours,
+  usePastDay,
+} from "../lib/days";
+import { useFocusChrome } from "../lib/focus-mode";
+import { dayKey, fromKey, todayKey } from "../lib/month";
+import { useNotice } from "../lib/use-notice";
+import { useToday } from "../lib/use-today";
+
+const KEY_SHAPE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A real calendar date: `2026-02-30` reads back as March, so it isn't one. */
+function isDayKey(key: string) {
+  return KEY_SHAPE.test(key) && dayKey(fromKey(key)) === key;
+}
+
+export const Route = createFileRoute("/day/$key")({
+  // Only past days are sealed; today and anything ahead belong to the writing page
+  beforeLoad: ({ params }) => {
+    if (!isDayKey(params.key) || params.key >= todayKey(new Date())) {
+      throw redirect({ to: "/today" });
+    }
+  },
+  component: SealedDayScreen,
+});
+
+/** Paper's "04a Sealed day" and "04b Rested day": a past day, read-only. */
+function SealedDayScreen() {
+  const { key } = Route.useParams();
+  const today = useToday();
+  const day = usePastDay(key);
+  const { previous, next } = useNeighbours(key, today);
+  const { chrome, focused, setFocused } = useFocusChrome();
+  const [notice, setNotice] = useNotice();
+
+  const markdown = day.kind === "written" ? day.markdown : "";
+  const title = day.kind === "written" ? day.title.trim() : "";
+  const copy = useCallback(async () => {
+    const text = [title && `# ${title}`, markdown]
+      .filter(Boolean)
+      .join("\n\n")
+      .trim();
+    await navigator.clipboard.writeText(text);
+    setNotice("The page is copied as markdown.");
+  }, [markdown, setNotice, title]);
+
+  let label = "A rested day · nothing in your journal for it";
+  if (day.kind === "written") {
+    label =
+      day.source === "journal"
+        ? `Read-only · ${journalPath(key)}`
+        : "Read-only · kept in memory until Daylily writes to your journal";
+  }
+
+  return (
+    <div className="flex grow flex-col">
+      <DayHeader
+        className={chrome}
+        day={key}
+        focused={focused}
+        leading={<DayArrows next={next} previous={previous} />}
+        menu={day.kind === "written" ? <PageMenu onCopy={copy} /> : null}
+        onFocusChange={setFocused}
+        seal={
+          day.kind === "written" ? (
+            <SealedPill label={sealedLabel(key, today)} />
+          ) : null
+        }
+      />
+      <div className="flex grow justify-center px-8 pt-3 pb-16">
+        <article className="flex w-full max-w-170 flex-col">
+          {day.kind === "written" ? (
+            <SealedPage day={key} key={key} page={day} />
+          ) : (
+            <RestedPage day={key} />
+          )}
+        </article>
+      </div>
+      <StatusBar className={chrome} dot="bg-ink-ghost" label={notice ?? label}>
+        {day.kind === "written" ? <span>{wordCount(day.words)}</span> : null}
+      </StatusBar>
+    </div>
+  );
+}

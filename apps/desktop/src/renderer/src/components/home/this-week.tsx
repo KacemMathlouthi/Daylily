@@ -1,10 +1,11 @@
 import { cn } from "@daylily/ui/lib/cn";
 import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
+import { dateFormat } from "../../lib/format";
 import { type DayKey, fromKey } from "../../lib/month";
 import type { MockDay } from "../../mock/journal";
 
-const WEEKDAY = new Intl.DateTimeFormat("en", { weekday: "short" });
+const WEEKDAY = dateFormat({ weekday: "short" });
 
 /** The six days before today and today's open page, as small covers. */
 export function ThisWeek({
@@ -33,10 +34,15 @@ export function ThisWeek({
           const date = fromKey(key);
           const label = `${WEEKDAY.format(date)} ${date.getDate()}`;
           return (
-            <div className="flex min-w-0 flex-col gap-1.5" key={key}>
+            <Link
+              className="group flex min-w-0 flex-col gap-1.5"
+              key={key}
+              params={{ key }}
+              to="/day/$key"
+            >
               <div
                 className={cn(
-                  "flex aspect-19/12 items-center justify-center overflow-hidden rounded-md",
+                  "flex aspect-19/12 items-center justify-center overflow-hidden rounded-md transition-[filter] duration-200 group-hover:brightness-105",
                   !entry && "bg-paper-tint"
                 )}
               >
@@ -60,7 +66,7 @@ export function ThisWeek({
               >
                 {entry ? label : `${label} · resting`}
               </span>
-            </div>
+            </Link>
           );
         })}
         <Link className="group flex min-w-0 flex-col gap-1.5" to="/today">

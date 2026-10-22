@@ -1,26 +1,29 @@
 import { cn } from "@daylily/ui/lib/cn";
 import { Maximize, Minimize } from "lucide-react";
 import { type ReactNode, useCallback } from "react";
+import { dateFormat } from "../../lib/format";
 import { fromKey } from "../../lib/month";
-import { SealCountdown } from "../seal-countdown";
 import { TOOL_BUTTON } from "./tool-button";
 
-const MONTH = new Intl.DateTimeFormat("en", { month: "long" });
+const MONTH = dateFormat({ month: "long" });
 
 /**
- * The writing screen's top bar (Paper: "03 Writing"): where the page sits in the
- * journal, when it seals, focus mode and the page menu.
+ * A day's top bar (Paper: "03 Writing", "04a Sealed day"): where the page sits in
+ * the journal, its seal, focus mode and the page menu. `leading` holds the sealed
+ * day's arrows.
  */
-export function WritingHeader({
+export function DayHeader({
   day,
-  now,
+  leading,
+  seal,
   focused,
   onFocusChange,
   menu,
   className,
 }: {
   day: string;
-  now: Date;
+  leading?: ReactNode;
+  seal?: ReactNode;
   focused: boolean;
   onFocusChange: (focused: boolean) => void;
   menu: ReactNode;
@@ -42,22 +45,26 @@ export function WritingHeader({
         className
       )}
     >
-      <nav
-        aria-label="Today’s place in the journal"
-        className="flex items-center gap-1.5 text-caption"
-      >
-        <span className="text-ink-subtle">{date.getFullYear()}</span>
-        <span className="text-ink-ghost">/</span>
-        <span className="text-ink-subtle">{MONTH.format(date)}</span>
-        <span className="text-ink-ghost">/</span>
-        <span aria-current="page" className="font-medium text-ink">
-          {date.getDate()}
-        </span>
-      </nav>
+      <div className="flex items-center gap-2.5">
+        {/* Clickable through macOS's draggable header, like the controls on the right */}
+        {leading ? (
+          <div className="[-webkit-app-region:no-drag]">{leading}</div>
+        ) : null}
+        <nav
+          aria-label="The page’s place in the journal"
+          className="flex items-center gap-1.5 text-caption"
+        >
+          <span className="text-ink-subtle">{date.getFullYear()}</span>
+          <span className="text-ink-ghost">/</span>
+          <span className="text-ink-subtle">{MONTH.format(date)}</span>
+          <span className="text-ink-ghost">/</span>
+          <span aria-current="page" className="font-medium text-ink">
+            {date.getDate()}
+          </span>
+        </nav>
+      </div>
       <div className="flex items-center gap-1.5 [-webkit-app-region:no-drag]">
-        <span className="flex h-7 items-center rounded-full border border-daylily-wash-line bg-daylily-wash px-2.5 text-xs">
-          <SealCountdown now={now} />
-        </span>
+        {seal}
         <button
           aria-label={focused ? "Leave focus mode" : "Focus mode"}
           aria-pressed={focused}
