@@ -15,6 +15,7 @@
   --color-paper-sunk: var(--paper-sunk);
   --color-paper-tint: var(--paper-tint);
   --color-paper-press: var(--paper-press);
+  --color-line-strong: var(--line-strong);
   --color-line: var(--line);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
@@ -26,11 +27,22 @@
   --color-ghost: var(--ghost);
   --color-daylily: var(--daylily);
   --color-daylily-deep: var(--daylily-deep);
+  --color-daylily-ink: var(--daylily-ink);
+  --color-daylily-wash: var(--daylily-wash);
+  --color-daylily-wash-line: var(--daylily-wash-line);
   --color-saffron: var(--saffron);
   --color-petal: var(--petal);
   --color-moss: var(--moss);
   --color-cornflower: var(--cornflower);
   --color-soil: var(--soil);
+  --color-soil-soft: var(--soil-soft);
+  --color-saffron-soft: var(--saffron-soft);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-2: var(--on-ink-2);
+  --color-on-ink-muted: var(--on-ink-muted);
+  --color-traffic-close: var(--traffic-close);
+  --color-traffic-minimize: var(--traffic-minimize);
+  --color-traffic-zoom: var(--traffic-zoom);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
