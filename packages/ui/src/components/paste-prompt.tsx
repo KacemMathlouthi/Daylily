@@ -38,14 +38,20 @@ export function PastePrompt({
   }, [editor, onDone]);
 
   const apply = useCallback(() => {
-    editor
-      .chain()
-      .focus()
-      .insertContentAt({ from: paste.from, to: paste.to }, paste.markdown, {
-        contentType: "markdown",
-      })
-      .run();
-    onDone();
+    try {
+      editor
+        .chain()
+        .focus()
+        .insertContentAt({ from: paste.from, to: paste.to }, paste.markdown, {
+          contentType: "markdown",
+        })
+        .run();
+    } catch (error) {
+      // The pasted text stays exactly as it was; formatting is only ever an offer
+      console.error("Could not format the pasted markdown", error);
+    } finally {
+      onDone();
+    }
   }, [editor, onDone, paste]);
 
   const keep = useCallback(() => {
