@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { LaunchScreen } from "./components/launch/launch-screen";
 import { routeTree } from "./route-tree.gen";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,8 @@ if (root) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        {/* Over the app, which renders underneath so it's ready when the screen fades */}
+        <LaunchScreen />
       </QueryClientProvider>
     </StrictMode>
   );

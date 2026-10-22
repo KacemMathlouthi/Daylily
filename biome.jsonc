@@ -34,6 +34,11 @@
           }
         }
       }
+    },
+    {
+      // The desktop app is not a Next.js app, so there is no next/image to prefer
+      "includes": ["apps/desktop/**"],
+      "linter": { "rules": { "performance": { "noImgElement": "off" } } }
     }
   ]
 }

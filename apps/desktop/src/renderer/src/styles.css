@@ -23,3 +23,13 @@ body,
 body {
   overflow: hidden;
 }
+
+/* The launch screen's soft light behind the words, so they read over the meadow */
+@utility bg-launch-veil {
+  background-image: radial-gradient(
+    ellipse 42% 54% at 50% 47% in oklab,
+    color-mix(in oklab, var(--paper-raised) 92%, transparent) 0%,
+    color-mix(in oklab, var(--paper-raised) 55%, transparent) 58%,
+    transparent 100%
+  );
+}
