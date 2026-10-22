@@ -11,9 +11,9 @@ import {
 import { CHANNELS } from "../shared/channels";
 import {
   appInfoSchema,
-  captureRectSchema,
   imageNameSchema,
   pickedImageSchema,
+  pngSchema,
 } from "../shared/schemas";
 
 /** Only answer requests that come from our own renderer, never from other frames. */
@@ -102,20 +102,13 @@ export function registerIpc() {
     });
   });
 
-  handle(CHANNELS.saveGardenImage, async (event, rawRect, rawName) => {
-    const rect = captureRectSchema.parse(rawRect);
+  handle(CHANNELS.saveGardenImage, async (event, rawPng, rawName) => {
+    const png = pngSchema.parse(rawPng);
     const name = imageNameSchema.parse(rawName);
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) {
       return false;
     }
-
-    const image = await event.sender.capturePage({
-      height: Math.round(rect.height),
-      width: Math.round(rect.width),
-      x: Math.round(rect.x),
-      y: Math.round(rect.y),
-    });
     const { canceled, filePath } = await dialog.showSaveDialog(window, {
       defaultPath: join(app.getPath("pictures"), `${name}.png`),
       filters: [{ extensions: ["png"], name: "PNG image" }],
@@ -123,7 +116,7 @@ export function registerIpc() {
     if (canceled || !filePath) {
       return false;
     }
-    await writeFile(filePath, image.toPNG());
+    await writeFile(filePath, png);
     return true;
   });
 }

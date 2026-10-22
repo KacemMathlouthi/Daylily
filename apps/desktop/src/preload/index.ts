@@ -10,8 +10,8 @@ const api: DaylilyApi = {
     pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
   },
   garden: {
-    saveImage: (rect, name) =>
-      ipcRenderer.invoke(CHANNELS.saveGardenImage, rect, name),
+    saveImage: (png, name) =>
+      ipcRenderer.invoke(CHANNELS.saveGardenImage, png, name),
   },
   platform: process.platform,
 };

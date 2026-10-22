@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { AppInfo, CaptureRect, PickedImage } from "./channels";
+import type { AppInfo, PickedImage } from "./channels";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
 export const appInfoSchema = z.object({
@@ -8,15 +8,18 @@ export const appInfoSchema = z.object({
   version: z.string(),
 }) satisfies z.ZodType<AppInfo>;
 
-const pixels = z.number().finite().min(0).max(20_000);
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+/** A share card is a few megabytes at most; anything far larger isn't one. */
+const MAX_PNG_BYTES = 40 * 1024 * 1024;
 
 /** Checked in the main process: the renderer is never trusted with what it sends. */
-export const captureRectSchema = z.object({
-  height: pixels.positive(),
-  width: pixels.positive(),
-  x: pixels,
-  y: pixels,
-}) satisfies z.ZodType<CaptureRect>;
+export const pngSchema = z
+  .instanceof(Uint8Array)
+  .refine((bytes) => bytes.byteLength <= MAX_PNG_BYTES, "Image too large")
+  .refine(
+    (bytes) => PNG_SIGNATURE.every((byte, index) => bytes[index] === byte),
+    "Not a PNG"
+  );
 
 /** The suggested file name, without a path: letters, digits, spaces and a few marks. */
 export const imageNameSchema = z

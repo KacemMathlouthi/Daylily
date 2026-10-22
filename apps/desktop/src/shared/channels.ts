@@ -16,14 +16,6 @@ export interface AppInfo {
   version: string;
 }
 
-/** A region of the window in CSS pixels, as getBoundingClientRect reports it. */
-export interface CaptureRect {
-  height: number;
-  width: number;
-  x: number;
-  y: number;
-}
-
 /** An image chosen from the computer, held in memory until days are saved as files. */
 export interface PickedImage {
   /** The image itself, as a data: URL the page can show. */
@@ -42,8 +34,8 @@ export interface DaylilyApi {
     pick: () => Promise<PickedImage | null>;
   };
   garden: {
-    /** Asks where to save, then writes that region of the window as a PNG. False if cancelled. */
-    saveImage: (rect: CaptureRect, name: string) => Promise<boolean>;
+    /** Asks where to save, then writes the garden's share card. False if cancelled. */
+    saveImage: (png: Uint8Array, name: string) => Promise<boolean>;
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;
