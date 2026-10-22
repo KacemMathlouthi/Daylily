@@ -1,8 +1,12 @@
 import { SidebarInset, SidebarProvider } from "@daylily/ui/primitives/sidebar";
 import { TooltipProvider } from "@daylily/ui/primitives/tooltip";
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
-import { type CSSProperties, useCallback, useState } from "react";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useNavigate,
+} from "@tanstack/react-router";
+import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
@@ -31,8 +35,24 @@ function useSidebarOpen() {
   return [open, change] as const;
 }
 
+/** ⌘N / Ctrl+N opens today's page from anywhere, as Home's button promises. */
+function useNewPageShortcut() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "n" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        navigate({ to: "/today" });
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [navigate]);
+}
+
 function AppShell() {
   const [open, setOpen] = useSidebarOpen();
+  useNewPageShortcut();
 
   return (
     <TooltipProvider>
@@ -43,14 +63,15 @@ function AppShell() {
         style={SIDEBAR_SIZE}
       >
         <AppSidebar />
-        <SidebarInset className="min-w-0 overflow-y-auto bg-paper-page">
+        <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
           {/*
-           * macOS hides the title bar, so this strip drags the window there. Elsewhere the
-           * window has its own frame, and drag regions would swallow the cursor styles.
+           * macOS hides the title bar, so this strip drags the window there. It overlays the
+           * page, which keeps its own top space. Elsewhere the window has its own frame, and
+           * drag regions would swallow the cursor styles.
            */}
-          <div
-            className={`h-12 shrink-0 ${window.daylily.platform === "darwin" ? "[-webkit-app-region:drag]" : ""}`}
-          />
+          {window.daylily.platform === "darwin" ? (
+            <div className="absolute inset-x-0 top-0 z-10 h-12 [-webkit-app-region:drag]" />
+          ) : null}
           <Outlet />
         </SidebarInset>
       </SidebarProvider>
