@@ -1,5 +1,7 @@
 import { type AnyExtension, Extension } from "@tiptap/core";
+import { Code } from "@tiptap/extension-code";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
+import { TableKit } from "@tiptap/extension-table";
 import { Placeholder } from "@tiptap/extensions";
 import { Markdown } from "@tiptap/markdown";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -35,6 +37,12 @@ export interface PageExtensionsOptions {
   placeholder?: string;
 }
 
+/**
+ * Inline code that sits inside bold or italic, as markdown allows (**`like
+ * this`**). Tiptap's own excludes every other mark, which rejects such pages.
+ */
+const InlineCode = Code.extend({ excludes: "" });
+
 /** Links that are safe to hand to the system browser. */
 const SAFE_LINK = /^(https?:\/\/|mailto:)/i;
 
@@ -50,7 +58,8 @@ export function pageExtensions({
 }: PageExtensionsOptions = {}): AnyExtension[] {
   const extensions: AnyExtension[] = [
     StarterKit.configure({
-      // Replaced by the highlighted one below
+      // Both replaced below: code that can be bold, and a highlighted code block
+      code: false,
       codeBlock: false,
       heading: { levels: [2, 3] },
       // Clicks open in the system browser: the app's window handler sends them there
@@ -62,7 +71,9 @@ export function pageExtensions({
       // Not markdown, so it wouldn't survive the file
       underline: false,
     }),
+    InlineCode,
     CodeBlock,
+    TableKit.configure({ table: { resizable: false } }),
     TaskList,
     TaskItem.configure({ nested: true }),
     Markdown,
