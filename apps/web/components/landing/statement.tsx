@@ -4,6 +4,7 @@ import { cn } from "cn";
 import {
   type MotionValue,
   motion,
+  useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
@@ -89,6 +90,10 @@ function Word({
   const start = index / LOUD_WORD_COUNT;
   const end = (index + 1) / LOUD_WORD_COUNT;
   const opacity = useTransform(progress, [start, end], [0.18, 1]);
+  const reduceMotion = useReducedMotion();
+  if (reduceMotion) {
+    return <span>{children}</span>;
+  }
   return <motion.span style={{ opacity }}>{children}</motion.span>;
 }
 

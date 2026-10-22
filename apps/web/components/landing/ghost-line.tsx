@@ -69,7 +69,7 @@ export function GhostLine({ text, prompt }: GhostLineProps) {
         <span aria-hidden="true">{text.slice(0, typed)}</span>
         <span
           aria-hidden="true"
-          className="ml-0.5 inline-block h-[1.15em] w-[1.5px] translate-y-[0.2em] animate-caret bg-daylily"
+          className="ml-0.5 inline-block h-[1.15em] w-[1.5px] translate-y-[0.2em] animate-caret bg-daylily motion-reduce:animate-none"
         />
         <AnimatePresence>
           {paused ? (
@@ -77,7 +77,7 @@ export function GhostLine({ text, prompt }: GhostLineProps) {
               animate={{ opacity: 1, x: 0 }}
               className="pl-2 text-ghost italic"
               initial={{ opacity: 0, x: -4 }}
-              transition={{ duration: 1.2, ease: EASE_SOFT }}
+              transition={{ duration: reduceMotion ? 0 : 1.2, ease: EASE_SOFT }}
             >
               {prompt}
             </motion.span>
