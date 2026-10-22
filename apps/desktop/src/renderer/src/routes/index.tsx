@@ -99,6 +99,7 @@ function HomeScreen() {
         <Link
           aria-label="Reminders"
           className="light flex size-7.5 items-center justify-center rounded-md bg-paper-page/60 text-ink-soft backdrop-blur-md transition-colors hover:bg-paper-page/85 hover:text-ink"
+          search={{ section: "reminders" }}
           to="/settings"
         >
           <Bell className="size-3.75" strokeWidth={1.9} />

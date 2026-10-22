@@ -29,6 +29,9 @@ importers:
 
   apps/desktop:
     devDependencies:
+      '@base-ui/react':
+        specifier: 1.9.0
+        version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@daylily/ui':
         specifier: workspace:*
         version: link:../../packages/ui
