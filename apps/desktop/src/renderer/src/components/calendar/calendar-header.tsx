@@ -1,16 +1,15 @@
 import { Button } from "@daylily/ui/primitives/button";
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@daylily/ui/primitives/toggle-group";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { OUTLINED, Segmented } from "../controls";
 
 const MONTH_NAME = new Intl.DateTimeFormat("en", { month: "long" });
 const NUMBER = new Intl.NumberFormat("en");
 
-/** Paper's outlined 30px controls beside the month. */
-const CONTROL =
-  "h-7.5 rounded-md border-line text-ink-muted hover:bg-paper-tint hover:text-ink";
+const VIEWS = [
+  { label: "Month", value: "month" },
+  // The year view comes once it's designed
+  { disabled: true, label: "Year", value: "year" },
+] as const;
 
 export interface MonthStats {
   resting: number;
@@ -54,30 +53,10 @@ export function CalendarHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        <ToggleGroup
-          aria-label="Calendar view"
-          className="rounded-tile bg-paper-tint p-0.75"
-          spacing={0}
-          value={["month"]}
-        >
-          <ToggleGroupItem
-            className="h-auto rounded-row! border-0 px-3 py-1.25 font-medium text-caption text-ink-subtle hover:bg-transparent hover:text-ink data-pressed:bg-paper-page data-pressed:text-ink data-pressed:shadow-hairline dark:data-pressed:bg-paper-press"
-            value="month"
-          >
-            Month
-          </ToggleGroupItem>
-          {/* The year view comes once it's designed */}
-          <ToggleGroupItem
-            className="h-auto rounded-row! border-0 px-3 py-1.25 font-medium text-caption text-ink-subtle"
-            disabled
-            value="year"
-          >
-            Year
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <Segmented label="Calendar view" options={VIEWS} value="month" />
         <Button
           aria-label="Previous month"
-          className={`${CONTROL} w-7.5`}
+          className={`${OUTLINED} w-7.5`}
           onClick={onPrevious}
           size="icon"
           variant="ghost"
@@ -85,7 +64,7 @@ export function CalendarHeader({
           <ChevronLeft className="size-3.5" strokeWidth={2} />
         </Button>
         <Button
-          className={`${CONTROL} px-3 font-medium text-caption text-ink`}
+          className={`${OUTLINED} px-3 font-medium text-caption text-ink`}
           onClick={onToday}
           variant="ghost"
         >
@@ -93,7 +72,7 @@ export function CalendarHeader({
         </Button>
         <Button
           aria-label="Next month"
-          className={`${CONTROL} w-7.5`}
+          className={`${OUTLINED} w-7.5`}
           onClick={onNext}
           size="icon"
           variant="ghost"

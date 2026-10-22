@@ -1,4 +1,8 @@
-import type { FlowerColor, GardenDay } from "@daylily/ui/components/garden";
+import {
+  type FlowerColor,
+  type GardenDay,
+  isFlower,
+} from "@daylily/ui/components/garden";
 
 const TODAY = new Date(2026, 9, 20);
 const DAYS_IN_YEAR_VIEW = 52 * 7;
@@ -61,7 +65,7 @@ export function gardenFor(view: GardenView) {
   const start = new Date(TODAY);
   start.setDate(TODAY.getDate() - length + 1);
 
-  const flowers = days.filter((day) => day !== null);
+  const flowers = days.filter(isFlower);
   return {
     days,
     flowers: flowers.length,

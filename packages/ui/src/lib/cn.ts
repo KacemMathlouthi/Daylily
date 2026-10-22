@@ -58,6 +58,7 @@ export const cn = createCn({
         "tag-xs",
         "title",
         "title-2xs",
+        "title-md",
         "title-sm",
         "title-xs",
         "ui",

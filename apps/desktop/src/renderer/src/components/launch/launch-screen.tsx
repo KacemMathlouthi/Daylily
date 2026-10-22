@@ -4,7 +4,7 @@ import { Progress } from "@daylily/ui/primitives/progress";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import dusk from "../../assets/dusk.jpg";
-import { greetingFor } from "./greeting";
+import { greetingFor } from "../../lib/greeting";
 import { randomQuote } from "./quotes";
 import { useMockLoading } from "./use-mock-loading";
 

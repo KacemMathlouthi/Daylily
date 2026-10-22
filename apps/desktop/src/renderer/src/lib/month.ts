@@ -8,12 +8,18 @@ export interface CalendarDay {
 }
 
 /** A day runs 04:00 to 04:00, so writing at 1am still belongs to the day being lived. */
-export const DAY_STARTS_AT_HOUR = 4;
+const DAY_STARTS_AT_HOUR = 4;
 
-function dayKey(date: Date): DayKey {
+export function dayKey(date: Date): DayKey {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${date.getFullYear()}-${month}-${day}`;
+}
+
+/** The local date a key names, at midnight. */
+export function fromKey(key: DayKey): Date {
+  const [year = 0, month = 1, day = 1] = key.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /** Today's key under the 4am boundary. */
@@ -48,4 +54,14 @@ export function monthWeeks(year: number, month: number): CalendarDay[][] {
   } while (cursor.getMonth() === month);
 
   return weeks;
+}
+
+/** Milliseconds from `now` until the next 4am boundary, when today seals. */
+export function msUntilNextBoundary(now: Date) {
+  const next = new Date(now);
+  next.setHours(DAY_STARTS_AT_HOUR, 0, 0, 0);
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+  return next.getTime() - now.getTime();
 }
