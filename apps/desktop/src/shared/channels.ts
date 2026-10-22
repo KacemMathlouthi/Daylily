@@ -5,6 +5,7 @@
  */
 export const CHANNELS = {
   appInfo: "app:info",
+  appReady: "app:ready",
   pickCover: "cover:pick",
   saveGardenImage: "garden:save-image",
 } as const;
@@ -28,6 +29,8 @@ export interface PickedImage {
 export interface DaylilyApi {
   app: {
     info: () => Promise<AppInfo>;
+    /** Tells the main process the app has painted, so the splash can hand over. */
+    ready: () => void;
   };
   cover: {
     /** Opens the system's file picker for one image. Null if cancelled. */

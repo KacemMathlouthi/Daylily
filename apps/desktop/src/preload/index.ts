@@ -5,6 +5,7 @@ import { CHANNELS, type DaylilyApi } from "../shared/channels";
 const api: DaylilyApi = {
   app: {
     info: () => ipcRenderer.invoke(CHANNELS.appInfo),
+    ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
   cover: {
     pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
