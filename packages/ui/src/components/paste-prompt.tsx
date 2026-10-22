@@ -9,6 +9,7 @@ const OFFER_MS = 10_000;
 /**
  * Paper's "03d" paste prompt: after markdown is pasted as plain text, a small
  * bar offers to apply its formatting. Typing on, Esc, or waiting keeps it as text.
+ * Key it by paste, so a second paste gets its full time.
  */
 export function PastePrompt({
   editor,

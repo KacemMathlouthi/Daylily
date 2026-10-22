@@ -105,7 +105,13 @@ export function PageView({
       </div>
       {paste && promptSlot
         ? createPortal(
-            <PastePrompt editor={editor} onDone={donePasting} paste={paste} />,
+            <PastePrompt
+              editor={editor}
+              // A new paste is a new offer, with its own ten seconds
+              key={`${paste.from}:${paste.to}:${paste.markdown.length}`}
+              onDone={donePasting}
+              paste={paste}
+            />,
             promptSlot
           )
         : null}
