@@ -31,16 +31,16 @@ function Card({
       <div className="flex max-w-105 flex-col gap-2">
         <h3
           className={cn(
-            "font-display text-[30px] leading-9.5 tracking-[-0.015em] md:text-[34px]",
-            dark ? "text-paper-raised" : "text-ink"
+            "font-display text-title-sm leading-9.5 tracking-title md:text-title",
+            dark ? "text-on-ink" : "text-ink"
           )}
         >
           {title}
         </h3>
         <p
           className={cn(
-            "text-[15px] leading-5.75",
-            dark ? "text-[#b5a493]" : "text-ink-muted"
+            "text-body-sm leading-5.75",
+            dark ? "text-on-ink-muted" : "text-ink-muted"
           )}
         >
           {body}
@@ -55,16 +55,16 @@ function GhostCard() {
   return (
     <Card
       body="Pause, and a quiet question fades in where your cursor rests. You can’t accept it or tab it in. It vanishes the moment you type."
-      className="bg-[radial-gradient(ellipse_70%_80%_at_85%_100%,#f9d9b6_0%,transparent_70%),radial-gradient(ellipse_50%_60%_at_10%_110%,#f6e3e8_0%,transparent_70%)]"
+      className="bg-ghost-glow"
       title="Ghost prompts"
     >
       <div className="absolute top-9 right-9 hidden items-center gap-1.5 rounded-lg border border-white/90 bg-white/70 px-2.5 py-1.5 text-ink-subtle text-xs backdrop-blur-md md:flex">
-        <kbd className="rounded-sm border border-[#dccfbf] px-1.5 py-px font-sans font-semibold text-[11px]">
+        <kbd className="rounded-sm border border-line-strong px-1.5 py-px font-sans font-semibold text-tag">
           Tab
         </kbd>
         does nothing, on purpose
       </div>
-      <Reveal className="flex max-w-150 flex-col gap-2.5 rounded-2xl border border-ink/6 bg-paper-page px-6 py-6.5 font-writing text-[17px] text-ink-2 leading-7.75 shadow-[0_1px_2px_#241b150a,0_18px_40px_#78461e1a] md:px-7.5 md:text-[19px]">
+      <Reveal className="flex max-w-150 flex-col gap-2.5 rounded-2xl border border-ink/6 bg-paper-page px-6 py-6.5 font-writing text-body text-ink-2 leading-7.75 shadow-card-lift md:px-7.5 md:text-lead">
         <p>
           Work was loud again. I kept my head down and finished the report, but
           by four I could feel it in my shoulders.
@@ -94,7 +94,7 @@ function AiCard() {
   return (
     <Card
       body="Turn features on one at a time, with your own key or a local model. It can ask and answer. It never writes."
-      className="bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,#dce7ee_0%,transparent_70%)] lg:min-h-125"
+      className="bg-mist-glow lg:min-h-125"
       title="AI is off until you say so"
     >
       <Reveal>
@@ -132,8 +132,8 @@ export function Features() {
       id="features"
     >
       <Reveal className="flex flex-col items-center gap-3.5 text-center">
-        <p className="font-medium text-[13px] text-daylily">How it works</p>
-        <h2 className="font-display text-[44px] text-ink leading-[1.03] tracking-[-0.025em] md:text-[64px]">
+        <p className="font-medium text-daylily text-ui">How it works</p>
+        <h2 className="font-display text-display-sm text-ink leading-heading tracking-heading md:text-display-lg">
           Made like a paper journal.
         </h2>
       </Reveal>

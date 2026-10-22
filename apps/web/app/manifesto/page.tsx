@@ -49,8 +49,8 @@ const NEVER = [
 function Masthead() {
   return (
     <Reveal className="flex flex-col items-center gap-7 px-5 pt-16 pb-18 text-center md:px-30 md:pt-30">
-      <p className="font-medium text-[13px] text-daylily">Manifesto</p>
-      <h1 className="font-display text-[clamp(48px,7.2vw,104px)] text-ink leading-[0.96] tracking-[-0.035em]">
+      <p className="font-medium text-daylily text-ui">Manifesto</p>
+      <h1 className="font-display text-fluid-page text-ink leading-display tracking-display-tight">
         Most journals want to write for you.
         <br />
         <em>We would rather listen.</em>
@@ -65,11 +65,11 @@ function Masthead() {
 function Lede() {
   return (
     <Reveal className="mx-auto flex max-w-170 flex-col gap-6 px-5 pb-24 font-writing">
-      <p className="text-[21px] text-ink-2 leading-9 md:text-2xl md:leading-9.5">
+      <p className="text-ink-2 text-lede leading-9 md:text-2xl md:leading-9.5">
         Most journaling apps are trying to write your journal for you, through
         AI summaries, chat-to-entry and auto-titles. Daylily goes the other way.
       </p>
-      <p className="text-[19px] text-ink-soft leading-8 md:text-xl md:leading-8.5">
+      <p className="text-ink-soft text-lead leading-8 md:text-xl md:leading-8.5">
         Its whole job is to get you to sit down every day and say what happened
         and how it felt, in your own words. Broken grammar, typos and unfinished
         thoughts all count, because they are true.
@@ -84,14 +84,12 @@ function Beliefs() {
       <div className="mx-auto flex max-w-300 flex-col gap-14">
         <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="flex flex-col gap-3.5">
-            <p className="font-medium text-[13px] text-daylily">
-              What we believe
-            </p>
-            <h2 className="font-display text-[48px] text-ink leading-[1.03] tracking-[-0.025em] md:text-[64px]">
+            <p className="font-medium text-daylily text-ui">What we believe</p>
+            <h2 className="font-display text-5xl text-ink leading-heading tracking-heading md:text-display-lg">
               Six promises, kept.
             </h2>
           </div>
-          <p className="max-w-105 text-[17px] text-ink-muted leading-7">
+          <p className="max-w-105 text-body text-ink-muted leading-7">
             Everything in Daylily comes back to these. When a feature would
             break one of them, the feature loses.
           </p>
@@ -100,11 +98,11 @@ function Beliefs() {
           {BELIEFS.map((belief, index) => (
             <li className="border-line border-t pt-7" key={belief.title}>
               <Reveal className="flex gap-7" delay={(index % 2) * 0.08}>
-                <span className="w-14 shrink-0 font-display text-[44px] text-daylily leading-11">
+                <span className="w-14 shrink-0 font-display text-daylily text-display-sm leading-11">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div className="flex flex-col gap-2.5">
-                  <h3 className="font-display text-[30px] text-ink leading-9.5 tracking-[-0.015em] md:text-[34px]">
+                  <h3 className="font-display text-ink text-title-sm leading-9.5 tracking-title md:text-title">
                     {belief.title}
                   </h3>
                   <p className="text-base text-ink-muted leading-6.5">
@@ -123,12 +121,12 @@ function Beliefs() {
 function Never() {
   return (
     <section className="px-4 md:px-16">
-      <Reveal className="mx-auto flex max-w-328 flex-col gap-10 rounded-[28px] bg-ink px-6 py-12 md:px-20 md:py-18 lg:flex-row lg:gap-20">
+      <Reveal className="mx-auto flex max-w-328 flex-col gap-10 rounded-card-lg bg-ink px-6 py-12 md:px-20 md:py-18 lg:flex-row lg:gap-20">
         <div className="flex flex-col gap-3.5 lg:w-90 lg:shrink-0">
-          <p className="font-medium text-[13px] text-saffron">
+          <p className="font-medium text-saffron text-ui">
             What we will never do
           </p>
-          <h2 className="font-display text-[44px] text-paper-raised leading-[1.04] tracking-[-0.025em] md:text-[56px]">
+          <h2 className="font-display text-display-sm text-on-ink leading-heading-loose tracking-heading md:text-display">
             Some lines stay uncrossed.
           </h2>
         </div>
@@ -139,7 +137,7 @@ function Never() {
               key={line}
             >
               <X className="shrink-0 text-daylily" size={18} strokeWidth={2} />
-              <span className="font-writing text-[#e9e0d2] text-[19px] leading-7.5 md:text-[21px]">
+              <span className="font-writing text-lead text-on-ink-2 leading-7.5 md:text-lede">
                 {line}
               </span>
             </li>
@@ -157,7 +155,7 @@ function Never() {
 function WhyDaylily() {
   return (
     <section className="px-4 pt-14 md:px-16 md:pt-30">
-      <Reveal className="mx-auto flex max-w-328 flex-col gap-7 md:relative md:aspect-[1312/738] md:overflow-clip md:rounded-[28px]">
+      <Reveal className="mx-auto flex max-w-328 flex-col gap-7 md:relative md:aspect-[1312/738] md:overflow-clip md:rounded-card-lg">
         <div className="relative aspect-square overflow-clip rounded-3xl md:absolute md:inset-0 md:aspect-auto md:rounded-none">
           <Image
             alt="A single orange daylily among grasses and wildflowers"
@@ -168,13 +166,11 @@ function WhyDaylily() {
           />
         </div>
         <div className="relative -order-1 flex max-w-135 flex-col gap-4 px-2 md:order-none md:gap-5 md:px-20 md:pt-21">
-          <p className="font-medium text-[13px] text-daylily-deep">
-            Why Daylily
-          </p>
-          <h2 className="font-display text-[48px] text-ink leading-[1.04] tracking-[-0.025em] md:text-[64px]">
+          <p className="font-medium text-daylily-deep text-ui">Why Daylily</p>
+          <h2 className="font-display text-5xl text-ink leading-heading-loose tracking-heading md:text-display-lg">
             Beauty for a day.
           </h2>
-          <p className="font-writing text-[19px] text-ink-2 leading-7.75 md:text-xl md:leading-8.25">
+          <p className="font-writing text-ink-2 text-lead leading-7.75 md:text-xl md:leading-8.25">
             Daylilies, Hemerocallis in Greek, bloom for exactly one day, and a
             new flower opens the next morning. That is the one-page-a-day rule,
             as a flower.
