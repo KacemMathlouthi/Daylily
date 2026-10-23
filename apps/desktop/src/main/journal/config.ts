@@ -1,13 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
+import type { JournalConfig } from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /**
- * The journal's preferences, in `.daylily/config.json` so they travel with the
- * folder. A field that's missing or unusable takes its default; fields from a
+ * Reads the journal's preferences. A field that's missing or unusable takes its default; fields from a
  * newer version are kept when saving.
  */
 const configSchema = z.looseObject({
@@ -21,9 +21,11 @@ const configSchema = z.looseObject({
       time: z.string().regex(TIME).catch("21:00"),
     })
     .catch({ enabled: true, time: "21:00" }),
-});
+}) satisfies z.ZodType<JournalConfig>;
 
-export type JournalConfig = z.infer<typeof configSchema>;
+export type ConfigChanges = Partial<Omit<JournalConfig, "reminder">> & {
+  reminder?: Partial<JournalConfig["reminder"]>;
+};
 
 const DEFAULTS = configSchema.parse({});
 
@@ -47,10 +49,8 @@ export async function readConfig(root: string): Promise<JournalConfig> {
 /** Saves preferences over the current ones, keeping fields it doesn't know. */
 export async function writeConfig(
   root: string,
-  changes: Partial<Omit<JournalConfig, "reminder">> & {
-    reminder?: Partial<JournalConfig["reminder"]>;
-  }
-) {
+  changes: ConfigChanges
+): Promise<JournalConfig> {
   const current = await readConfig(root);
   const next = configSchema.parse({
     ...current,

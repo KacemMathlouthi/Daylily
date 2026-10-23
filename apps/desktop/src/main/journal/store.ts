@@ -11,45 +11,14 @@ import {
 import { fail, ok, type Result } from "@daylily/core/result";
 import { sealDayFile, sealState } from "@daylily/core/seal";
 import { countMarkdownWords } from "@daylily/core/words";
+import type {
+  CoverExtension,
+  JournalError,
+  ListedDay,
+  StoredDay,
+  UnreadableDay,
+} from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
-
-/** A day as the calendar and garden need it, without its page. */
-export interface DaySummary {
-  cover: string | null;
-  day: DayKey;
-  /** Open while it can still be written; edited when its seal no longer matches. */
-  state: "open" | "sealed" | "edited";
-  title: string;
-  words: number;
-}
-
-export interface StoredDay extends DaySummary {
-  body: string;
-}
-
-/** A day whose file is there but whose frontmatter can't be read. Shown, never rewritten. */
-export interface UnreadableDay {
-  day: DayKey;
-  state: "unreadable";
-}
-
-export type JournalError =
-  | DayFileError
-  /** Only today is written, or a day that ended and hasn't sealed yet. */
-  | { kind: "not-writable"; day: DayKey }
-  /** The disk said no: full, read-only, permissions. */
-  | { kind: "io"; code: string };
-
-/** The image types a cover may be, by extension. */
-export const COVER_EXTENSIONS = [
-  "avif",
-  "gif",
-  "jpeg",
-  "jpg",
-  "png",
-  "webp",
-] as const;
-export type CoverExtension = (typeof COVER_EXTENSIONS)[number];
 
 const YEAR = /^\d{4}$/;
 const TWO_DIGITS = /^\d{2}$/;
@@ -172,7 +141,7 @@ export function createJournal({
     dayAsset,
 
     /** Every day with a file, oldest first. Days without one are bare soil. */
-    async listDays(): Promise<(DaySummary | UnreadableDay)[]> {
+    async listDays(): Promise<ListedDay[]> {
       const years = await folderNames(journalRoot, YEAR);
       const months = await Promise.all(
         years.map(async (year) =>
