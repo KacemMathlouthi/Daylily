@@ -55,8 +55,9 @@ function createWindow() {
 }
 
 /** Opens the app behind the splash, which follows its loading and hands over when it has painted. */
-function launch() {
+async function launch() {
   const splash = openSplash({ background: PAPER, icon: ICON });
+  await splash.shown;
   const window = createWindow();
   splash.progress(15);
   window.webContents.once("did-start-loading", () => splash.progress(35));

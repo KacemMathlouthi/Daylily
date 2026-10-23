@@ -4,6 +4,8 @@ import { BrowserWindow } from "electron";
 /** Long enough for the bloom and the name to appear, even when the app loads at once. */
 const MIN_SPLASH_MS = 1400;
 const FADE_MS = 280;
+/** If the splash can't paint by then, the app opens without it rather than waiting. */
+const SHOW_TIMEOUT_MS = 2000;
 const FADE_STEPS = 14;
 
 /** Loads one of the renderer's pages: from the dev server, or from the built files. */
@@ -29,7 +31,7 @@ export function openSplash({
   background: string;
 }) {
   // Counted from when it appears, so a slow first paint doesn't eat into the bloom
-  let shownAt = Date.now();
+  let shownAt: number | null = null;
   let progress = 0;
   const splash = new BrowserWindow({
     backgroundColor: background,
@@ -50,9 +52,15 @@ export function openSplash({
     },
     width: 300,
   });
-  splash.once("ready-to-show", () => {
-    shownAt = Date.now();
-    splash.show();
+  const shown = new Promise<void>((resolve) => {
+    splash.once("ready-to-show", () => {
+      if (!splash.isDestroyed()) {
+        shownAt = Date.now();
+        splash.show();
+      }
+      resolve();
+    });
+    setTimeout(resolve, SHOW_TIMEOUT_MS);
   });
 
   // Numbers only, set by this process; the page listens for the event
@@ -73,6 +81,12 @@ export function openSplash({
     handOver(app: BrowserWindow) {
       progress = 100;
       send();
+      if (shownAt === null) {
+        // It never appeared; showing it now would only flash it
+        splash.destroy();
+        app.show();
+        return;
+      }
       const wait = Math.max(0, MIN_SPLASH_MS - (Date.now() - shownAt));
       setTimeout(() => {
         // Behind the splash while it fades, then brought forward once it's gone
@@ -102,5 +116,10 @@ export function openSplash({
       progress = Math.max(progress, value);
       send();
     },
+    /**
+     * Resolves once the splash is on screen, or has given up trying. The app waits
+     * for it, so the two never race for the machine and the splash comes first.
+     */
+    shown,
   };
 }
