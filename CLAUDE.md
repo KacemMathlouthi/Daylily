@@ -286,7 +286,7 @@ packages/ui/         the shared UI, used by every app
   src/primitives/      accessible building blocks on Base UI (shadcn-generated, then owned)
   src/components/      Daylily components: Flower, Garden, DayCover, Logo, the page editor's view and toolbar…
   src/editor/          the journal page editor on Tiptap: markdown in and out, ghost prompts, word counts
-packages/core/       later: pure domain logic (days, sealing, hashing, frontmatter, flowers)
+packages/core/       pure domain logic: days, sealing, hashing, frontmatter, flowers (no DOM, no Node)
 brand/               brand and product assets
 ```
 
@@ -312,13 +312,14 @@ brand/               brand and product assets
 | Motion | Motion (`motion/react`) for scroll and entrance animation; every animation honours reduced motion |
 | Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
+| Tests | Vitest (`pnpm test`), run on Linux, macOS and Windows in CI |
 | Component workbench | Storybook, later, once the first components exist |
 | Desktop build | electron-vite (Vite for main, preload and renderer); electron-builder for packaging, added when we package |
 | Electron | 44.x, the mature stable line; `pnpm-workspace.yaml` allows its install script |
 | Desktop routing | TanStack Router, file-based, hash history (the app loads from `file://`) |
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
-| CI | GitHub Actions: check, knip, typecheck, build on every PR |
+| CI | GitHub Actions: check, knip, typecheck, build and tests on every PR |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
