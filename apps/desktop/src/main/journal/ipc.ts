@@ -34,25 +34,17 @@ export function registerJournalIpc(journal: Journal) {
     journal.readDay(daySchema.parse(day))
   );
 
-  handle(CHANNELS.journalWrite, async (_event, day, page) => {
-    const saved = await journal.writeDay(
-      daySchema.parse(day),
-      pageSchema.parse(page)
-    );
-    // The first save creates the journal folder, which can be watched from then on
-    watcher.ensure();
-    return saved;
-  });
+  handle(CHANNELS.journalWrite, (_event, day, page) =>
+    journal.writeDay(daySchema.parse(day), pageSchema.parse(page))
+  );
 
-  handle(CHANNELS.journalSaveCover, async (_event, day, image, extension) => {
-    const saved = await journal.saveCover(
+  handle(CHANNELS.journalSaveCover, (_event, day, image, extension) =>
+    journal.saveCover(
       daySchema.parse(day),
       coverImageSchema.parse(image),
       coverExtensionSchema.parse(extension)
-    );
-    watcher.ensure();
-    return saved;
-  });
+    )
+  );
 
   handle(CHANNELS.journalSetConfig, (_event, changes) =>
     writeConfig(journal.root, configChangesSchema.parse(changes))

@@ -6,62 +6,62 @@ import { writeFileAtomic } from "./atomic-write";
 import { watchJournal } from "./watch";
 
 let root: string;
-let close: () => void;
+let watcher: ReturnType<typeof watchJournal>;
 
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), "daylily-watch-"));
 });
 
 afterEach(async () => {
-  close();
+  await watcher.close();
   await rm(root, { force: true, recursive: true });
 });
 
-/** Watchers start asynchronously on some platforms; give them a moment. */
-const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const reported = (onChange: ReturnType<typeof vi.fn>) =>
+  onChange.mock.calls.flat(2);
 
 describe("watchJournal", () => {
   it("reports the days another app changed", async () => {
     await mkdir(join(root, "2026", "10", "21"), { recursive: true });
     const onChange = vi.fn();
-    ({ close } = watchJournal(root, onChange));
-    await settle();
+    watcher = watchJournal(root, onChange);
+    await watcher.ready;
 
     await writeFile(join(root, "2026", "10", "21", "2026-10-21.md"), "Edited");
-    await vi.waitFor(() => expect(onChange).toHaveBeenCalled(), {
-      timeout: 5000,
-    });
-    expect(onChange.mock.calls.flat(2)).toContain("2026-10-21");
+    await vi.waitFor(() => expect(reported(onChange)).toContain("2026-10-21"));
+  });
+
+  it("reports a day saved the way Daylily saves, over the old file", async () => {
+    const file = join(root, "2026", "10", "21", "2026-10-21.md");
+    await writeFileAtomic(file, "First");
+    const onChange = vi.fn();
+    watcher = watchJournal(root, onChange);
+    await watcher.ready;
+
+    await writeFileAtomic(file, "Second");
+    await vi.waitFor(() => expect(reported(onChange)).toContain("2026-10-21"));
+  });
+
+  it("starts watching the journal folder once it exists", async () => {
+    const journal = join(root, "Daylily");
+    const onChange = vi.fn();
+    watcher = watchJournal(journal, onChange);
+    await watcher.ready;
+
+    await writeFileAtomic(join(journal, "2026", "10", "21", "a.md"), "First");
+    await vi.waitFor(() => expect(reported(onChange)).toContain("2026-10-21"));
   });
 
   it("ignores files that aren't in a day's folder", async () => {
-    // Nothing made just before watching: macOS can report changes from moments earlier
     const onChange = vi.fn();
-    ({ close } = watchJournal(root, onChange));
-    await settle();
+    watcher = watchJournal(root, onChange);
+    await watcher.ready;
 
     await writeFile(join(root, "notes.md"), "Not a day");
     await mkdir(join(root, ".daylily"), { recursive: true });
     await writeFile(join(root, ".daylily", "config.json"), "{}");
-    await settle();
+    await pause(500);
     expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("starts watching once the journal folder exists", {
-    timeout: 10_000,
-  }, async () => {
-    const journal = join(root, "Daylily");
-    const onChange = vi.fn();
-    const watcher = watchJournal(journal, onChange);
-    ({ close } = watcher);
-
-    await writeFileAtomic(join(journal, "2026", "10", "21", "a.md"), "First");
-    watcher.ensure();
-    await settle();
-    await writeFileAtomic(join(journal, "2026", "10", "21", "a.md"), "Second");
-    await vi.waitFor(() => expect(onChange).toHaveBeenCalled(), {
-      timeout: 5000,
-    });
-    expect(onChange.mock.calls.flat(2)).toContain("2026-10-21");
   });
 });
