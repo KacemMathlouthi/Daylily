@@ -1,3 +1,4 @@
+import { bloomSize } from "@daylily/core/flower";
 import type { CSSProperties, ReactElement, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { DaylilyMark } from "./daylily-mark";
@@ -26,18 +27,12 @@ const COLOR_CLASS: Record<FlowerColor, string> = {
   saffron: "text-saffron",
 };
 
+/** The share of its cell a flower fills, for each bloom size. */
+const BLOOM_SCALE = [0.62, 0.76, 0.88, 0.98] as const;
+
 /** Longer days grow bigger blooms: the share of its cell a flower fills. */
 export function bloomScale(words: number) {
-  if (words < 150) {
-    return 0.62;
-  }
-  if (words < 400) {
-    return 0.76;
-  }
-  if (words < 700) {
-    return 0.88;
-  }
-  return 0.98;
+  return BLOOM_SCALE[bloomSize(words)];
 }
 
 interface GardenProps {
