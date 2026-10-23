@@ -2,8 +2,8 @@ import { randomBytes } from "node:crypto";
 import { mkdir, open, rename, rm } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 
-/** Marks our temp files, so a listing can skip any a crash left behind. */
-export const TEMP_SUFFIX = ".daylily-tmp";
+/** Marks our temp files, so one left by a crash is plainly ours. */
+const TEMP_SUFFIX = ".daylily-tmp";
 
 /** Windows refuses a rename while an antivirus or indexer briefly holds the file. */
 const BUSY = new Set(["EACCES", "EBUSY", "EPERM"]);

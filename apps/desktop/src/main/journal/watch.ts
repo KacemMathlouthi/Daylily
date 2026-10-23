@@ -1,10 +1,13 @@
 import { type FSWatcher, watch } from "node:fs";
 import { type DayKey, parseDayKey } from "@daylily/core/day";
-import { TEMP_SUFFIX } from "./atomic-write";
 
 /** `2026/10/21/…`, with either slash, as watchers report paths per platform. */
 const DAY_FOLDER = /^(\d{4})[\\/](\d{2})[\\/](\d{2})(?:[\\/]|$)/;
-/** Changes come in bursts (a save is a write and a rename); report each burst once. */
+/**
+ * Changes come in bursts (a save is a temp file and a rename); report each burst
+ * once. The temp file counts too: on Linux, Node notices a new file at once but
+ * a file replaced in place only when it next polls, seconds later.
+ */
 const SETTLE_MS = 150;
 
 /**
@@ -36,10 +39,7 @@ export function watchJournal(root: string, onChange: (days: DayKey[]) => void) {
     }
     try {
       watcher = watch(root, { recursive: true }, (_event, name) => {
-        if (!name || name.endsWith(TEMP_SUFFIX)) {
-          return;
-        }
-        const match = DAY_FOLDER.exec(name);
+        const match = name ? DAY_FOLDER.exec(name) : null;
         const day = match && parseDayKey(`${match[1]}-${match[2]}-${match[3]}`);
         if (day) {
           changed.add(day);

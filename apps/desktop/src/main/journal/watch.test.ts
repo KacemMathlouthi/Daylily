@@ -35,7 +35,7 @@ describe("watchJournal", () => {
   });
 
   it("ignores files that aren't in a day's folder", async () => {
-    await mkdir(join(root, "2026", "10", "21"), { recursive: true });
+    // Nothing made just before watching: macOS can report changes from moments earlier
     const onChange = vi.fn();
     ({ close } = watchJournal(root, onChange));
     await settle();
@@ -47,7 +47,9 @@ describe("watchJournal", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("starts watching once the journal folder exists", async () => {
+  it("starts watching once the journal folder exists", {
+    timeout: 10_000,
+  }, async () => {
     const journal = join(root, "Daylily");
     const onChange = vi.fn();
     const watcher = watchJournal(journal, onChange);
