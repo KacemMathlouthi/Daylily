@@ -10,6 +10,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
+    "test": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
