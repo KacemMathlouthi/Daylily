@@ -1,4 +1,4 @@
-import { countWords } from "@daylily/ui/editor/extensions";
+import { countWords } from "@daylily/core/words";
 import type { DayKey } from "../lib/month";
 import type { MockDay } from "./journal";
 

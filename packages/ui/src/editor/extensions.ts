@@ -90,17 +90,3 @@ export function pageExtensions({
   }
   return extensions;
 }
-
-const WORD = /\p{L}|\p{N}/u;
-const segmenter = new Intl.Segmenter(undefined, { granularity: "word" });
-
-/** Words as a reader would count them, in any script (Japanese has no spaces). */
-export function countWords(text: string) {
-  let words = 0;
-  for (const segment of segmenter.segment(text)) {
-    if (segment.isWordLike && WORD.test(segment.segment)) {
-      words += 1;
-    }
-  }
-  return words;
-}
