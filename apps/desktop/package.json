@@ -11,6 +11,7 @@
     "package:win": "electron-vite build && electron-builder --win --x64",
     "package:win:installer": "electron-vite build && electron-builder --win nsis --x64",
     "start": "electron-vite preview",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vite": "8.3.5",
+    "vitest": "5.0.3",
     "zod": "4.6.7"
   }
 }
