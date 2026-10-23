@@ -1,10 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import type { JournalConfig } from "../../shared/journal";
+import type { JournalConfigChanges } from "../../shared/channels";
+import { type JournalConfig, REMINDER_TIME } from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
-
-const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /**
  * Reads the journal's preferences. A field that's missing or unusable takes its default; fields from a
@@ -18,16 +17,19 @@ const configSchema = z.looseObject({
     .object({
       enabled: z.boolean().catch(true),
       /** Local time, `HH:MM`. */
-      time: z.string().regex(TIME).catch("21:00"),
+      time: z.string().regex(REMINDER_TIME).catch("21:00"),
     })
     .catch({ enabled: true, time: "21:00" }),
 }) satisfies z.ZodType<JournalConfig>;
 
-export type ConfigChanges = Partial<Omit<JournalConfig, "reminder">> & {
-  reminder?: Partial<JournalConfig["reminder"]>;
-};
-
 const DEFAULTS = configSchema.parse({});
+
+/** Leaves out fields set to undefined, which mean "unchanged". */
+function defined<T extends object>(changes: T) {
+  return Object.fromEntries(
+    Object.entries(changes).filter(([, value]) => value !== undefined)
+  );
+}
 
 const configPath = (root: string) => join(root, ".daylily", "config.json");
 
@@ -49,13 +51,13 @@ export async function readConfig(root: string): Promise<JournalConfig> {
 /** Saves preferences over the current ones, keeping fields it doesn't know. */
 export async function writeConfig(
   root: string,
-  changes: ConfigChanges
+  changes: JournalConfigChanges
 ): Promise<JournalConfig> {
   const current = await readConfig(root);
   const next = configSchema.parse({
     ...current,
-    ...changes,
-    reminder: { ...current.reminder, ...changes.reminder },
+    ...defined(changes),
+    reminder: { ...current.reminder, ...defined(changes.reminder ?? {}) },
   });
   await writeFileAtomic(configPath(root), `${JSON.stringify(next, null, 2)}\n`);
   return next;

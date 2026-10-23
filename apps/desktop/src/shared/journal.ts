@@ -2,7 +2,7 @@ import type { DayKey } from "@daylily/core/day";
 import type { DayFileError } from "@daylily/core/day-file";
 
 /** A day as the calendar and garden need it, without its page. */
-export interface DaySummary {
+interface DaySummary {
   /** A file in the day's folder, shown through `journalAssetUrl`. */
   cover: string | null;
   day: DayKey;
@@ -41,6 +41,14 @@ export const COVER_EXTENSIONS = [
   "webp",
 ] as const;
 export type CoverExtension = (typeof COVER_EXTENSIONS)[number];
+
+/** The name a day's cover is copied in as. */
+export const COVER_NAME = new RegExp(
+  `^cover\\.(${COVER_EXTENSIONS.join("|")})$`
+);
+
+/** A reminder time, `HH:MM` on a 24-hour clock. */
+export const REMINDER_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** The journal's preferences, kept in `.daylily/config.json` so they travel with it. */
 export interface JournalConfig {
