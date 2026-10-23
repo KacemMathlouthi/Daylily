@@ -32,6 +32,9 @@ importers:
       '@base-ui/react':
         specifier: 1.9.0
         version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@daylily/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@daylily/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -140,6 +143,13 @@ importers:
         version: 6.0.3
 
   packages/core:
+    dependencies:
+      yaml:
+        specifier: 2.9.1
+        version: 2.9.1
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       vitest:
         specifier: 5.0.3
@@ -150,6 +160,9 @@ importers:
       '@base-ui/react':
         specifier: 1.9.0
         version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@daylily/core':
+        specifier: workspace:*
+        version: link:../core
       '@tiptap/core':
         specifier: 3.32.0
         version: 3.32.0(@tiptap/pm@3.32.0)
