@@ -7,8 +7,19 @@ import {
   DialogTitle,
 } from "@daylily/ui/primitives/dialog";
 import { Upload, X } from "lucide-react";
-import { useCallback } from "react";
-import { type Cover, GALLERY, type GalleryCover } from "../../lib/covers";
+import { useCallback, useState } from "react";
+import type { JournalError } from "../../../../shared/journal";
+import { GALLERY, type GalleryCover, type GalleryId } from "../../lib/covers";
+import type { DayKey } from "../../lib/month";
+import type { PageCover } from "../../lib/today-page";
+
+/** What to say when a cover couldn't be copied into the day's folder. */
+function coverProblem(error: JournalError) {
+  if (error.kind === "io" && error.code === "EFBIG") {
+    return "That picture is too large to use as a cover.";
+  }
+  return "Couldn’t add that cover to your journal.";
+}
 
 function GalleryTile({
   item,
@@ -17,12 +28,9 @@ function GalleryTile({
 }: {
   item: GalleryCover;
   selected: boolean;
-  onPick: (cover: Cover) => void;
+  onPick: (id: GalleryId) => void;
 }) {
-  const pick = useCallback(
-    () => onPick({ id: item.id, source: "gallery" }),
-    [item.id, onPick]
-  );
+  const pick = useCallback(() => onPick(item.id), [item.id, onPick]);
   return (
     <button
       aria-label={item.label}
@@ -47,33 +55,82 @@ function GalleryTile({
 
 /**
  * Paper's "03c Writing · cover picker": the bundled gallery, a picture from the
- * computer, or no cover. Choosing one applies it and closes.
+ * computer, or no cover. Choosing one copies it into the day's folder, applies
+ * it and closes.
  */
 export function CoverPicker({
+  day,
   open,
   onOpenChange,
   cover,
   onChange,
+  onProblem,
 }: {
+  day: DayKey;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  cover: Cover | null;
-  onChange: (cover: Cover | null) => void;
+  cover: PageCover | null;
+  onChange: (cover: PageCover | null) => void;
+  /** Says why a cover couldn't be added. */
+  onProblem: (message: string) => void;
 }) {
+  // One copy at a time; a second click while copying does nothing
+  const [copying, setCopying] = useState(false);
+
   const choose = useCallback(
-    (next: Cover | null) => {
+    (next: PageCover | null) => {
       onChange(next);
       onOpenChange(false);
     },
     [onChange, onOpenChange]
   );
 
-  const fromComputer = useCallback(async () => {
-    const picked = await window.daylily.cover.pick();
-    if (picked) {
-      choose({ name: picked.name, source: "computer", url: picked.dataUrl });
-    }
-  }, [choose]);
+  const copyIn = useCallback(
+    async (
+      copy: () => Promise<Awaited<
+        ReturnType<typeof window.daylily.journal.saveCover>
+      > | null>,
+      galleryId?: GalleryId
+    ) => {
+      if (copying) {
+        return;
+      }
+      setCopying(true);
+      try {
+        const saved = await copy();
+        if (saved?.ok) {
+          choose({
+            name: saved.value,
+            version: Date.now(),
+            ...(galleryId ? { galleryId } : {}),
+          });
+        } else if (saved) {
+          onProblem(coverProblem(saved.error));
+        }
+      } catch (error) {
+        console.error("Could not add the cover", error);
+        onProblem("Couldn’t add that cover to your journal.");
+      } finally {
+        setCopying(false);
+      }
+    },
+    [choose, copying, onProblem]
+  );
+
+  const fromGallery = useCallback(
+    (id: GalleryId) =>
+      copyIn(async () => {
+        const url = GALLERY.find((item) => item.id === id)?.url ?? "";
+        const image = new Uint8Array(await (await fetch(url)).arrayBuffer());
+        return window.daylily.journal.saveCover(day, image, "jpg");
+      }, id),
+    [copyIn, day]
+  );
+
+  const fromComputer = useCallback(
+    () => copyIn(() => window.daylily.journal.pickCover(day)),
+    [copyIn, day]
+  );
 
   const remove = useCallback(() => choose(null), [choose]);
 
@@ -107,8 +164,8 @@ export function CoverPicker({
             <GalleryTile
               item={item}
               key={item.id}
-              onPick={choose}
-              selected={cover?.source === "gallery" && cover.id === item.id}
+              onPick={fromGallery}
+              selected={cover?.galleryId === item.id}
             />
           ))}
         </div>

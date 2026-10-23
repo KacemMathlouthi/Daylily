@@ -14,8 +14,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { coverLabel, coverUrl } from "../../lib/covers";
-import type { TodayPage } from "../../lib/today-page";
+import { coverLabel } from "../../lib/covers";
+import { pageCoverUrl, type TodayPage } from "../../lib/today-page";
 import { DayCover } from "../day/day-cover";
 import { DayDate } from "../day/day-date";
 import { NUDGES } from "./nudges";
@@ -79,7 +79,7 @@ export function PageView({
     <>
       <DayCover
         label={page.cover ? coverLabel(page.cover) : ""}
-        url={page.cover ? coverUrl(page.cover) : null}
+        url={pageCoverUrl(page)}
         {...(sealed ? {} : { onChoose: onChooseCover })}
       />
       <div className="flex flex-col gap-3.5 pt-7.5">

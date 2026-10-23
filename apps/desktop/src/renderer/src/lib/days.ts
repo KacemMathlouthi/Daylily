@@ -2,10 +2,10 @@ import { countWords } from "@daylily/core/words";
 import { useMemo } from "react";
 import { MOCK_DAYS } from "../mock/journal";
 import { mockPage } from "../mock/pages";
-import { coverLabel, coverUrl } from "./covers";
+import { coverLabel } from "./covers";
 import { dateFormat } from "./format";
 import { type DayKey, fromKey } from "./month";
-import { type TodayPage, useWrittenPages } from "./today-page";
+import { pageCoverUrl, type TodayPage, useWrittenPages } from "./today-page";
 
 /** A day before today: sealed with its page, or rested with nothing written. */
 export type PastDay =
@@ -35,7 +35,10 @@ export function usePastDay(key: DayKey): PastDay {
     if (written && wasWritten(written)) {
       return {
         cover: written.cover
-          ? { label: coverLabel(written.cover), url: coverUrl(written.cover) }
+          ? {
+              label: coverLabel(written.cover),
+              url: pageCoverUrl(written) ?? "",
+            }
           : null,
         kind: "written",
         markdown: written.markdown,
