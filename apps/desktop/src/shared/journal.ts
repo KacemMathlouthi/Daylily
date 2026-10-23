@@ -72,6 +72,6 @@ export interface JournalInfo {
 export const JOURNAL_SCHEME = "daylily-journal";
 
 /** Where the page finds a file in a day's folder, like its cover. */
-export function journalAssetUrl(day: DayKey, name: string) {
+export function journalAssetUrl(day: string, name: string) {
   return `${JOURNAL_SCHEME}://day/${day}/${encodeURIComponent(name)}`;
 }

@@ -3,6 +3,7 @@ import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { registerIpc, whenAppReady } from "./ipc";
 import { registerJournalIpc } from "./journal/ipc";
+import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
 import { createJournal } from "./journal/store";
 import { deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
@@ -81,7 +82,10 @@ async function openJournal() {
     root: await settings.journalPath(),
   });
   registerJournalIpc(journal);
+  serveJournalAssets(journal);
 }
+
+registerJournalScheme();
 
 app.whenReady().then(async () => {
   registerIpc();
