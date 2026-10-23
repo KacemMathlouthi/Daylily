@@ -4,4 +4,6 @@ packages:
 allowBuilds:
   electron: true
   electron-winstaller: false
+  # tsx's esbuild finds its platform binary without the install check
+  esbuild: false
   lefthook: true
