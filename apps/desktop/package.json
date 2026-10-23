@@ -8,11 +8,13 @@
   "scripts": {
     "build": "electron-vite build",
     "dev": "electron-vite dev",
+    "journal:seed": "tsx scripts/seed-journal.mts",
+    "journal:unseed": "tsx scripts/unseed-journal.mts",
     "package:win": "electron-vite build && electron-builder --win --x64",
     "package:win:installer": "electron-vite build && electron-builder --win nsis --x64",
     "start": "electron-vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.scripts.json"
   },
   "devDependencies": {
     "@base-ui/react": "1.9.0",
@@ -38,6 +40,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vite": "8.3.5",
     "vitest": "5.0.3",

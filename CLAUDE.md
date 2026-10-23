@@ -315,6 +315,7 @@ brand/               brand and product assets
 | Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
 | Tests | Vitest (`pnpm test`), run on Linux, macOS and Windows in CI |
+| Sample journal | `pnpm journal:seed` writes the sample year and a half into `~/Daylily` (or `-- --journal <folder>`) as sealed days with covers, skipping days already written; `pnpm journal:unseed` removes only the files it wrote that are still unchanged |
 | Component workbench | Storybook, later, once the first components exist |
 | Desktop build | electron-vite (Vite for main, preload and renderer); electron-builder for packaging, added when we package |
 | Electron | 44.x, the mature stable line; `pnpm-workspace.yaml` allows its install script |

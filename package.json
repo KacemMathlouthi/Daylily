@@ -8,6 +8,8 @@
     "check": "ultracite check",
     "dev": "turbo dev",
     "fix": "ultracite fix",
+    "journal:seed": "pnpm --filter @daylily/desktop journal:seed",
+    "journal:unseed": "pnpm --filter @daylily/desktop journal:unseed",
     "knip": "knip",
     "prepare": "lefthook install",
     "test": "turbo test",

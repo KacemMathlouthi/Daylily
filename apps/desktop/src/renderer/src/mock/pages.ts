@@ -1,6 +1,6 @@
 import { countWords } from "@daylily/core/words";
 import type { DayKey } from "../lib/month";
-import type { MockDay } from "./journal";
+import type { SampleDay } from "./sample-days";
 
 /** The words of the days Paper quotes, as their files would hold them. */
 const QUOTED: Record<DayKey, string> = {
@@ -85,6 +85,9 @@ function grownPage(key: DayKey, target: number, opening: string | undefined) {
 }
 
 /** A sealed day's page as markdown: Paper's words where it has them, sample ones elsewhere. */
-export function mockPage(key: DayKey, day: MockDay): string {
+export function mockPage(
+  key: DayKey,
+  day: Pick<SampleDay, "excerpt" | "words">
+): string {
   return QUOTED[key] ?? grownPage(key, day.words, day.excerpt);
 }

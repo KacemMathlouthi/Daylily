@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The scripts reuse the renderer's sample days, which bring DOM types along
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@daylily/ui/*": ["../../packages/ui/src/*"]
+    }
+  },
+  "include": ["scripts"]
+}
