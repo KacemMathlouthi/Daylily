@@ -23,11 +23,11 @@ export const CHANNELS = {
   journalChanged: "journal:changed",
   journalInfo: "journal:info",
   journalList: "journal:list",
+  journalPickCover: "journal:pick-cover",
   journalRead: "journal:read",
   journalSaveCover: "journal:save-cover",
   journalSetConfig: "journal:set-config",
   journalWrite: "journal:write",
-  pickCover: "cover:pick",
   saveGardenImage: "garden:save-image",
 } as const;
 
@@ -36,14 +36,6 @@ export interface AppInfo {
   /** A first name from the OS account, for greetings; null when it doesn't read as one. */
   userName: string | null;
   version: string;
-}
-
-/** An image chosen from the computer, held in memory until days are saved as files. */
-export interface PickedImage {
-  /** The image itself, as a data: URL the page can show. */
-  dataUrl: string;
-  /** The file's name, for display. */
-  name: string;
 }
 
 /** Fields to change; any left out, or undefined, stay as they are. */
@@ -86,6 +78,11 @@ export interface DaylilyApi {
     list: () => Promise<ListedDay[]>;
     /** Calls `listener` with the days that changed on disk, by any app. Returns a way to stop. */
     onChange: (listener: (days: string[]) => void) => () => void;
+    /**
+     * Opens the system's picker for one image and copies it into the day's folder.
+     * Null if cancelled; otherwise the cover's name, for the next save.
+     */
+    pickCover: (day: string) => Promise<Result<string, JournalError> | null>;
     /** A day's page and fields, or null when nothing was written. */
     read: (day: string) => Promise<Result<StoredDay | null, JournalError>>;
     /** Copies a cover into the day's folder; the name it returns goes in the next save. */

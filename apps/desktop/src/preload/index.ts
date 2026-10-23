@@ -28,9 +28,6 @@ const api: DaylilyApi = {
     info: () => ipcRenderer.invoke(CHANNELS.appInfo),
     ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
-  cover: {
-    pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
-  },
   device: {
     initial: initialDevice(),
     set: (changes) => ipcRenderer.invoke(CHANNELS.deviceSet, changes),
@@ -51,6 +48,7 @@ const api: DaylilyApi = {
         ipcRenderer.off(CHANNELS.journalChanged, forward);
       };
     },
+    pickCover: (day) => ipcRenderer.invoke(CHANNELS.journalPickCover, day),
     read: (day) => ipcRenderer.invoke(CHANNELS.journalRead, day),
     saveCover: (day, image, extension) =>
       ipcRenderer.invoke(CHANNELS.journalSaveCover, day, image, extension),
