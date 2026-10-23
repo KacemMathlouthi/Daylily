@@ -278,7 +278,7 @@ keychain and **never** into the journal folder.
 ```
 apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
 apps/desktop/        Electron app
-  src/main/            the backend: windows, IPC handlers, later the journal store and seal scheduler
+  src/main/            the backend: windows, IPC handlers, the journal store (src/main/journal), later the seal scheduler
   src/preload/         the bridge: exposes the typed window.daylily API, nothing else
   src/shared/          the IPC contract (channels, types, Zod schemas); private to the desktop app
   src/renderer/        the React app: TanStack Router routes, screens, components
@@ -542,13 +542,13 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Sealed and rested days, opened from the calendar, garden and Home; the page seals in place at 4am |
 | 2026-10-23 | Feedback round: months-only calendar, garden by year with a share card, more formats with code highlighting and a paste prompt, logo-mark theme cards, Home without header art, a splash window at launch |
 | 2026-10-23 | `packages/core`: the 4am day boundary across zones and DST, day files with frontmatter that keeps unknown fields, sealing and the seal hash, word counts and bloom sizes; tested on Linux, macOS and Windows |
+| 2026-10-23 | Journal storage in the main process: atomic writes, reading, listing, saving and sealing days, covers copied into day folders and served to the page, journal and device settings, folder watching, all behind checked IPC; screens still on sample data |
 
 ### Next
-1. Filesystem storage adapter with atomic writes and folder watching.
-2. Today's page: autosave to the day's file, copying covers into the day folder.
-3. Sealing for real: the seal scheduler, and gallery covers for coverless days.
-4. Calendar, garden, search, onboarding, settings, reminder.
-5. Packaging and signing for all three platforms.
+1. Today's page: autosave to the day's file, copying covers into the day folder.
+2. Sealing for real: the seal scheduler, and gallery covers for coverless days.
+3. Calendar, garden, search, onboarding, settings, reminder.
+4. Packaging and signing for all three platforms.
 
 ---
 

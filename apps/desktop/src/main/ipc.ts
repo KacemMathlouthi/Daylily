@@ -29,7 +29,7 @@ function isTrustedSender(event: IpcMainEvent | IpcMainInvokeEvent) {
   );
 }
 
-function handle<T>(
+export function handle<T>(
   channel: string,
   handler: (event: IpcMainInvokeEvent, ...args: unknown[]) => T | Promise<T>
 ) {

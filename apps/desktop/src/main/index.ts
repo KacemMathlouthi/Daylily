@@ -1,6 +1,11 @@
 import { join } from "node:path";
+import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { registerIpc, whenAppReady } from "./ipc";
+import { registerJournalIpc } from "./journal/ipc";
+import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
+import { createJournal } from "./journal/store";
+import { deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
 
 const PAPER = "#f4eee3";
@@ -68,8 +73,23 @@ function launch() {
   }, READY_FALLBACK_MS);
 }
 
-app.whenReady().then(() => {
+/** Opens the journal this computer uses, and the door to it from the page. */
+async function openJournal() {
+  const settings = deviceSettings(app.getPath("userData"));
+  const journal = createJournal({
+    app: `daylily/${app.getVersion()}`,
+    clock: systemClock,
+    root: await settings.journalPath(),
+  });
+  registerJournalIpc(journal);
+  serveJournalAssets(journal);
+}
+
+registerJournalScheme();
+
+app.whenReady().then(async () => {
   registerIpc();
+  await openJournal();
   launch();
 
   // macOS keeps apps alive without windows; clicking the dock icon opens one again

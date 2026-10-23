@@ -1,5 +1,7 @@
+import { parseDayKey } from "@daylily/core/day";
 import { z } from "zod";
-import type { AppInfo, PickedImage } from "./channels";
+import type { AppInfo, JournalConfigChanges, PickedImage } from "./channels";
+import { COVER_EXTENSIONS, COVER_NAME, REMINDER_TIME } from "./journal";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
 export const appInfoSchema = z.object({
@@ -34,3 +36,44 @@ export const pickedImageSchema = z
     name: z.string().min(1),
   })
   .nullable() satisfies z.ZodType<PickedImage | null>;
+
+/** A day the renderer names: only a real date, so it can never become a path elsewhere. */
+export const daySchema = z.string().transform((text, context) => {
+  const day = parseDayKey(text);
+  if (!day) {
+    context.addIssue({ code: "custom", message: "Not a day" });
+    return z.NEVER;
+  }
+  return day;
+});
+
+/** A day's page is words; this is far beyond any page a person writes in a day. */
+const MAX_PAGE_CHARS = 5_000_000;
+
+export const pageSchema = z.object({
+  body: z.string().max(MAX_PAGE_CHARS),
+  // Only the cover the app copied in, never a path elsewhere
+  cover: z.string().regex(COVER_NAME).nullable(),
+  title: z.string().max(1000),
+});
+
+/** Larger than any photo a phone takes. */
+const MAX_COVER_BYTES = 30 * 1024 * 1024;
+
+export const coverImageSchema = z
+  .instanceof(Uint8Array)
+  .refine((bytes) => bytes.byteLength > 0, "Empty image")
+  .refine((bytes) => bytes.byteLength <= MAX_COVER_BYTES, "Image too large");
+
+export const coverExtensionSchema = z.enum(COVER_EXTENSIONS);
+
+export const configChangesSchema = z.strictObject({
+  galleryCovers: z.boolean().optional(),
+  ghostPrompts: z.boolean().optional(),
+  reminder: z
+    .strictObject({
+      enabled: z.boolean().optional(),
+      time: z.string().regex(REMINDER_TIME).optional(),
+    })
+    .optional(),
+}) satisfies z.ZodType<JournalConfigChanges>;
