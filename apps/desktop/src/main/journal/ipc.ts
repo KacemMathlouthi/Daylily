@@ -1,5 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
-import { extname } from "node:path";
+import { homedir } from "node:os";
+import { extname, sep } from "node:path";
 import { app, BrowserWindow, dialog } from "electron";
 import { CHANNELS } from "../../shared/channels";
 import { COVER_EXTENSIONS, type CoverExtension } from "../../shared/journal";
@@ -17,6 +18,14 @@ import { watchJournal } from "./watch";
 
 /** Larger than any photo a phone takes; it keeps a stray video or scan out of memory. */
 const MAX_COVER_BYTES = 30 * 1024 * 1024;
+
+/** `/home/kacem/Daylily` as `~/Daylily`, the way people say where their files are. */
+function tildeHome(path: string) {
+  const home = homedir();
+  return path === home || path.startsWith(`${home}${sep}`)
+    ? `~${path.slice(home.length)}`
+    : path;
+}
 
 function coverExtension(path: string): CoverExtension | null {
   const extension = extname(path).slice(1).toLowerCase();
@@ -36,7 +45,9 @@ export function registerJournalIpc(journal: Journal) {
 
   handle(CHANNELS.journalInfo, async () => ({
     config: await readConfig(journal.root),
+    displayRoot: tildeHome(journal.root),
     root: journal.root,
+    separator: sep,
   }));
 
   handle(CHANNELS.journalList, () => journal.listDays());

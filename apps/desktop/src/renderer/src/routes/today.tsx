@@ -9,13 +9,18 @@ import { CountdownPill, SealedPill } from "../components/day/seal-pill";
 import { StatusBar, wordCount } from "../components/day/status-bar";
 import { CoverPicker } from "../components/today/cover-picker";
 import { PageView } from "../components/today/page-view";
-import type { Cover } from "../lib/covers";
+import { useSaveState } from "../lib/autosave";
 import { useFocusChrome } from "../lib/focus-mode";
+import { dayFileLabel, useJournalInfo } from "../lib/journal-info";
 import type { DayKey } from "../lib/month";
 import { useGhostPrompts } from "../lib/preferences";
 import {
+  loadPage,
+  type PageCover,
+  type PageLoad,
   type TodayPage,
   updateTodayPage,
+  usePageLoad,
   useTodayPage,
 } from "../lib/today-page";
 import { useNotice } from "../lib/use-notice";
@@ -82,12 +87,54 @@ function useSealTransition(today: DayKey) {
   return { phase, shownDay, shownPage };
 }
 
+/** Why a page that can't be written is shown as it is. */
+function lockedLabel(load: PageLoad) {
+  if (load.state !== "locked") {
+    return null;
+  }
+  return load.reason === "sealed"
+    ? "This day is already sealed, so it stays as it was."
+    : "Today’s file can’t be read, so Daylily won’t write over it.";
+}
+
+/**
+ * The status bar's line: a passing notice, why the page is locked, a failed save,
+ * an invitation on a blank page, or where the page is saved (Paper: "03 Writing").
+ * The dot is green once saved, saffron while a change is on its way.
+ */
+function useSaveLabel(page: TodayPage, load: PageLoad, notice: string | null) {
+  const save = useSaveState(page.day);
+  const info = useJournalInfo();
+  const locked = lockedLabel(load);
+  if (notice) {
+    return { dot: "bg-ink-ghost", label: notice };
+  }
+  if (locked) {
+    return { dot: "bg-ink-ghost", label: locked };
+  }
+  if (save?.kind === "failed") {
+    return { dot: "bg-daylily", label: save.message };
+  }
+  if (!save || (isBlank(page) && save.kind === "saved")) {
+    return {
+      dot: "bg-ink-ghost",
+      label: "Today’s page is saved to your journal from the first word.",
+    };
+  }
+  return {
+    dot: save.kind === "saved" ? "bg-moss" : "bg-saffron",
+    label: info ? `Saved to ${dayFileLabel(info, page.day)}` : "Saving…",
+  };
+}
+
 /** Paper's "03 Writing" and its states (03a to 03c): today's page, the only one you can write. */
 function TodayScreen() {
   const today = useToday();
   const now = useNow();
   const { phase, shownDay, shownPage: page } = useSealTransition(today);
+  const load = usePageLoad(shownDay);
   const sealed = phase === "sealing" || phase === "leaving";
+  const writable = load.state === "ready" && !sealed;
   const [ghostPrompts, setGhostPrompts] = useGhostPrompts();
   const { chrome, focused, setFocused } = useFocusChrome();
   const [notice, setNotice] = useNotice();
@@ -106,8 +153,12 @@ function TodayScreen() {
     },
     [shownDay]
   );
+  useEffect(() => {
+    loadPage(shownDay);
+  }, [shownDay]);
+
   const recover = useCallback(
-    (cover: Cover | null) => {
+    (cover: PageCover | null) => {
       updateTodayPage(shownDay, { cover });
     },
     [shownDay]
@@ -124,13 +175,7 @@ function TodayScreen() {
     setNotice("Today’s page is copied as markdown.");
   }, [page.markdown, page.title, setNotice]);
 
-  const blank = isBlank(page);
-  // Until storage exists, words live only in memory, and the bar says so
-  const label =
-    notice ??
-    (blank
-      ? "Today’s page is saved to your journal from the first word."
-      : "Not saved yet: kept in memory until Daylily writes to your journal.");
+  const { dot, label } = useSaveLabel(page, load, notice);
 
   return (
     <div className="flex grow flex-col">
@@ -161,16 +206,19 @@ function TodayScreen() {
             phase === "arriving" && "motion-safe:animate-rise-in"
           )}
         >
-          <PageView
-            ghostPrompts={ghostPrompts}
-            key={shownDay}
-            onChooseCover={openPicker}
-            onTitle={retitle}
-            onWrite={write}
-            page={page}
-            promptSlot={promptSlot}
-            sealed={sealed}
-          />
+          {/* Shown once the day's file is read, so the editor opens on its words */}
+          {load.state === "loading" ? null : (
+            <PageView
+              ghostPrompts={ghostPrompts}
+              key={shownDay}
+              onChooseCover={openPicker}
+              onTitle={retitle}
+              onWrite={write}
+              page={page}
+              promptSlot={promptSlot}
+              sealed={!writable}
+            />
+          )}
         </article>
       </div>
       {/* Sticks above the status bar, centred on the page column */}
@@ -178,11 +226,7 @@ function TodayScreen() {
         className="pointer-events-none sticky bottom-13 z-20 flex justify-center *:pointer-events-auto"
         ref={setPromptSlot}
       />
-      <StatusBar
-        className={chrome}
-        dot={blank ? "bg-ink-ghost" : "bg-saffron"}
-        label={label}
-      >
+      <StatusBar className={chrome} dot={dot} label={label}>
         <span className="flex items-center gap-1.5">
           <DaylilyMark
             className={ghostPrompts ? "text-daylily/50" : "text-ink-ghost"}
@@ -194,8 +238,10 @@ function TodayScreen() {
       </StatusBar>
       <CoverPicker
         cover={page.cover}
+        day={shownDay}
         onChange={recover}
         onOpenChange={setPickerOpen}
+        onProblem={setNotice}
         open={pickerOpen}
       />
     </div>

@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { flushSaves } from "./lib/autosave";
 import { startTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
 
@@ -41,6 +42,12 @@ if (root) {
     </StrictMode>
   );
 }
+
+// Nothing unsaved is left behind when the window loses focus, closes, or the computer sleeps
+window.daylily.app.onFlush(flushSaves);
+window.addEventListener("blur", () => {
+  flushSaves();
+});
 
 // Two frames after the first render the app has painted; the splash window can hand over
 requestAnimationFrame(() =>
