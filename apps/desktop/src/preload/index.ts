@@ -26,6 +26,15 @@ function initialDevice(): DeviceState {
 const api: DaylilyApi = {
   app: {
     info: () => ipcRenderer.invoke(CHANNELS.appInfo),
+    onFlush: (save) => {
+      ipcRenderer.on(CHANNELS.appFlush, async () => {
+        try {
+          await save();
+        } finally {
+          ipcRenderer.send(CHANNELS.appFlushed);
+        }
+      });
+    },
     ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
   device: {

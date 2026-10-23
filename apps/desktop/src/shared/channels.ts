@@ -16,6 +16,8 @@ import type {
  * preload stays free of runtime dependencies.
  */
 export const CHANNELS = {
+  appFlush: "app:flush",
+  appFlushed: "app:flushed",
   appInfo: "app:info",
   appReady: "app:ready",
   deviceGet: "device:get",
@@ -49,6 +51,11 @@ export type JournalConfigChanges = Changes<Omit<JournalConfig, "reminder">> & {
 export interface DaylilyApi {
   app: {
     info: () => Promise<AppInfo>;
+    /**
+     * Runs `save` when the app is about to close or the computer to sleep, so
+     * nothing unsaved is lost; the window waits for it, up to a few seconds.
+     */
+    onFlush: (save: () => Promise<void>) => void;
     /** Tells the main process the app has painted, so the splash can hand over. */
     ready: () => void;
   };

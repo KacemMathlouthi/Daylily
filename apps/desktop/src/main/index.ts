@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { registerDeviceIpc } from "./device-ipc";
+import { saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
 import { registerIpc, whenAppReady } from "./ipc";
 import { registerJournalIpc } from "./journal/ipc";
 import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
@@ -51,6 +52,7 @@ function createWindow() {
   });
   window.webContents.on("will-navigate", (event) => event.preventDefault());
 
+  saveBeforeClosing(window);
   loadPage(window, "index");
   return window;
 }
@@ -95,6 +97,7 @@ registerJournalScheme();
 app.whenReady().then(async () => {
   const settings = deviceSettings(app.getPath("userData"));
   registerIpc();
+  saveOnSleepAndQuit();
   await registerDeviceIpc(settings);
   await openJournal(settings);
   launch(settings);
