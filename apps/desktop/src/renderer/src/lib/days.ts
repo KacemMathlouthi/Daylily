@@ -1,4 +1,4 @@
-import { countWords } from "@daylily/ui/editor/extensions";
+import { countWords } from "@daylily/core/words";
 import { useMemo } from "react";
 import { MOCK_DAYS } from "../mock/journal";
 import { mockPage } from "../mock/pages";

@@ -1,6 +1,7 @@
+import { countWords } from "@daylily/core/words";
 import { type Editor, useEditor } from "@tiptap/react";
 import { useEffect, useRef } from "react";
-import { countWords, pageExtensions } from "./extensions";
+import { pageExtensions } from "./extensions";
 import type { GhostPromptsOptions } from "./ghost-prompts";
 import type { MarkdownPaste } from "./markdown-paste";
 

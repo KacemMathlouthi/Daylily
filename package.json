@@ -10,6 +10,7 @@
     "fix": "ultracite fix",
     "knip": "knip",
     "prepare": "lefthook install",
+    "test": "turbo test",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {

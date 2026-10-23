@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The core is pure: no DOM, no Node. Standard globals (Intl, Web Crypto) only.
+    "lib": ["ES2022", "ES2023.Array"]
+  },
+  "include": ["src"]
+}

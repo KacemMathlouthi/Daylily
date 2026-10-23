@@ -204,9 +204,11 @@ keychain and **never** into the journal folder.
   its boundary time, not the launch time.
 - **At seal:** finish any pending save, assign a random gallery cover if none was chosen, compute `hash`, write
   `sealed`, then treat the day as read-only.
-- **Hash:** `sha256` over the canonical content, which is `title`, `cover` and the body, with LF line endings and
-  trailing whitespace trimmed. `updated`, `words` and unknown fields are excluded, so harmless metadata changes don't
-  break it.
+- **Hash:** `sha256` over the canonical content: the JSON array `[title, cover, body]` (an absent cover is `""`),
+  with the body's line endings as LF, trailing whitespace trimmed from each line and blank lines trimmed from both
+  ends. `updated`, `words` and unknown fields are excluded, so harmless metadata changes don't break it. The format
+  is fixed: changing it would mark every sealed day as edited (`packages/core/src/seal.ts` pins a known value).
+- **Stamp:** `sealed` is the day's 4am boundary in the zone it was written in (`tz`), with that zone's offset.
 - **Edited outside the app:** if the hash no longer matches, the day shows a quiet *"edited outside Daylily"* marker.
   No blocking, no restoring, no re-sealing. Trust over enforcement.
 - If the writing screen is open at the boundary, the page seals in place with a gentle transition (the
@@ -286,7 +288,7 @@ packages/ui/         the shared UI, used by every app
   src/primitives/      accessible building blocks on Base UI (shadcn-generated, then owned)
   src/components/      Daylily components: Flower, Garden, DayCover, Logo, the page editor's view and toolbar…
   src/editor/          the journal page editor on Tiptap: markdown in and out, ghost prompts, word counts
-packages/core/       later: pure domain logic (days, sealing, hashing, frontmatter, flowers)
+packages/core/       pure domain logic: days, sealing, hashing, frontmatter, flowers (no DOM, no Node)
 brand/               brand and product assets
 ```
 
@@ -312,13 +314,14 @@ brand/               brand and product assets
 | Motion | Motion (`motion/react`) for scroll and entrance animation; every animation honours reduced motion |
 | Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
+| Tests | Vitest (`pnpm test`), run on Linux, macOS and Windows in CI |
 | Component workbench | Storybook, later, once the first components exist |
 | Desktop build | electron-vite (Vite for main, preload and renderer); electron-builder for packaging, added when we package |
 | Electron | 44.x, the mature stable line; `pnpm-workspace.yaml` allows its install script |
 | Desktop routing | TanStack Router, file-based, hash history (the app loads from `file://`) |
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
-| CI | GitHub Actions: check, knip, typecheck, build on every PR |
+| CI | GitHub Actions: check, knip, typecheck, build and tests on every PR |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
@@ -538,14 +541,14 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-22 | Today's page: a shared markdown editor with ghost prompts and a selection toolbar, title, gallery or own cover, focus mode; held in memory until storage exists |
 | 2026-10-22 | Sealed and rested days, opened from the calendar, garden and Home; the page seals in place at 4am |
 | 2026-10-23 | Feedback round: months-only calendar, garden by year with a share card, more formats with code highlighting and a paste prompt, logo-mark theme cards, Home without header art, a splash window at launch |
+| 2026-10-23 | `packages/core`: the 4am day boundary across zones and DST, day files with frontmatter that keeps unknown fields, sealing and the seal hash, word counts and bloom sizes; tested on Linux, macOS and Windows |
 
 ### Next
-1. Build `packages/core`: day boundary, sealing, hashing and frontmatter, fully tested.
-2. Filesystem storage adapter with atomic writes and folder watching.
-3. Today's page: autosave to the day's file, copying covers into the day folder.
-4. Sealing for real: the seal scheduler, hashing, and gallery covers for coverless days.
-5. Calendar, garden, search, onboarding, settings, reminder.
-6. Packaging and signing for all three platforms.
+1. Filesystem storage adapter with atomic writes and folder watching.
+2. Today's page: autosave to the day's file, copying covers into the day folder.
+3. Sealing for real: the seal scheduler, and gallery covers for coverless days.
+4. Calendar, garden, search, onboarding, settings, reminder.
+5. Packaging and signing for all three platforms.
 
 ---
 
