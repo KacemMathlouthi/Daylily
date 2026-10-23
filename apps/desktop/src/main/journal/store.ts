@@ -1,0 +1,314 @@
+import { readdir, readFile } from "node:fs/promises";
+import { join, relative, resolve, sep } from "node:path";
+import type { Clock } from "@daylily/core/clock";
+import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
+import {
+  type DayFileError,
+  type PageContent,
+  readDayFile,
+  writeDayFile,
+} from "@daylily/core/day-file";
+import { fail, ok, type Result } from "@daylily/core/result";
+import { sealDayFile, sealState } from "@daylily/core/seal";
+import { countMarkdownWords } from "@daylily/core/words";
+import { writeFileAtomic } from "./atomic-write";
+
+/** A day as the calendar and garden need it, without its page. */
+export interface DaySummary {
+  cover: string | null;
+  day: DayKey;
+  /** Open while it can still be written; edited when its seal no longer matches. */
+  state: "open" | "sealed" | "edited";
+  title: string;
+  words: number;
+}
+
+export interface StoredDay extends DaySummary {
+  body: string;
+}
+
+/** A day whose file is there but whose frontmatter can't be read. Shown, never rewritten. */
+export interface UnreadableDay {
+  day: DayKey;
+  state: "unreadable";
+}
+
+export type JournalError =
+  | DayFileError
+  /** Only today is written, or a day that ended and hasn't sealed yet. */
+  | { kind: "not-writable"; day: DayKey }
+  /** The disk said no: full, read-only, permissions. */
+  | { kind: "io"; code: string };
+
+/** The image types a cover may be, by extension. */
+export const COVER_EXTENSIONS = [
+  "avif",
+  "gif",
+  "jpeg",
+  "jpg",
+  "png",
+  "webp",
+] as const;
+export type CoverExtension = (typeof COVER_EXTENSIONS)[number];
+
+const YEAR = /^\d{4}$/;
+const TWO_DIGITS = /^\d{2}$/;
+
+function errorCode(error: unknown) {
+  return (error as NodeJS.ErrnoException).code ?? "UNKNOWN";
+}
+
+async function readIfThere(path: string) {
+  try {
+    return await readFile(path, "utf8");
+  } catch (error) {
+    if (errorCode(error) === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function folderNames(path: string, pattern: RegExp) {
+  try {
+    const entries = await readdir(path, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isDirectory() && pattern.test(entry.name))
+      .map((entry) => entry.name);
+  } catch (error) {
+    if (errorCode(error) === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+}
+
+/**
+ * The journal on disk: one folder per day, `YYYY/MM/DD/YYYY-MM-DD.md`, with its
+ * cover beside it. The only code that touches the journal's files.
+ */
+export function createJournal({
+  app,
+  clock,
+  root,
+}: {
+  /** Who writes, like `daylily/0.1.0`. */
+  app: string;
+  clock: Clock;
+  root: string;
+}) {
+  const journalRoot = resolve(root);
+  // One write at a time per file, so a save and the seal never interleave
+  const queues = new Map<string, Promise<unknown>>();
+
+  function inJournal(...segments: string[]) {
+    const path = resolve(journalRoot, ...segments);
+    const inside = relative(journalRoot, path);
+    if (inside === "" || inside.startsWith(`..${sep}`) || inside === "..") {
+      throw new Error(`Refused a path outside the journal: ${path}`);
+    }
+    return path;
+  }
+
+  const dayFile = (day: DayKey) => inJournal(...dayPath(day));
+  const dayAsset = (day: DayKey, name: string) =>
+    inJournal(...dayPath(day).slice(0, 3), name);
+
+  function queued<T>(path: string, task: () => Promise<T>): Promise<T> {
+    const previous = queues.get(path) ?? Promise.resolve();
+    const next = previous.then(task, task);
+    const settled = next.catch(() => undefined);
+    queues.set(path, settled);
+    settled.then(() => {
+      if (queues.get(path) === settled) {
+        queues.delete(path);
+      }
+    });
+    return next;
+  }
+
+  async function toStored(day: DayKey, text: string) {
+    const file = readDayFile(text);
+    if (!file.ok) {
+      return file;
+    }
+    const { body, meta } = file.value;
+    return ok<StoredDay>({
+      body,
+      cover: meta.cover,
+      day,
+      state: await sealState(file.value),
+      title: meta.title,
+      // Counted from the page, since another app may have changed it since
+      words: countMarkdownWords(body),
+    });
+  }
+
+  /**
+   * A day may be written while it is today. A day that has ended may still take
+   * a save that was on its way, until it seals; it is never started late.
+   */
+  function writable(day: DayKey, existing: string | null) {
+    const now = today(clock);
+    return day === now || (day < now && existing !== null);
+  }
+
+  async function guarded<T>(
+    work: () => Promise<Result<T, JournalError>>
+  ): Promise<Result<T, JournalError>> {
+    try {
+      return await work();
+    } catch (error) {
+      const code = errorCode(error);
+      if (code === "UNKNOWN") {
+        throw error;
+      }
+      return fail({ code, kind: "io" });
+    }
+  }
+
+  return {
+    /** Where a file in a day's folder lives, for showing its cover. */
+    dayAsset,
+
+    /** Every day with a file, oldest first. Days without one are bare soil. */
+    async listDays(): Promise<(DaySummary | UnreadableDay)[]> {
+      const years = await folderNames(journalRoot, YEAR);
+      const months = await Promise.all(
+        years.map(async (year) =>
+          (await folderNames(join(journalRoot, year), TWO_DIGITS)).map(
+            (month) => [year, month] as const
+          )
+        )
+      );
+      const dates = await Promise.all(
+        months
+          .flat()
+          .map(async ([year, month]) =>
+            (await folderNames(join(journalRoot, year, month), TWO_DIGITS)).map(
+              (date) => parseDayKey(`${year}-${month}-${date}`)
+            )
+          )
+      );
+      const days = dates.flat().filter((day) => day !== null);
+      const listed = await Promise.all(
+        days.sort().map(async (day) => {
+          const text = await readIfThere(dayFile(day));
+          if (text === null) {
+            return null;
+          }
+          const stored = await toStored(day, text);
+          if (!stored.ok) {
+            return { day, state: "unreadable" } satisfies UnreadableDay;
+          }
+          const { body: _, ...summary } = stored.value;
+          return summary;
+        })
+      );
+      return listed.filter((day) => day !== null);
+    },
+
+    /** A day's page and fields, or null when nothing was written that day. */
+    async readDay(
+      day: DayKey
+    ): Promise<Result<StoredDay | null, DayFileError>> {
+      const text = await readIfThere(dayFile(day));
+      return text === null ? ok(null) : toStored(day, text);
+    },
+
+    root: journalRoot,
+
+    /**
+     * Copies a cover image into a day's folder as `cover.<ext>`, returning its
+     * name. The page's next save records it. A sealed day's cover never changes.
+     */
+    saveCover(
+      day: DayKey,
+      bytes: Uint8Array,
+      extension: CoverExtension
+    ): Promise<Result<string, JournalError>> {
+      const path = dayFile(day);
+      return queued(path, () =>
+        guarded(async () => {
+          const existing = await readIfThere(path);
+          if (!writable(day, existing)) {
+            return fail({ day, kind: "not-writable" });
+          }
+          const file = existing === null ? null : readDayFile(existing);
+          if (file && !file.ok) {
+            return file;
+          }
+          if (file?.value.meta.sealed) {
+            return fail({ kind: "sealed" });
+          }
+          const name = `cover.${extension}`;
+          await writeFileAtomic(dayAsset(day, name), bytes);
+          return ok(name);
+        })
+      );
+    },
+
+    /**
+     * Seals a day: its cover if it had none, the time and the hash. Finishes any
+     * save still on its way first. A day without a file has nothing to seal.
+     */
+    sealDay(
+      day: DayKey,
+      seal: { cover: string | null; sealed: string }
+    ): Promise<Result<"sealed" | "nothing", JournalError>> {
+      const path = dayFile(day);
+      return queued(path, () =>
+        guarded(async () => {
+          const text = await readIfThere(path);
+          if (text === null) {
+            return ok("nothing" as const);
+          }
+          const sealed = await sealDayFile(text, seal);
+          if (!sealed.ok) {
+            return sealed;
+          }
+          await writeFileAtomic(path, sealed.value);
+          return ok("sealed" as const);
+        })
+      );
+    },
+
+    /**
+     * Saves a day's page, starting its folder on the first save. An empty page
+     * on a day never written leaves no trace.
+     */
+    writeDay(
+      day: DayKey,
+      page: PageContent
+    ): Promise<Result<StoredDay | null, JournalError>> {
+      const path = dayFile(day);
+      return queued(path, () =>
+        guarded(async () => {
+          const existing = await readIfThere(path);
+          if (!writable(day, existing)) {
+            return fail({ day, kind: "not-writable" });
+          }
+          const empty =
+            page.body.trim() === "" &&
+            page.title.trim() === "" &&
+            page.cover === null;
+          if (existing === null && empty) {
+            return ok(null);
+          }
+          const text = writeDayFile(existing, page, {
+            app,
+            now: clock.now(),
+            timeZone: clock.timeZone(),
+          });
+          if (!text.ok) {
+            return text;
+          }
+          await writeFileAtomic(path, text.value);
+          return toStored(day, text.value);
+        })
+      );
+    },
+  };
+}
+
+export type Journal = ReturnType<typeof createJournal>;
