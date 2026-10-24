@@ -290,8 +290,12 @@ export function TitleStrip() {
           <StripMenu groups={groups} key={label} label={label} />
         ))}
       </div>
-      {/* Centred on the window, whatever the menus' width */}
-      <span className="pointer-events-none absolute inset-x-0 top-0 flex h-full items-center justify-center text-ink-subtle text-meta">
+      {/*
+       * Centred on the window, whatever the menus' width, and only as wide as its
+       * words: Windows hit-tests drag regions by layout, not pointer-events, so a
+       * full-width overlay would turn the menus and controls into drag handles.
+       */}
+      <span className="pointer-events-none absolute top-0 left-1/2 flex h-full -translate-x-1/2 items-center whitespace-nowrap text-ink-subtle text-meta">
         {title}
       </span>
       <WindowControls />
