@@ -6,14 +6,7 @@
  * decided on purpose.
  */
 
-/** Work on the website, which ships separately, under these scopes. */
-const WEBSITE = ["web", "site"];
-
 const TYPES = [
-  ...WEBSITE.flatMap((scope) => [
-    { hidden: true, scope, type: "feat" },
-    { hidden: true, scope, type: "fix" },
-  ]),
   { section: "Features", type: "feat" },
   { section: "Bug fixes", type: "fix" },
   { section: "Performance", type: "perf" },
@@ -24,21 +17,16 @@ export default {
   branches: ["main"],
   plugins: [
     [
-      "@semantic-release/commit-analyzer",
+      // The official analyzer and notes, leaving out the website's commits
+      "./release-app-commits.mjs",
       {
         preset: "conventionalcommits",
+        presetConfig: { types: TYPES },
         releaseRules: [
-          ...WEBSITE.map((scope) => ({ release: false, scope })),
           // Below 1.0 a breaking change is a minor release; 1.0 is a choice, not a side effect
           { breaking: true, release: "minor" },
-          { release: "patch", type: "perf" },
-          { release: "patch", type: "revert" },
         ],
       },
-    ],
-    [
-      "@semantic-release/release-notes-generator",
-      { preset: "conventionalcommits", presetConfig: { types: TYPES } },
     ],
     [
       "@semantic-release/github",
