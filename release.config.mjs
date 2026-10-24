@@ -11,8 +11,8 @@ const WEBSITE = ["web", "site"];
 
 const TYPES = [
   ...WEBSITE.flatMap((scope) => [
-    { effect: "hidden", scope, type: "feat" },
-    { effect: "hidden", scope, type: "fix" },
+    { hidden: true, scope, type: "feat" },
+    { hidden: true, scope, type: "fix" },
   ]),
   { section: "Features", type: "feat" },
   { section: "Bug fixes", type: "fix" },
