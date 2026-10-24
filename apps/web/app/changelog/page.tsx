@@ -1,5 +1,5 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
-import { Lock } from "lucide-react";
+import { Lock, Rss } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,12 +9,20 @@ import { GithubMark } from "@/components/site/github-mark";
 import { HeaderSpacer } from "@/components/site/header-spacer";
 import { GITHUB_URL, SUGGEST_URL } from "@/components/site/links";
 import { Reveal } from "@/components/site/motion";
+import { pageMetadata } from "@/lib/site";
 import { RELEASES, type Release } from "./releases";
 
 export const metadata: Metadata = {
-  description:
-    "Every release of Daylily, newest first: what grew, what was mended, and what's being written next.",
-  title: "Changelog · Daylily",
+  ...pageMetadata({
+    description:
+      "Every release of Daylily, newest first: what grew, what was mended, and what's being written next.",
+    path: "/changelog",
+    title: "Changelog · Daylily",
+  }),
+  alternates: {
+    canonical: "/changelog",
+    types: { "application/rss+xml": "/changelog/rss.xml" },
+  },
 };
 
 const RELEASES_URL = `${GITHUB_URL}/releases`;
@@ -38,13 +46,31 @@ function Masthead() {
         Every release of Daylily, newest first. Each one is a page, sealed the
         day it ships, and every page grows a flower.
       </p>
-      <Link
-        className="flex items-center gap-1.75 pt-1.5 font-medium text-ink-soft text-sm hover:text-ink"
-        href={RELEASES_URL}
-      >
-        <GithubMark />
-        Releases on GitHub
-      </Link>
+      <div className="flex items-center gap-4.5 pt-1.5">
+        <Link
+          className="flex items-center gap-1.75 font-medium text-ink-soft text-sm hover:text-ink"
+          href="/changelog/rss.xml"
+        >
+          <Rss
+            aria-hidden="true"
+            className="text-daylily-deep"
+            size={14}
+            strokeWidth={2.2}
+          />
+          Follow by RSS
+        </Link>
+        <span
+          aria-hidden="true"
+          className="size-0.75 rounded-full bg-ink-ghost"
+        />
+        <Link
+          className="flex items-center gap-1.75 font-medium text-ink-soft text-sm hover:text-ink"
+          href={RELEASES_URL}
+        >
+          <GithubMark />
+          Releases on GitHub
+        </Link>
+      </div>
     </Reveal>
   );
 }
@@ -82,7 +108,10 @@ function DateColumn({ release }: { release: Release }) {
 
 function ReleaseEntry({ release }: { release: Release }) {
   return (
-    <Reveal className="flex flex-col gap-6 lg:flex-row lg:gap-0">
+    <Reveal
+      className="flex scroll-mt-28 flex-col gap-6 lg:flex-row lg:gap-0"
+      id={`v${release.version}`}
+    >
       <DateColumn release={release} />
       <div
         aria-hidden="true"
