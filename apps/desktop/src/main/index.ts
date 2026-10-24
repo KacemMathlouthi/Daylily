@@ -17,7 +17,7 @@ const PAPER = "#f4eee3";
 // Packaged builds carry the icon as a resource; in development it sits in resources/
 const ICON = app.isPackaged
   ? join(process.resourcesPath, "icon.png")
-  : join(import.meta.dirname, "../../build/icon.png");
+  : join(import.meta.dirname, "../../resources/icon.png");
 
 /** What a link may open outside the app: web pages, and mail from links in a page. */
 const EXTERNAL_LINK = /^(https?:\/\/|mailto:)/i;
