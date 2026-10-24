@@ -81,7 +81,7 @@ export function Header() {
           scrolled ? "py-3" : "py-5 md:py-7"
         )}
       >
-        <Link className="flex items-center gap-2.25 md:w-55" href="/">
+        <Link className="flex items-center gap-2.25 xl:w-55" href="/">
           <DaylilyMark className="text-ink" size={22} />
           <span
             className={cn(
@@ -95,7 +95,7 @@ export function Header() {
 
         <nav
           className={cn(
-            "hidden items-center gap-1 rounded-full border p-1.25 transition-[background-color,border-color] duration-300 ease-soft md:flex",
+            "hidden items-center gap-1 rounded-full border p-1.25 transition-[background-color,border-color] duration-300 ease-soft lg:flex",
             scrolled
               ? "border-transparent bg-transparent"
               : "border-white/70 bg-white/55 backdrop-blur-lg"
@@ -116,7 +116,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center justify-end gap-2 md:w-55">
+        <div className="flex items-center justify-end gap-2 xl:w-55">
           <ButtonLink
             aria-label="Daylily on GitHub"
             href={GITHUB_URL}

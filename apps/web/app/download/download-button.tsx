@@ -14,7 +14,10 @@ interface DownloadChoice {
 
 export type DownloadChoices = Record<Computer, DownloadChoice>;
 
-type Computer = "linux" | "mac" | "mac-intel" | "windows";
+/** `other` is a phone or tablet: nothing to install there, so it points at every download. */
+const PHONE_OR_TABLET = /Android|iPhone|iPad/;
+
+type Computer = "linux" | "mac" | "mac-intel" | "other" | "windows";
 
 /** Chromium's client hints; the only way a page can tell an Intel Mac from Apple silicon. */
 type NavigatorWithHints = Navigator & {
@@ -27,10 +30,15 @@ type NavigatorWithHints = Navigator & {
 
 async function whichComputer(): Promise<Computer> {
   const agent = navigator.userAgent;
+  // iPads say they're Macs, but a Mac has no touch screen
+  const touchMac = agent.includes("Mac") && navigator.maxTouchPoints > 1;
+  if (PHONE_OR_TABLET.test(agent) || touchMac) {
+    return "other";
+  }
   if (agent.includes("Windows")) {
     return "windows";
   }
-  if (agent.includes("Linux") && !agent.includes("Android")) {
+  if (agent.includes("Linux")) {
     return "linux";
   }
   // Most Macs sold since 2020 are Apple silicon, and Safari can't say, so that's the default
@@ -56,7 +64,10 @@ export function DownloadButton({ choices }: { choices: DownloadChoices }) {
   return (
     <div className="flex flex-col items-center gap-4 pt-2">
       <ButtonLink href={choice.url} size="pill-lg" variant="ink">
-        {isMac ? <AppleLogo /> : <Download aria-hidden="true" size={16} />}
+        {isMac ? <AppleLogo /> : null}
+        {computer === "linux" || computer === "windows" ? (
+          <Download aria-hidden="true" size={16} />
+        ) : null}
         {choice.label}
       </ButtonLink>
       <p className="text-ink-muted text-ui">{choice.meta}</p>

@@ -95,6 +95,11 @@ function downloadChoices(release: Release | null): DownloadChoices {
     linux: choice("Download for Linux", FILES.appImage, "AppImage"),
     mac: choice("Download for Mac", FILES.macArm, "Apple silicon"),
     "mac-intel": choice("Download for Mac", FILES.macIntel, "Intel"),
+    other: {
+      label: "See every download",
+      meta: "Daylily is for macOS, Windows and Linux computers",
+      url: "#platforms",
+    },
     windows: choice("Download for Windows", FILES.windows, "x64"),
   };
 }
@@ -288,7 +293,10 @@ export default async function DownloadPage() {
       <main className="bg-dawn-glow bg-paper-raised bg-no-repeat pb-10">
         <HeaderSpacer />
         <DownloadHero release={release} />
-        <div className="mx-auto grid max-w-328 gap-5 px-4 pb-30 md:grid-cols-3 md:px-0">
+        <div
+          className="mx-auto grid max-w-328 scroll-mt-28 gap-5 px-4 pb-30 md:grid-cols-3 md:px-0"
+          id="platforms"
+        >
           {PLATFORMS.map((platform, index) => (
             <Reveal className="flex" delay={index * 0.08} key={platform.name}>
               <PlatformCard platform={platform} release={release} />
