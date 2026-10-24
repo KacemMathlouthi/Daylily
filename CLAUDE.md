@@ -283,7 +283,7 @@ keychain and **never** into the journal folder.
 ### 4.3 Repo layout
 
 ```
-apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
+apps/web/            Next.js website: landing, /manifesto, /download, /changelog, /roadmap (later: docs, codexes, accounts)
 apps/desktop/        Electron app
   src/main/            the backend: windows, IPC handlers, the journal store and sealing (src/main/journal), the seal scheduler
   src/preload/         the bridge: exposes the typed window.daylily API, nothing else
@@ -330,7 +330,7 @@ brand/               brand and product assets
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
 | CI | GitHub Actions: check, knip, typecheck, build and tests on every PR; installers built on each OS for PRs that change packaging |
-| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. The Releases page is the changelog; nothing is committed back. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
+| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. Nothing is committed back; the website's changelog (`apps/web/app/changelog/releases.ts`) is written by hand, an entry for each release. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
@@ -427,7 +427,7 @@ Work accordingly.
 - **Atomic:** one concern per commit, committed as you go. A commit need not build on its own when splitting keeps
   review readable.
 - **Commits make the releases.** Every merge to `main` with a `feat` releases a minor version, a `fix` (or `perf`,
-  `revert`) a patch, and their titles are the release notes, so write them for the people who use the app. Other
+  `revert`) a patch, and their titles are the release notes, so write them for the people who use the app. Each release also gets a short entry, written by hand, on the website's changelog. Other
   types release nothing. The website's scopes, `web` and `site`, never release the app.
 
 ### Versions
@@ -515,7 +515,7 @@ drift, sync Paper back to what was agreed.
 | Page | Contents |
 |---|---|
 | v1 | First landing page draft (superseded) |
-| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download |
+| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 
@@ -571,11 +571,12 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Releases: installers for macOS, Windows and Linux built in CI, versions and notes from the commits by semantic-release, unsigned for now; `main` protected by PRs and green CI |
 | 2026-10-24 | **Daylily 0.1.0 released** on GitHub: dmg (Apple silicon and Intel), Windows setup, AppImage and deb |
 | 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
+| 2026-10-24 | Website: Download offers the latest release's real files (read from GitHub hourly) and picks the visitor's computer; a hand-written Changelog and a Roadmap of what grows after v1, both in the header; designed in Paper first |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: test 0.1.0 on real machines, the changelog and roadmap
-pages and real download links, the domain, the README, then end-to-end tests and auto-update.
+Keep it current as items ship or move. The next few: the domain, the README, repo details and community files,
+then end-to-end tests and auto-update.
 
 ---
 
