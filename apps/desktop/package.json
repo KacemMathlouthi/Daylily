@@ -1,8 +1,10 @@
 {
   "name": "@daylily/desktop",
-  "version": "0.0.1",
+  "version": "0.0.0-development",
   "private": true,
   "description": "Daylily, a human-first journal",
+  "homepage": "https://github.com/KacemMathlouthi/Daylily",
+  "license": "AGPL-3.0-only",
   "author": "Kacem Mathlouthi",
   "main": "out/main/index.js",
   "scripts": {
@@ -10,6 +12,8 @@
     "dev": "electron-vite dev",
     "journal:seed": "tsx scripts/seed-journal.mts",
     "journal:unseed": "tsx scripts/unseed-journal.mts",
+    "package:linux": "electron-vite build && electron-builder --linux",
+    "package:mac": "electron-vite build && electron-builder --mac",
     "package:win": "electron-vite build && electron-builder --win --x64",
     "package:win:installer": "electron-vite build && electron-builder --win nsis --x64",
     "start": "electron-vite preview",
@@ -45,5 +49,6 @@
     "vite": "8.3.5",
     "vitest": "5.0.3",
     "zod": "4.6.7"
-  }
+  },
+  "desktopName": "daylily.desktop"
 }

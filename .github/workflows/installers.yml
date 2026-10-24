@@ -1,0 +1,101 @@
+name: Installers
+
+# Builds the installers on each OS: for a release, attached to its draft; for a
+# pull request that changes packaging, kept as downloads on the run for a week.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: The commit or tag to build
+        required: true
+        type: string
+      version:
+        description: The version the app and its installers carry, like 0.2.0 or v0.2.0
+        required: true
+        type: string
+      release:
+        description: The release tag to attach the installers to; none keeps them on the run
+        required: false
+        default: ""
+        type: string
+  pull_request:
+    paths:
+      - .github/workflows/installers.yml
+      - apps/desktop/electron-builder.yml
+      - apps/desktop/package.json
+      - apps/desktop/resources/**
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            targets: --mac dmg --arm64 --x64
+          - os: windows-latest
+            # The Windows runner can set the .exe's icon and version, which needs Wine elsewhere
+            targets: --win nsis --x64 -c.win.signAndEditExecutable=true
+          - os: ubuntu-latest
+            targets: --linux AppImage deb --x64
+    runs-on: ${{ matrix.os }}
+    # Builds run the repository's code, so they never hold a token that can write
+    permissions:
+      contents: read
+    env:
+      # A pull request builds a preview, numbered after the run
+      VERSION: ${{ inputs.version || format('0.0.0-pr.{0}', github.run_number) }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        working-directory: apps/desktop
+        run: |
+          # The version lives in the tag; the app and its installer take it from here
+          npm pkg set version="${VERSION#v}"
+          pnpm exec electron-vite build
+          pnpm exec electron-builder ${{ matrix.targets }} --publish never
+      - name: Gather the installers
+        working-directory: apps/desktop/release
+        run: |
+          # Each runner makes only its own kind
+          shopt -s nullglob
+          mkdir ../installers
+          mv Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb ../installers/
+          ls -l ../installers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          path: apps/desktop/installers
+          retention-days: 7
+
+  attach:
+    needs: build
+    if: inputs.release != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE: ${{ inputs.release }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          merge-multiple: true
+          path: installers
+      - name: Attach to the release
+        run: gh release upload "$RELEASE" installers/* --repo "$GITHUB_REPOSITORY" --clobber
