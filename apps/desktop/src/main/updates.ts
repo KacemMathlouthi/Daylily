@@ -62,7 +62,7 @@ export async function keepUpToDate({
     if (state.status === "off" || busy) {
       return;
     }
-    // Failures arrive as "error" events too; this only keeps the promise quiet
+    // Failures also arrive as "error" events, which log them; this only keeps the promise quiet
     autoUpdater.checkForUpdates().catch(() => undefined);
   };
 
@@ -70,8 +70,10 @@ export async function keepUpToDate({
   handle(CHANNELS.updatesCheck, () => check());
   handle(CHANNELS.updatesDismiss, async () => {
     if (state.status === "ready" || state.status === "available") {
-      dismissedVersion = state.version;
-      await settings.write({ dismissedUpdate: state.version });
+      const { version } = state;
+      await settings.write({ dismissedUpdate: version });
+      // Only once it's remembered, so the card and a later look agree
+      dismissedVersion = version;
       apply({ type: "dismissed" });
     }
   });
@@ -92,6 +94,7 @@ export async function keepUpToDate({
 
   autoUpdater.autoDownload = download === null;
   autoUpdater.autoInstallOnAppQuit = true;
+  // Quiet in normal use; failures are logged by the "error" handler below
   autoUpdater.logger = null;
   autoUpdater.on("checking-for-update", () => apply({ type: "checking" }));
   autoUpdater.on("update-not-available", () =>
@@ -106,7 +109,10 @@ export async function keepUpToDate({
   autoUpdater.on("update-downloaded", (info) =>
     apply({ type: "downloaded", version: info.version })
   );
-  autoUpdater.on("error", () => apply({ type: "failed" }));
+  autoUpdater.on("error", (error) => {
+    console.error("Could not update Daylily", error);
+    apply({ type: "failed" });
+  });
 
   setInterval(check, RECHECK_MS).unref();
   return { check };
