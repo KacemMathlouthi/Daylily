@@ -283,7 +283,7 @@ keychain and **never** into the journal folder.
 ### 4.3 Repo layout
 
 ```
-apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
+apps/web/            Next.js website: landing, /manifesto, /download, /changelog, /roadmap (later: docs, codexes, accounts)
 apps/desktop/        Electron app
   src/main/            the backend: windows, IPC handlers, the journal store and sealing (src/main/journal), the seal scheduler
   src/preload/         the bridge: exposes the typed window.daylily API, nothing else
@@ -515,7 +515,7 @@ drift, sync Paper back to what was agreed.
 | Page | Contents |
 |---|---|
 | v1 | First landing page draft (superseded) |
-| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download |
+| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 
