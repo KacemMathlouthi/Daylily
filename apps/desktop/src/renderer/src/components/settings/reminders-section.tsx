@@ -7,8 +7,9 @@ import {
   SelectValue,
 } from "@daylily/ui/primitives/select";
 import { Switch } from "@daylily/ui/primitives/switch";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { dateFormat } from "../../lib/format";
+import { useJournalConfig } from "../../lib/preferences";
 import {
   SettingsGroup,
   SettingsHeading,
@@ -34,15 +35,21 @@ const LABELS = new Map(TIMES.map((time) => [time.value, time.label]));
 
 /** Paper's "09c": one evening reminder and what it will look like. */
 export function RemindersSection() {
-  // Held here until the reminder scheduler exists
-  const [enabled, setEnabled] = useState(true);
-  const [time, setTime] = useState("21:00");
+  const [config, change] = useJournalConfig();
+  const { enabled, time } = config.reminder;
   const label = LABELS.get(time) ?? time;
-  const chooseTime = useCallback((next: string | null) => {
-    if (next) {
-      setTime(next);
-    }
-  }, []);
+  const setEnabled = useCallback(
+    (next: boolean) => change({ reminder: { enabled: next } }),
+    [change]
+  );
+  const chooseTime = useCallback(
+    (next: string | null) => {
+      if (next) {
+        change({ reminder: { time: next } });
+      }
+    },
+    [change]
+  );
 
   return (
     <>

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import type { DayKey } from "./month";
 
+export const JOURNAL_INFO_KEY = ["journal", "info"] as const;
+
 /** The journal's folder and preferences, read once; they change only through Settings. */
 export function useJournalInfo() {
   return useQuery({
     queryFn: () => window.daylily.journal.info(),
-    queryKey: ["journal", "info"],
+    queryKey: JOURNAL_INFO_KEY,
     staleTime: Number.POSITIVE_INFINITY,
   }).data;
 }
