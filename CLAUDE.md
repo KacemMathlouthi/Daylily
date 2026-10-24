@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app writes, saves and reads a real journal folder; sealing, search, onboarding and the reminder are next. |
+| **Status** | Website live. Desktop app writes, saves, reads and seals a real journal folder; search, onboarding and the reminder are next. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -281,7 +281,7 @@ keychain and **never** into the journal folder.
 ```
 apps/web/            Next.js website: landing, /manifesto, /download (later: docs, codexes, accounts)
 apps/desktop/        Electron app
-  src/main/            the backend: windows, IPC handlers, the journal store (src/main/journal), later the seal scheduler
+  src/main/            the backend: windows, IPC handlers, the journal store and sealing (src/main/journal), the seal scheduler
   src/preload/         the bridge: exposes the typed window.daylily API, nothing else
   src/shared/          the IPC contract (channels, types, Zod schemas); private to the desktop app
   src/renderer/        the React app: TanStack Router routes, screens, components
@@ -502,7 +502,7 @@ drift, sync Paper back to what was agreed.
 |---|---|
 | v1 | First landing page draft (superseded) |
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 05 Calendar · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 
 Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases and are **not in v1**.
@@ -551,11 +551,13 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Every screen reads the journal: Home, Calendar, Garden and sealed days follow the folder as it changes; flowers take their colour from the cover (gallery covers carry a colour chosen by eye, photos are sampled), cached in `.daylily/cache/flowers.json`; the sample data lives only in the seed script |
 | 2026-10-24 | Settings › Journal for real: the folder, its days and size on disk, "Show in folder", and "Change…" moving the journal to another folder while running (unsaved words are saved first; nothing in the old folder moves) |
 | 2026-10-24 | Daylily's own title strip on Windows and Linux (Paper 12b); the garden ends on plain paper (06d) |
+| 2026-10-24 | Days seal for real: on launch, on wake, on focus and just after 4am, each at its own 4am where it was written, after the page's last save, with a random gallery cover for a day written without one; the gallery moved to `resources/covers` so sealing can reach it |
+| 2026-10-24 | A sealed day changed elsewhere says "Edited outside Daylily" (04d); a file that can't be read explains itself and shows the file (04e); a day without a cover shows its flower on its tile, pale when unreadable (05f) |
 
 ### Next
-1. Design in Paper, then build: the "edited outside Daylily" marker, a day whose file can't be read, and a day written without a cover.
-2. Sealing for real: the seal scheduler, and gallery covers for coverless days.
-3. Calendar, garden, search, onboarding, settings, reminder.
+1. Search across all days.
+2. Onboarding: choosing the folder on first run.
+3. The evening reminder.
 4. Packaging and signing for all three platforms.
 
 ---
