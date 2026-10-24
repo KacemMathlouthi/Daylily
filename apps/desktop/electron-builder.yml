@@ -4,8 +4,14 @@ copyright: Copyright © 2026 Daylily
 directories:
   output: release
   buildResources: resources
-# The release workflow attaches the installers itself; there's no auto-update feed yet
-publish: null
+# Where the app looks for new versions (electron-updater). Builds never publish
+# (--publish never): the release workflow attaches the installers and the
+# latest*.yml files this writes beside them
+publish:
+  provider: github
+  owner: KacemMathlouthi
+  repo: Daylily
+  releaseType: release
 # The app is fully bundled by electron-vite; nothing else needs to ship
 files:
   - out/**/*

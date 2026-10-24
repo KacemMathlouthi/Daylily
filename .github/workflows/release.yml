@@ -94,9 +94,10 @@ jobs:
       - name: Checksums
         run: |
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir installers
-          # A rerun finds the last run's list among the assets; it isn't an installer
-          rm -f installers/SHA256SUMS
-          (cd installers && sha256sum -- * > ../SHA256SUMS)
+          # Only the installers: not the updater's latest*.yml and blockmaps, nor
+          # the list a rerun finds among the assets
+          shopt -s extglob
+          (cd installers && sha256sum -- !(*.yml|*.blockmap|SHA256SUMS) > ../SHA256SUMS)
           gh release upload "$TAG" SHA256SUMS --repo "$GITHUB_REPOSITORY" --clobber
       - name: Publish
         run: gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
