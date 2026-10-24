@@ -11,7 +11,7 @@ import { YearList } from "../components/garden/year-list";
 import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
 import { gardenGrid, gardenStats, gardenYears } from "../lib/garden";
-import { useJournalDays } from "../lib/journal";
+import { useJournalBegins, useJournalDays } from "../lib/journal";
 import { useToday } from "../lib/use-today";
 
 export const Route = createFileRoute("/garden")({
@@ -25,6 +25,7 @@ const NUMBER = new Intl.NumberFormat("en");
 function GardenScreen() {
   const today = useToday();
   const days = useJournalDays();
+  const begins = useJournalBegins(today);
   const years = useMemo(() => gardenYears(days.keys(), today), [days, today]);
   const [year, setYear] = useState(() => Number(today.slice(0, 4)));
   const { data: info } = useQuery({
@@ -38,10 +39,11 @@ function GardenScreen() {
       new Date(year, 0, 1),
       new Date(year, 11, 31),
       today,
-      days
+      days,
+      begins
     );
     return { grid: built, stats: gardenStats(built, days) };
-  }, [days, year, today]);
+  }, [begins, days, year, today]);
 
   const saveImage = useCallback(async () => {
     const png = await renderShareCard({
@@ -102,13 +104,14 @@ function GardenScreen() {
         <YearList onSelect={setYear} selected={year} years={years} />
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      {/* Two by two in a narrow window, so "9 – 10 pm" never breaks */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tiles.map((tile) => (
           <div
             className="flex flex-col gap-1 rounded-xl border border-line bg-paper-page/85 px-5 py-4.5"
             key={tile.label}
           >
-            <span className="font-display text-ink text-title leading-9.5">
+            <span className="whitespace-nowrap font-display text-ink text-title leading-9.5">
               {tile.value}
             </span>
             <span className="text-caption text-ink-subtle">{tile.label}</span>

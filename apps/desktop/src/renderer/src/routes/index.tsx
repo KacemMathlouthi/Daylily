@@ -10,7 +10,11 @@ import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
 import { gardenGrid } from "../lib/garden";
 import { greetingFor } from "../lib/greeting";
-import { type JournalDay, useJournalDays } from "../lib/journal";
+import {
+  type JournalDay,
+  useJournalBegins,
+  useJournalDays,
+} from "../lib/journal";
 import { type DayKey, dayKey, fromKey } from "../lib/month";
 import { useTodayPage } from "../lib/today-page";
 import { useNow } from "../lib/use-now";
@@ -40,12 +44,16 @@ function shift(key: DayKey, days: number) {
   return date;
 }
 
-function useGlance(today: DayKey, days: ReadonlyMap<DayKey, JournalDay>) {
+function useGlance(
+  today: DayKey,
+  begins: DayKey,
+  days: ReadonlyMap<DayKey, JournalDay>
+) {
   return useMemo(() => {
     const now = fromKey(today);
     const end = shift(today, 6 - ((now.getDay() + 6) % 7));
     const start = shift(dayKey(end), -GLANCE_WEEKS * 7 + 1);
-    const grid = gardenGrid(start, end, today, days);
+    const grid = gardenGrid(start, end, today, days, begins);
 
     const written = grid.keys
       .map((key) => (key <= today ? days.get(key) : undefined))
@@ -64,11 +72,12 @@ function useGlance(today: DayKey, days: ReadonlyMap<DayKey, JournalDay>) {
           : 0,
         flowers: written.length,
         since: MONTH.format(start),
+        weekDays: week.filter((key) => key >= begins).length,
         weekWritten: week.filter((key) => days.has(key)).length,
       },
       week,
     };
-  }, [days, today]);
+  }, [begins, days, today]);
 }
 
 /** Paper's "02 Home": a greeting, today's invitation, the garden and the week. */
@@ -81,7 +90,8 @@ function HomeScreen() {
     queryKey: ["app", "info"],
   });
   const days = useJournalDays();
-  const { grid, stats, week } = useGlance(today, days);
+  const begins = useJournalBegins(today);
+  const { grid, stats, week } = useGlance(today, begins, days);
   const yearAgo = fromKey(today);
   yearAgo.setFullYear(yearAgo.getFullYear() - 1);
   const memoryKey = dayKey(yearAgo);
@@ -127,7 +137,7 @@ function HomeScreen() {
         {memory ? <OnThisDay day={memory} dayKey={memoryKey} /> : null}
       </div>
 
-      <ThisWeek days={week} entries={days} />
+      <ThisWeek begins={begins} days={week} entries={days} />
     </Page>
   );
 }
