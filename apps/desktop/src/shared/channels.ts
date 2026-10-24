@@ -2,6 +2,7 @@ import type { PageContent } from "@daylily/core/day-file";
 import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
+  DeviceState,
   JournalConfig,
   JournalError,
   JournalInfo,
@@ -17,6 +18,8 @@ import type {
 export const CHANNELS = {
   appInfo: "app:info",
   appReady: "app:ready",
+  deviceGet: "device:get",
+  deviceSet: "device:set",
   journalChanged: "journal:changed",
   journalInfo: "journal:info",
   journalList: "journal:list",
@@ -60,6 +63,14 @@ export interface DaylilyApi {
   cover: {
     /** Opens the system's file picker for one image. Null if cancelled. */
     pick: () => Promise<PickedImage | null>;
+  };
+  /**
+   * What this computer remembers, such as the theme: read from the main process
+   * as the page starts, so it never waits on its own storage, and saved through here.
+   */
+  device: {
+    initial: DeviceState;
+    set: (changes: Partial<DeviceState>) => Promise<void>;
   };
   garden: {
     /** Asks where to save, then writes the garden's share card. False if cancelled. */

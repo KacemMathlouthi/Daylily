@@ -1,5 +1,26 @@
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from "electron";
 import { CHANNELS, type DaylilyApi } from "../shared/channels";
+import type { DeviceState } from "../shared/journal";
+
+const THEMES = new Set(["light", "dark", "system"]);
+
+/**
+ * This computer's settings, asked of the main process once as the page starts:
+ * it holds them in memory, so the answer is immediate. Checked by hand to keep
+ * the preload free of dependencies.
+ */
+function initialDevice(): DeviceState {
+  const value: Partial<DeviceState> | null = ipcRenderer.sendSync(
+    CHANNELS.deviceGet
+  );
+  return {
+    sidebarOpen:
+      typeof value?.sidebarOpen === "boolean" ? value.sidebarOpen : true,
+    theme: THEMES.has(value?.theme ?? "")
+      ? (value?.theme as DeviceState["theme"])
+      : "system",
+  };
+}
 
 /** The only door between the UI and the rest of the computer. Keep it small. */
 const api: DaylilyApi = {
@@ -9,6 +30,10 @@ const api: DaylilyApi = {
   },
   cover: {
     pick: () => ipcRenderer.invoke(CHANNELS.pickCover),
+  },
+  device: {
+    initial: initialDevice(),
+    set: (changes) => ipcRenderer.invoke(CHANNELS.deviceSet, changes),
   },
   garden: {
     saveImage: (png, name) =>

@@ -16,13 +16,26 @@ const TWO_FRAMES =
   "new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))";
 const FADE_STEPS = 14;
 
-/** Loads one of the renderer's pages: from the dev server, or from the built files. */
-export function loadPage(window: BrowserWindow, page: "index" | "splash") {
+/** Loads one of the renderer's pages, from the dev server or the built files, with an optional query. */
+export function loadPage(
+  window: BrowserWindow,
+  page: "index" | "splash",
+  query: Record<string, string> = {}
+) {
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   if (devUrl) {
-    return window.loadURL(page === "index" ? devUrl : `${devUrl}/${page}.html`);
+    const url = new URL(page === "index" ? devUrl : `${devUrl}/${page}.html`);
+    for (const [key, value] of Object.entries(query)) {
+      url.searchParams.set(key, value);
+    }
+    return window.loadURL(url.toString());
   }
-  return window.loadFile(join(import.meta.dirname, `../renderer/${page}.html`));
+  return window.loadFile(
+    join(import.meta.dirname, `../renderer/${page}.html`),
+    {
+      query,
+    }
+  );
 }
 
 /**
@@ -33,10 +46,13 @@ export function loadPage(window: BrowserWindow, page: "index" | "splash") {
 export function openSplash({
   icon,
   background,
+  theme,
 }: {
   icon: string;
   /** The paper colour, so the window never flashes white before it paints. */
   background: string;
+  /** The theme the app will open in; the splash has no bridge, so it reads it from its address. */
+  theme: string;
 }) {
   // Counted from when it appears, so a slow first paint doesn't eat into the bloom
   let shownAt: number | null = null;
@@ -97,7 +113,7 @@ export function openSplash({
     }
   };
   splash.webContents.on("did-finish-load", send);
-  loadPage(splash, "splash");
+  loadPage(splash, "splash", { theme });
 
   return {
     /** Shows the app, then fades the splash away once it has been up long enough. */

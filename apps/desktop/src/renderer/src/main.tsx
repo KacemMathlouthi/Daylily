@@ -12,7 +12,9 @@ import { startTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
 
 // Before React renders, so the first paint is already in the right theme
-startTheme();
+startTheme(window.daylily.device.initial.theme, (theme) => {
+  window.daylily.device.set({ theme });
+});
 
 const queryClient = new QueryClient();
 

@@ -20,7 +20,7 @@ import {
 } from "../shared/schemas";
 
 /** Only answer requests that come from our own renderer, never from other frames. */
-function isTrustedSender(event: IpcMainEvent | IpcMainInvokeEvent) {
+export function isTrustedSender(event: IpcMainEvent | IpcMainInvokeEvent) {
   const url = event.senderFrame?.url ?? "";
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   return (

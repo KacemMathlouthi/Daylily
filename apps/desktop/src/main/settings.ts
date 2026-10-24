@@ -22,6 +22,8 @@ export type DeviceSettings = z.infer<typeof settingsSchema>;
 /** Where a journal lives until onboarding lets people choose. */
 export const DEFAULT_JOURNAL = join(homedir(), "Daylily");
 
+export type DeviceSettingsStore = ReturnType<typeof deviceSettings>;
+
 export function deviceSettings(folder: string) {
   const path = join(folder, "settings.json");
 
@@ -39,8 +41,16 @@ export function deviceSettings(folder: string) {
       return (await read()).journalPath ?? DEFAULT_JOURNAL;
     },
     read,
-    async write(changes: Partial<DeviceSettings>) {
-      const next = settingsSchema.parse({ ...(await read()), ...changes });
+    /** Saves changes over what's there; a field left out, or undefined, keeps its value. */
+    async write(
+      changes: {
+        [Key in keyof DeviceSettings]?: DeviceSettings[Key] | undefined;
+      }
+    ) {
+      const defined = Object.fromEntries(
+        Object.entries(changes).filter(([, value]) => value !== undefined)
+      );
+      const next = settingsSchema.parse({ ...(await read()), ...defined });
       await writeFileAtomic(path, `${JSON.stringify(next, null, 2)}\n`);
       return next;
     },

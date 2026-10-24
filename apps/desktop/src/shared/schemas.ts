@@ -77,3 +77,8 @@ export const configChangesSchema = z.strictObject({
     })
     .optional(),
 }) satisfies z.ZodType<JournalConfigChanges>;
+
+export const deviceChangesSchema = z.strictObject({
+  sidebarOpen: z.boolean().optional(),
+  theme: z.enum(["light", "dark", "system"]).optional(),
+});
