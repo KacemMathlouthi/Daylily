@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app writes, saves, reads and seals a real journal folder, and reminds in the evening; search, onboarding and packaging are next. |
+| **Status** | Website live. Desktop app 0.x released for macOS, Windows and Linux (unsigned): writes, saves, reads and seals a real journal folder, and reminds in the evening; search and onboarding are next. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -329,7 +329,8 @@ brand/               brand and product assets
 | Desktop routing | TanStack Router, file-based, hash history (the app loads from `file://`) |
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
-| CI | GitHub Actions: check, knip, typecheck, build and tests on every PR |
+| CI | GitHub Actions: check, knip, typecheck, build and tests on every PR; installers built on each OS for PRs that change packaging |
+| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. The Releases page is the changelog; nothing is committed back. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
@@ -425,6 +426,14 @@ Work accordingly.
 - **No description body, no `Co-Authored-By` trailer, no AI tool or session links.**
 - **Atomic:** one concern per commit, committed as you go. A commit need not build on its own when splitting keeps
   review readable.
+- **Commits make the releases.** Every merge to `main` with a `feat` releases a minor version, a `fix` (or `perf`,
+  `revert`) a patch, and their titles are the release notes, so write them for the people who use the app. Other
+  types release nothing. The website's scopes, `web` and `site`, never release the app.
+
+### Versions
+- Semantic versioning, `MAJOR.MINOR.PATCH`. Releases began at `0.1.0` on 2026-10-24.
+- **Daylily stays below 1.0** until the owner decides it's ready; a breaking change is released as a minor version.
+  Going to 1.0 is a deliberate change to `release.config.mjs`, never a side effect.
 
 ### Branches and pull requests
 - Never commit directly to `main`. Branch from an up-to-date `main` with a short descriptive name
@@ -558,11 +567,12 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Days seal for real: on launch, on wake, on focus and just after 4am, each at its own 4am where it was written, after the page's last save, with a random gallery cover for a day written without one; the gallery moved to `resources/covers` so sealing can reach it |
 | 2026-10-24 | A sealed day changed elsewhere says "Edited outside Daylily" (04d); a file that can't be read explains itself and shows the file (04e); a day without a cover shows its flower on its tile, pale when unreadable (05f) |
 | 2026-10-24 | The evening reminder, from the tray while the window is closed; ghost prompts, gallery covers and the reminder are kept in the journal's config |
+| 2026-10-24 | Releases: installers for macOS, Windows and Linux built in CI, versions and notes from the commits by semantic-release, unsigned for now; `main` protected by PRs and green CI |
 
 ### Next
 1. Search across all days (design in Paper first).
 2. Onboarding: choosing the folder on first run.
-3. Packaging and signing for all three platforms. Then check the evening reminder's notification on Windows from
+3. Signing for macOS (Developer ID, notarization) and Windows, and auto-update. Then check the evening reminder's notification on Windows from
    the installer: it's untested there, and the unpacked build can't show it, since Windows only shows notifications
    from an app with a Start Menu entry under its id (`app.daylily.desktop`), which the installer creates.
 
