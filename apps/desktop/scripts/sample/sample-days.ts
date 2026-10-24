@@ -1,15 +1,18 @@
 import type { FlowerColor } from "@daylily/core/flower";
-import { type DayKey, dayKey, fromKey, todayKey } from "../lib/month";
+import {
+  type DayKey,
+  dayKey,
+  fromKey,
+  todayKey,
+} from "../../src/renderer/src/lib/month";
 
 /**
- * Sample days: what the screens show until they read the journal, and what the
- * seed script writes into one. October 2026 is Paper's "05 Calendar" exactly;
- * the months before it are grown from a seed so the garden has something to show.
+ * The sample journal the seed script writes: October 2026 is Paper's "05
+ * Calendar" exactly; the months before it are grown from a seed, so a journal has
+ * a year and a half of history to try the app with.
  */
 export interface SampleDay {
-  /** The flower's colour, which the real app samples from the cover. */
-  color: FlowerColor;
-  /** Which of `mock/covers/oct-<id>.webp` is its cover. */
+  /** Which of `covers/oct-<id>.webp` is its cover. */
   coverId: string;
   /** A first line, for the days the design quotes. */
   excerpt?: string;
@@ -19,8 +22,11 @@ export interface SampleDay {
   words: number;
 }
 
-/** Each cover's dominant colour, as a flower. */
-const COVER_COLORS: Record<string, FlowerColor> = {
+/**
+ * Each sample cover's flower, chosen by eye like the gallery's: the pictures are
+ * all warm golden light, so sampling them would grow a garden of one colour.
+ */
+export const COVER_COLORS: Record<string, FlowerColor> = {
   "01": "saffron",
   "02": "daylily",
   "04": "saffron",
@@ -41,7 +47,7 @@ const COVER_COLORS: Record<string, FlowerColor> = {
 const COVER_IDS = Object.keys(COVER_COLORS);
 
 function cover(id: string) {
-  return { color: COVER_COLORS[id] ?? "daylily", coverId: id };
+  return { coverId: id };
 }
 
 const OCTOBER: [day: string, title: string, words: number][] = [

@@ -6,11 +6,9 @@ import { writeDayFile } from "@daylily/core/day-file";
 import { sealDayFile, sealTime } from "@daylily/core/seal";
 import { instantAt } from "@daylily/core/zone";
 import { writeFileAtomic } from "../src/main/journal/atomic-write";
-import { mockPage } from "../src/renderer/src/mock/pages";
-import {
-  type SampleDay,
-  sampleDays,
-} from "../src/renderer/src/mock/sample-days";
+import { fileStamp, flowerCache } from "../src/main/journal/flower-cache";
+import { mockPage } from "./sample/pages";
+import { COVER_COLORS, type SampleDay, sampleDays } from "./sample/sample-days";
 import {
   journalFolder,
   manifestPath,
@@ -24,7 +22,7 @@ import {
  * manifest lets `journal:unseed` take back exactly what was added.
  */
 
-const COVERS = join(import.meta.dirname, "../src/renderer/src/mock/covers");
+const COVERS = join(import.meta.dirname, "sample/covers");
 
 const exists = (path: string) =>
   access(path).then(
@@ -36,7 +34,8 @@ async function seedDay(
   journal: string,
   key: string,
   day: SampleDay,
-  zone: string
+  zone: string,
+  flowers: ReturnType<typeof flowerCache>
 ): Promise<SeedManifest["files"]> {
   const dayKey = parseDayKey(key);
   if (!dayKey) {
@@ -86,6 +85,12 @@ async function seedDay(
       writeFileAtomic(join(journal, ...folder, name), data)
     )
   );
+  // The sample covers' colours are set, as the gallery's are
+  const stamp = await fileStamp(join(journal, ...folder, "cover.webp"));
+  const color = COVER_COLORS[day.coverId];
+  if (stamp && color) {
+    await flowers.set(key, stamp, color);
+  }
   return files.map(([name, data]) => ({
     path: [...folder, name].join("/"),
     sha256: sha256(data),
@@ -101,10 +106,12 @@ if (await exists(manifestPath(target))) {
 }
 
 const deviceZone = systemClock.timeZone();
+const cache = flowerCache(target);
 const days = [...sampleDays()];
 const written = await Promise.all(
-  days.map(([key, day]) => seedDay(target, key, day, deviceZone))
+  days.map(([key, day]) => seedDay(target, key, day, deviceZone, cache))
 );
+await cache.flush();
 const files = written.flat();
 const manifest: SeedManifest = {
   files,
