@@ -19,7 +19,8 @@ export async function GET(
   { params }: { params: Promise<{ file: string }> }
 ) {
   const { file } = await params;
-  const pattern = LINKS[file];
+  // Only our own names: a plain lookup would also find `constructor` and friends
+  const pattern = Object.hasOwn(LINKS, file) ? LINKS[file] : undefined;
   const release = pattern ? await latestRelease() : null;
   const asset = release?.assets.find((candidate) =>
     pattern?.test(candidate.name)
