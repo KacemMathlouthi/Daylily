@@ -280,6 +280,24 @@ describe("listDays", () => {
   });
 });
 
+describe("diskUsage", () => {
+  it("adds up every file in the journal", async () => {
+    expect(await journal.diskUsage()).toBe(0);
+    await journal.saveCover(key("2026-10-21"), new Uint8Array(1000), "jpg");
+    await writeFile(join(root, "notes.md"), "12345");
+    expect(await journal.diskUsage()).toBe(1005);
+  });
+
+  it("is nothing before the folder exists", async () => {
+    const missing = createJournal({
+      app: "daylily/0.1.0",
+      clock,
+      root: join(root, "not-yet"),
+    });
+    expect(await missing.diskUsage()).toBe(0);
+  });
+});
+
 describe("dayAsset", () => {
   it("refuses a name that leads out of the journal", () => {
     const day = key("2026-10-21");

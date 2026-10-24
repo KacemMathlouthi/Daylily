@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
@@ -177,6 +177,32 @@ export function createJournal({
 
     /** Writes any flower colours not yet saved, such as before quitting. */
     flushCache: () => flowers.flush(),
+
+    /** How much the journal folder holds, every file in it, in bytes. */
+    async diskUsage(): Promise<number> {
+      try {
+        const entries = await readdir(journalRoot, {
+          recursive: true,
+          withFileTypes: true,
+        });
+        const sizes = await Promise.all(
+          entries
+            .filter((entry) => entry.isFile())
+            .map((entry) =>
+              stat(join(entry.parentPath, entry.name)).then(
+                (file) => file.size,
+                () => 0
+              )
+            )
+        );
+        return sizes.reduce((total, size) => total + size, 0);
+      } catch (error) {
+        if (errorCode(error) === "ENOENT") {
+          return 0;
+        }
+        throw error;
+      }
+    },
 
     /** Every day with a file, oldest first. Days without one are bare soil. */
     async listDays(): Promise<ListedDay[]> {
