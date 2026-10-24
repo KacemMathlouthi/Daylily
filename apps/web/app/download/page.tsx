@@ -1,14 +1,19 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
-import { Button } from "@daylily/ui/primitives/button";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { AppleLogo } from "@/components/site/apple-logo";
 import { ButtonLink } from "@/components/site/button-link";
 import { Footer } from "@/components/site/footer";
 import { GithubMark } from "@/components/site/github-mark";
 import { HeaderSpacer } from "@/components/site/header-spacer";
 import { GITHUB_URL } from "@/components/site/links";
 import { Reveal } from "@/components/site/motion";
+import {
+  latestRelease,
+  megabytes,
+  RELEASES_URL,
+  type Release,
+} from "@/lib/release";
+import { DownloadButton, type DownloadChoices } from "./download-button";
 
 export const metadata: Metadata = {
   description:
@@ -16,54 +21,83 @@ export const metadata: Metadata = {
   title: "Download · Daylily",
 };
 
-/*
- * Placeholder release details: Daylily has no public build yet, so the
- * versions, sizes and checksums below are illustrative until the first release.
- */
-const VERSION = "0.1.0";
+/** How each release file is told apart; the names come from electron-builder.yml. */
+const FILES = {
+  appImage: /\.AppImage$/,
+  checksums: /^SHA256SUMS$/,
+  deb: /\.deb$/,
+  macArm: /-arm64\.dmg$/,
+  macIntel: /-x64\.dmg$/,
+  windows: /-setup\.exe$/,
+};
 
 const PLATFORMS = [
   {
-    checksum: "9f2c41e8…a7d3e41a",
     files: [
-      {
-        file: `Daylily-${VERSION}.dmg`,
-        kind: "Universal disk image",
-        size: "112 MB",
-      },
+      { kind: "Apple silicon", pattern: FILES.macArm },
+      { kind: "Intel", pattern: FILES.macIntel },
     ],
     icon: "/images/icons/macos.png",
     name: "macOS",
     requires: "macOS 13 Ventura or later",
   },
   {
-    checksum: "41b07c9e…d25f80c3",
-    files: [
-      {
-        file: `Daylily-${VERSION}-setup.exe`,
-        kind: "Installer",
-        size: "96 MB",
-      },
-    ],
+    files: [{ kind: "Installer", pattern: FILES.windows }],
     icon: "/images/icons/windows.png",
     name: "Windows",
-    requires: "Windows 10 or later · x64 and ARM64",
+    requires: "Windows 10 or later · x64",
   },
   {
-    checksum: "c86e2f17…3b9a0d5e",
     files: [
-      { file: `Daylily-${VERSION}.AppImage`, kind: "AppImage", size: "118 MB" },
-      {
-        file: `daylily_${VERSION}_amd64.deb`,
-        kind: "Debian package",
-        size: "84 MB",
-      },
+      { kind: "AppImage", pattern: FILES.appImage },
+      { kind: "Debian package", pattern: FILES.deb },
     ],
     icon: "/images/icons/linux.png",
     name: "Linux",
-    requires: "Ubuntu 22.04, Fedora 39 or similar",
+    requires: "Ubuntu 22.04, Fedora 39 or similar · x64",
   },
 ];
+
+type Platform = (typeof PLATFORMS)[number];
+
+function findAsset(release: Release | null, pattern: RegExp) {
+  return release?.assets.find((asset) => pattern.test(asset.name));
+}
+
+/** The release's date, the same for every visitor wherever they are. */
+function publishedOn(release: Release) {
+  return new Date(release.published).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+    year: "numeric",
+  });
+}
+
+/** The hero button for each kind of computer; without a release, each goes to GitHub's list. */
+function downloadChoices(release: Release | null): DownloadChoices {
+  const choice = (label: string, pattern: RegExp, chip: string) => {
+    const asset = findAsset(release, pattern);
+    if (!(release && asset)) {
+      return {
+        label,
+        meta: "Every version is on GitHub",
+        url: RELEASES_URL,
+      };
+    }
+    return {
+      label,
+      meta: `Version ${release.version} · ${publishedOn(release)} · ${chip} · ${megabytes(asset.size)}`,
+      url: asset.url,
+    };
+  };
+  return {
+    linux: choice("Download for Linux", FILES.appImage, "AppImage"),
+    mac: choice("Download for Mac", FILES.macArm, "Apple silicon"),
+    "mac-intel": choice("Download for Mac", FILES.macIntel, "Intel"),
+    windows: choice("Download for Windows", FILES.windows, "x64"),
+  };
+}
 
 const NOTES = [
   {
@@ -72,9 +106,9 @@ const NOTES = [
     title: "Today’s page",
   },
   {
-    body: "When the day ends the page seals and stays honest, like ink. Past days open, but never change.",
+    body: "When the day ends, at 4am, the page seals and stays honest, like ink. Past days open, but never change.",
     color: "text-petal",
-    title: "Sealed at midnight",
+    title: "Sealed at 4am",
   },
   {
     body: "Every day you write plants a flower. Scroll back through covers and titles like a photo album.",
@@ -82,9 +116,9 @@ const NOTES = [
     title: "Garden and calendar",
   },
   {
-    body: "Each day is a markdown file in a folder you choose. Search every page, fully offline.",
+    body: "Each day is a markdown file in a folder you choose. Open it in any editor, today or in twenty years.",
     color: "text-cornflower",
-    title: "Plain files, instant search",
+    title: "Plain files you own",
   },
   {
     body: "“How was your day?” at 9pm. Change the time, or turn it off. It never mentions a missed day.",
@@ -93,7 +127,7 @@ const NOTES = [
   },
 ];
 
-function DownloadHero() {
+function DownloadHero({ release }: { release: Release | null }) {
   return (
     <Reveal className="flex flex-col items-center gap-7 px-5 pt-14 pb-24 text-center md:pt-22">
       <Image
@@ -113,21 +147,19 @@ function DownloadHero() {
           Your journal is a folder on your machine.
         </p>
       </div>
-      <div className="flex flex-col items-center gap-4 pt-2">
-        <Button size="pill-lg" variant="ink">
-          <AppleLogo />
-          Download for Mac
-        </Button>
-        <p className="text-ink-muted text-ui">
-          Version {VERSION} · October 20, 2026 · Universal for Apple silicon and
-          Intel · 112 MB
-        </p>
-      </div>
+      <DownloadButton choices={downloadChoices(release)} />
     </Reveal>
   );
 }
 
-function PlatformCard({ platform }: { platform: (typeof PLATFORMS)[number] }) {
+function PlatformCard({
+  platform,
+  release,
+}: {
+  platform: Platform;
+  release: Release | null;
+}) {
+  const checksums = findAsset(release, FILES.checksums);
   return (
     <div className="flex w-full flex-col gap-6 rounded-3xl border border-line bg-paper-page p-8 shadow-tile">
       <div className="flex items-center gap-4">
@@ -146,28 +178,42 @@ function PlatformCard({ platform }: { platform: (typeof PLATFORMS)[number] }) {
         </div>
       </div>
       <ul className="flex grow flex-col gap-3.5 border-line border-t pt-4">
-        {platform.files.map((file) => (
-          <li
-            className="flex items-center justify-between gap-3"
-            key={file.file}
-          >
-            <div className="flex min-w-0 flex-col gap-0.75">
-              <span className="font-medium text-body-sm text-ink">
-                {file.kind}
-              </span>
-              <span className="truncate font-mono text-ink-subtle text-xs">
-                {file.file} · {file.size}
-              </span>
-            </div>
-            <Button size="pill-sm" variant="paper">
-              Download
-            </Button>
-          </li>
-        ))}
+        {platform.files.map((file) => {
+          const asset = findAsset(release, file.pattern);
+          return (
+            <li
+              className="flex items-center justify-between gap-3"
+              key={file.kind}
+            >
+              <div className="flex min-w-0 flex-col gap-0.75">
+                <span className="font-medium text-body-sm text-ink">
+                  {file.kind}
+                </span>
+                <span className="truncate font-mono text-ink-subtle text-xs">
+                  {asset
+                    ? `${asset.name} · ${megabytes(asset.size)}`
+                    : "On GitHub Releases"}
+                </span>
+              </div>
+              <ButtonLink
+                href={asset?.url ?? RELEASES_URL}
+                size="pill-sm"
+                variant="paper"
+              >
+                Download
+              </ButtonLink>
+            </li>
+          );
+        })}
       </ul>
-      <p className="font-mono text-ink-faint text-tag">
-        SHA-256 {platform.checksum}
-      </p>
+      {checksums && (
+        <a
+          className="font-mono text-ink-faint text-tag underline-offset-3 hover:text-ink-muted hover:underline"
+          href={checksums.url}
+        >
+          SHA-256 checksums
+        </a>
+      )}
     </div>
   );
 }
@@ -182,8 +228,8 @@ function ReleaseNotes() {
             The human core, first.
           </h2>
           <p className="text-base text-ink-muted leading-6.5">
-            Version 0.1 is everything you need to write every day. AI, sync and
-            import arrive later, and stay optional.
+            Version 0.1 is everything you need to write every day. Search, sync
+            and AI arrive later, and AI stays optional.
           </p>
         </Reveal>
         <ul className="flex grow flex-col">
@@ -235,16 +281,17 @@ function BuildFromSource() {
   );
 }
 
-export default function DownloadPage() {
+export default async function DownloadPage() {
+  const release = await latestRelease();
   return (
     <>
       <main className="bg-dawn-glow bg-paper-raised bg-no-repeat pb-10">
         <HeaderSpacer />
-        <DownloadHero />
+        <DownloadHero release={release} />
         <div className="mx-auto grid max-w-328 gap-5 px-4 pb-30 md:grid-cols-3 md:px-0">
           {PLATFORMS.map((platform, index) => (
             <Reveal className="flex" delay={index * 0.08} key={platform.name}>
-              <PlatformCard platform={platform} />
+              <PlatformCard platform={platform} release={release} />
             </Reveal>
           ))}
         </div>
