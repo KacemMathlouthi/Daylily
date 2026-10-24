@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app 0.x released for macOS, Windows and Linux (unsigned): writes, saves, reads and seals a real journal folder, and reminds in the evening; search and onboarding are next. |
+| **Status** | Website live. Desktop app packaged for macOS, Windows and Linux (unsigned), its first release 0.1.0 next: writes, saves, reads and seals a real journal folder, and reminds in the evening; search and onboarding are next. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -431,7 +431,8 @@ Work accordingly.
   types release nothing. The website's scopes, `web` and `site`, never release the app.
 
 ### Versions
-- Semantic versioning, `MAJOR.MINOR.PATCH`. Releases began at `0.1.0` on 2026-10-24.
+- Semantic versioning, `MAJOR.MINOR.PATCH`. The first release, `0.1.0`, is tagged by hand with written notes; the
+  release workflow waits for that first `v*` tag, and every release after it is made from the commits.
 - **Daylily stays below 1.0** until the owner decides it's ready; a breaking change is released as a minor version.
   Going to 1.0 is a deliberate change to `release.config.mjs`, never a side effect.
 
