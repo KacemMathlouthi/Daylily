@@ -9,6 +9,7 @@ import { HeaderSpacer } from "@/components/site/header-spacer";
 import { GITHUB_URL } from "@/components/site/links";
 import { Reveal } from "@/components/site/motion";
 import {
+  FILES,
   latestRelease,
   megabytes,
   RELEASES_URL,
@@ -23,16 +24,6 @@ export const metadata: Metadata = pageMetadata({
   path: "/download",
   title: "Download · Daylily",
 });
-
-/** How each release file is told apart; the names come from electron-builder.yml. */
-const FILES = {
-  appImage: /\.AppImage$/,
-  checksums: /^SHA256SUMS$/,
-  deb: /\.deb$/,
-  macArm: /-arm64\.dmg$/,
-  macIntel: /-x64\.dmg$/,
-  windows: /-setup\.exe$/,
-};
 
 const PLATFORMS = [
   {
