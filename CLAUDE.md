@@ -575,7 +575,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
 Keep it current as items ship or move. The next few: test 0.1.0 on real machines, the changelog and roadmap
-pages and real download links, onboarding, end-to-end tests, then signing and auto-update.
+pages and real download links, the domain, the README, then end-to-end tests and auto-update.
 
 ---
 
