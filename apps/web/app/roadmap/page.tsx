@@ -6,12 +6,14 @@ import { Footer } from "@/components/site/footer";
 import { HeaderSpacer } from "@/components/site/header-spacer";
 import { SUGGEST_URL } from "@/components/site/links";
 import { Reveal } from "@/components/site/motion";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   description:
     "What's growing in Daylily next: richer days, AI that asks but never writes, and your journal everywhere you write.",
+  path: "/roadmap",
   title: "Roadmap · Daylily",
-};
+});
 
 interface Item {
   body: string;

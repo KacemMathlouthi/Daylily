@@ -4,12 +4,14 @@ import Image from "next/image";
 import { Footer } from "@/components/site/footer";
 import { HeaderSpacer } from "@/components/site/header-spacer";
 import { Reveal } from "@/components/site/motion";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   description:
     "Most journals want to write for you. Daylily would rather listen. The six promises behind it.",
+  path: "/manifesto",
   title: "Manifesto · Daylily",
-};
+});
 
 const BELIEFS = [
   {
