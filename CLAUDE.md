@@ -8,11 +8,11 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app skeleton running; journal logic not started. |
+| **Status** | Website live. Desktop app writes, saves and reads a real journal folder; sealing, search, onboarding and the reminder are next. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-22 |
+| **Last updated** | 2026-10-24 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
