@@ -1,6 +1,7 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { AppSchema } from "@/components/site/app-schema";
 import { ButtonLink } from "@/components/site/button-link";
 import { Footer } from "@/components/site/footer";
 import { GithubMark } from "@/components/site/github-mark";
@@ -13,13 +14,15 @@ import {
   RELEASES_URL,
   type Release,
 } from "@/lib/release";
+import { pageMetadata } from "@/lib/site";
 import { DownloadButton, type DownloadChoices } from "./download-button";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   description:
     "Download Daylily for macOS, Windows and Linux. No account, no cloud. Your journal is a folder on your machine.",
+  path: "/download",
   title: "Download · Daylily",
-};
+});
 
 /** How each release file is told apart; the names come from electron-builder.yml. */
 const FILES = {
@@ -290,6 +293,7 @@ export default async function DownloadPage() {
   const release = await latestRelease();
   return (
     <>
+      <AppSchema />
       <main className="bg-dawn-glow bg-paper-raised bg-no-repeat pb-10">
         <HeaderSpacer />
         <DownloadHero release={release} />

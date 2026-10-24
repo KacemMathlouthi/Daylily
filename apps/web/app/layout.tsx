@@ -10,6 +10,7 @@ import {
 import type { ReactNode } from "react";
 import { Header } from "@/components/site/header";
 import { MotionProvider } from "@/components/site/motion";
+import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const display = Instrument_Serif({
   style: ["normal", "italic"],
@@ -35,10 +36,13 @@ const description =
   "A human-first journal. One page a day, written by you, kept by you, grown into a garden.";
 
 export const metadata: Metadata = {
-  description,
-  openGraph: { description, siteName: "Daylily", type: "website" },
-  title: "Daylily: One page a day. Yours to keep.",
-  twitter: { card: "summary_large_image" },
+  ...pageMetadata({
+    description,
+    path: "/",
+    title: "Daylily: One page a day. Yours to keep.",
+  }),
+  applicationName: SITE_NAME,
+  metadataBase: new URL(SITE_URL),
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
