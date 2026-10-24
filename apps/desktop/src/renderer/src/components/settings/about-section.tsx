@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import { LINKS } from "../../lib/links";
 import { SettingsRow, SettingsRows } from "./parts";
+import { UpdatesGroup } from "./updates-group";
 
 const ROWS = [
   { href: LINKS.manifesto, title: "Read the manifesto" },
@@ -40,6 +41,8 @@ export function AboutSection() {
       <p className="font-display text-ink-soft text-title-2xs italic leading-7.5">
         One page a day. Written by you, kept by you, grown into a garden.
       </p>
+
+      {info ? <UpdatesGroup version={info.version} /> : null}
 
       <SettingsRows>
         {ROWS.map((row) => (

@@ -19,7 +19,6 @@ import {
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   Calendar,
-  ChevronDown,
   House,
   type LucideIcon,
   Moon,
@@ -32,8 +31,10 @@ import {
   Sun,
 } from "lucide-react";
 import type { ReactElement } from "react";
+import { useJournalInfo } from "../lib/journal-info";
 import { useTheme } from "../lib/theme";
 import type { FileRoutesByTo } from "../route-tree.gen";
+import { UpdateCard } from "./update-card";
 
 type AppPath = keyof FileRoutesByTo;
 
@@ -147,6 +148,7 @@ export function AppSidebar() {
   const isMac = window.daylily.platform === "darwin";
   const { state, toggleSidebar } = useSidebar();
   const { theme, toggleTheme } = useTheme();
+  const journal = useJournalInfo();
   const collapsed = state === "collapsed";
 
   return (
@@ -160,16 +162,23 @@ export function AppSidebar() {
         {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}
         <SidebarMenu>
           <SidebarMenuItem>
+            {/* The journal and where it lives; it opens its settings, as there's one journal to pick */}
             <SidebarMenuButton
-              className="h-8 gap-2.25 px-2 font-semibold text-ink text-ui-lg"
+              className="h-auto gap-2.25 px-2 py-1.25"
+              render={<Link search={{ section: "journal" }} to="/settings" />}
               tooltip="Your journal"
             >
-              <DaylilyMark className="text-daylily" size={18} />
-              <span className="grow">Your journal</span>
-              <ChevronDown
-                className="size-3! text-ink-subtle"
-                strokeWidth={2.2}
-              />
+              <DaylilyMark className="shrink-0 text-daylily" size={18} />
+              <span className="flex min-w-0 flex-col gap-px">
+                <span className="font-semibold text-ink text-ui-lg leading-4.5">
+                  Your journal
+                </span>
+                {journal ? (
+                  <span className="truncate text-ink-subtle text-meta leading-3.5">
+                    {journal.displayRoot}
+                  </span>
+                ) : null}
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -207,7 +216,8 @@ export function AppSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="px-3 pb-3.5">
+      <SidebarFooter className="gap-2.5 px-3 pb-3.5">
+        <UpdateCard />
         {/* A row beside Settings; in the rail they stack, theme first as in Paper */}
         <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
           <SidebarMenu className="min-w-0 grow">
