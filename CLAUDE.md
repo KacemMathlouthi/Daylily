@@ -236,8 +236,10 @@ keychain and **never** into the journal folder.
   colour. Any keystroke dismisses it. Never insertable, never repeated twice in a row, at most one per pause.
 - **Cover:** pick from the bundled gallery (copied into the day folder) or an image from disk. If none is chosen
   by seal, a random gallery cover is assigned. Days before seal show a soft "add a cover" state.
-- **Flowers:** size comes from `words` in buckets; petal colour is the dominant colour sampled from the cover.
-  Computed values are cached in `.daylily/cache/` and are derivable, never stored in the day file.
+- **Flowers:** size comes from `words` in buckets; petal colour is one of the four flower colours. A gallery cover
+  carries a colour chosen by eye (the gallery is all warm light, so sampling would grow one colour); a cover from
+  disk is sampled, each pixel voting for the flower nearest its hue. Computed values are cached in
+  `.daylily/cache/` and are derivable, never stored in the day file.
 - **Search:** in-memory index built on launch from the files, cached, updated on save. Works fully offline.
 - **Reminder:** on by default at 21:00, *"How was your day?"*. Skipped if today already has words. Never mentions
   missed days. Changeable or off in Settings.
@@ -545,9 +547,10 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-23 | `packages/core`: the 4am day boundary across zones and DST, day files with frontmatter that keeps unknown fields, sealing and the seal hash, word counts and bloom sizes; tested on Linux, macOS and Windows |
 | 2026-10-23 | Journal storage in the main process: atomic writes, reading, listing, saving and sealing days, covers copied into day folders and served to the page, journal and device settings, folder watching, all behind checked IPC; screens still on sample data |
 | 2026-10-24 | Today's page saves to the journal: within half a second of a change and on blur, close and sleep, read back on launch, covers copied into the day folder; the splash shows before the app loads |
+| 2026-10-24 | Every screen reads the journal: Home, Calendar, Garden and sealed days follow the folder as it changes; flowers take their colour from the cover (gallery covers carry a colour chosen by eye, photos are sampled), cached in `.daylily/cache/flowers.json`; the sample data lives only in the seed script |
 
 ### Next
-1. The other screens read the journal: Home, Calendar, Garden and sealed days; the sample data goes.
+1. Settings › Journal for real: the folder, its size, show it, change it. Design the "edited outside" and unreadable-day states in Paper.
 2. Sealing for real: the seal scheduler, and gallery covers for coverless days.
 3. Calendar, garden, search, onboarding, settings, reminder.
 4. Packaging and signing for all three platforms.
