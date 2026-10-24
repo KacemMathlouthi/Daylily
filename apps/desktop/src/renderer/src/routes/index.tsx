@@ -85,7 +85,9 @@ function HomeScreen() {
   const yearAgo = fromKey(today);
   yearAgo.setFullYear(yearAgo.getFullYear() - 1);
   const memoryKey = dayKey(yearAgo);
-  const memory = days.get(memoryKey);
+  const remembered = days.get(memoryKey);
+  // A day that can't be read has nothing to show here yet
+  const memory = remembered?.state === "unreadable" ? undefined : remembered;
 
   return (
     <Page

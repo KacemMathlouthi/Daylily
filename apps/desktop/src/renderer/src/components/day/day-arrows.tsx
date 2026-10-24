@@ -18,14 +18,15 @@ function isTyping(target: EventTarget | null) {
 
 /**
  * The sealed day's ‹ › (Paper: "04a"): the written days before and after, and
- * today's page after the last one. ← and → do the same.
+ * today's page after the last one. ← and → do the same. Undefined while the
+ * journal is still being read, so an arrow never points the wrong way.
  */
 export function DayArrows({
   previous,
   next,
 }: {
   previous: DayKey | undefined;
-  next: DayKey | "today";
+  next: DayKey | "today" | undefined;
 }) {
   const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ export function DayArrows({
         navigate({ params: { key: previous }, to: "/day/$key" });
       } else if (event.key === "ArrowRight" && next === "today") {
         navigate({ to: "/today" });
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === "ArrowRight" && next) {
         navigate({ params: { key: next }, to: "/day/$key" });
       }
     };
@@ -75,7 +76,8 @@ export function DayArrows({
         <Link aria-label="Today’s page" className={ARROW} to="/today">
           <ChevronRight className="size-3.25" strokeWidth={2.1} />
         </Link>
-      ) : (
+      ) : null}
+      {next && next !== "today" ? (
         <Link
           aria-label="Next day"
           className={ARROW}
@@ -84,6 +86,14 @@ export function DayArrows({
         >
           <ChevronRight className="size-3.25" strokeWidth={2.1} />
         </Link>
+      ) : null}
+      {next ? null : (
+        <span
+          aria-hidden="true"
+          className={cn(ARROW, "opacity-40 hover:bg-transparent")}
+        >
+          <ChevronRight className="size-3.25" strokeWidth={2.1} />
+        </span>
       )}
     </div>
   );

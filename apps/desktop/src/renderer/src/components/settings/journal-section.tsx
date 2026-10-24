@@ -1,6 +1,6 @@
 import { Button } from "@daylily/ui/primitives/button";
 import { Folder } from "lucide-react";
-import { useJournalDays } from "../../lib/journal";
+import { useJournalListing } from "../../lib/journal";
 import { useJournalInfo } from "../../lib/journal-info";
 import { OUTLINED } from "../controls";
 import {
@@ -19,7 +19,7 @@ const ON_DISK = [
 /** Paper's "09a": where the journal lives and what's in it. */
 export function JournalSection() {
   const info = useJournalInfo();
-  const days = useJournalDays();
+  const { days, ready } = useJournalListing();
   return (
     <>
       <SettingsHeading title="Journal">
@@ -40,7 +40,11 @@ export function JournalSection() {
               {info?.displayRoot ?? ""}
             </span>
             <span className="text-ink-subtle text-xs">
-              {days.size} {days.size === 1 ? "day" : "days"} · plain markdown
+              {/* Counted once the journal is read, so it never says 0 for a while */}
+              {ready
+                ? `${days.size} ${days.size === 1 ? "day" : "days"} · `
+                : ""}
+              plain markdown
             </span>
           </div>
           {/* The folder picker arrives with the storage layer */}

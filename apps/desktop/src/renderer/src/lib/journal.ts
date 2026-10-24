@@ -68,16 +68,23 @@ function toJournalDay(listed: ListedDay): JournalDay {
   };
 }
 
+/**
+ * Every written day in the journal, by day, and whether it has been read yet:
+ * until then `days` is empty, which isn't the same as a journal with none.
+ */
+export function useJournalListing(): { days: Days; ready: boolean } {
+  const { data } = useQuery({
+    queryFn: listDays,
+    queryKey: DAYS_KEY,
+    select: toScreens,
+    staleTime: Number.POSITIVE_INFINITY,
+  });
+  return { days: data ?? NO_DAYS, ready: data !== undefined };
+}
+
 /** Every written day in the journal, by day; empty while it's first read. */
 export function useJournalDays(): Days {
-  return (
-    useQuery({
-      queryFn: listDays,
-      queryKey: DAYS_KEY,
-      select: toScreens,
-      staleTime: Number.POSITIVE_INFINITY,
-    }).data ?? NO_DAYS
-  );
+  return useJournalListing().days;
 }
 
 /** A day's page from its file: undefined while reading, null if nothing was written. */
@@ -116,18 +123,30 @@ function applyRead(
  */
 export function followJournal(client: QueryClient) {
   return window.daylily.journal.onChange(async (changed) => {
+    // Each day on its own, so one that can't be read doesn't hold back the rest
     const reads = await Promise.all(
-      changed.map(
-        async (day) => [day, await window.daylily.journal.read(day)] as const
-      )
+      changed.map(async (day) => {
+        try {
+          return [day, await window.daylily.journal.read(day)] as const;
+        } catch (error) {
+          console.error("Could not read a changed day", error);
+          return null;
+        }
+      })
     );
+    if (!client.getQueryData(DAYS_KEY)) {
+      // Still being listed, perhaps from before this change: list again
+      client.invalidateQueries({ queryKey: DAYS_KEY });
+    }
     client.setQueryData<Listing>(DAYS_KEY, (current) => {
       if (!current) {
         return current;
       }
       const next = new Map(current);
-      for (const [day, read] of reads) {
-        applyRead(next, day, read);
+      for (const entry of reads) {
+        if (entry) {
+          applyRead(next, entry[0], entry[1]);
+        }
       }
       return next;
     });

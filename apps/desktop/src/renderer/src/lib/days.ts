@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { journalAssetUrl } from "../../../shared/journal";
 import { dateFormat } from "./format";
-import { useJournalDays, useStoredDay } from "./journal";
+import { useJournalListing, useStoredDay } from "./journal";
 import { type DayKey, fromKey } from "./month";
 
 /** A day before today: sealed with its page, rested with nothing written, or still being read. */
@@ -56,13 +56,16 @@ export function usePastDay(key: DayKey): PastDay {
  * the last sealed day comes today's page.
  */
 export function useNeighbours(key: DayKey, today: DayKey) {
-  const days = useJournalDays();
+  const { days, ready } = useJournalListing();
   return useMemo(() => {
+    if (!ready) {
+      return { next: undefined, previous: undefined };
+    }
     const sealed = [...days.keys()].filter((day) => day < today).sort();
     const previous = sealed.findLast((day) => day < key);
     const next = sealed.find((day) => day > key) ?? "today";
     return { next, previous };
-  }, [days, key, today]);
+  }, [days, key, ready, today]);
 }
 
 const WEEKDAY = dateFormat({ weekday: "long" });
