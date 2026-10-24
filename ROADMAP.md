@@ -29,7 +29,7 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 4a | **Make the repository public** | Until then GitHub hides the release from the website and from visitors, so every download link leads nowhere. | High | S | Blocked: the owner's call |
 | 5 | **Buy the domain, link Vercel** | `daylily.so` (CLAUDE.md §12). Everything public should live on our own name. A quick trademark search first. | High | S | Blocked: purchase |
 | 6 | ~~**Download links on our domain**~~ | `/download/mac`, `mac-intel`, `windows`, `linux`, `deb` and `checksums` redirect to the latest release's file. On `daylily-silk.vercel.app` until the domain (5). | Medium | S | ✓ Done, Oct 25 |
-| 7 | ~~**README**~~ | Designed in Paper ("v5 · README"): hero (light and dark), the app, three moments, download buttons, principles, install and build. The app picture is still the design mock; swap in a real screenshot. | High | S | ✓ Done, Oct 25 |
+| 7 | ~~**README**~~ | Designed in Paper ("v5 · README"): hero, the app, three moments, download buttons, principles, install and build. The app picture is still the design mock; swap in a real screenshot. | High | S | ✓ Done, Oct 25 |
 | 8 | ~~**Repo description, topics, website link**~~ | Set, with Discussions and private vulnerability reporting on. The social preview image is uploaded by hand in Settings (10). | Low | S | ✓ Done, Oct 25 |
 | 9 | ~~**Community files**~~ | `CONTRIBUTING.md`, `SECURITY.md`, issue forms (something isn't right, suggest a change) and a pull request template. | Medium | S | ✓ Done, Oct 25 |
 | 10 | **SEO and sharing** | An Open Graph image per page, titles and descriptions, `sitemap.xml`, `robots.txt`, structured data for the app, and an RSS feed for the changelog. | Medium | S | After 5 |

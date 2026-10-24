@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/readme/hero-dark.webp">
-    <img alt="Daylily. One page a day. Written by you, kept by you, grown into a garden." src=".github/readme/hero-light.webp" width="880">
-  </picture>
+  <img alt="Daylily. One page a day. Written by you, kept by you, grown into a garden." src=".github/readme/hero.webp" width="880">
 </p>
 
 <p align="center">
