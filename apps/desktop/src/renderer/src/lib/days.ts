@@ -11,7 +11,7 @@ import { pageCoverUrl, type TodayPage, useWrittenPages } from "./today-page";
 export type PastDay =
   | {
       kind: "written";
-      /** Sample days stand for files in the journal; pages from this session live in memory. */
+      /** Sample days stand for files in the journal; "memory" pages were written this session and saved to it. */
       source: "journal" | "memory";
       title: string;
       cover: { url: string; label: string } | null;

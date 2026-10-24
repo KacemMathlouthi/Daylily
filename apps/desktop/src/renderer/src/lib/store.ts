@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 /**
  * A little shared state that outlives the screens that use it, such as today's
- * page while you visit the garden. Held in memory; storage takes over later.
+ * page while you visit the garden.
  */
 export function createStore<T>(initial: T) {
   let value = initial;
