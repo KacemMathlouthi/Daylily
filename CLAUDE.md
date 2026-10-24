@@ -544,9 +544,10 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-23 | Feedback round: months-only calendar, garden by year with a share card, more formats with code highlighting and a paste prompt, logo-mark theme cards, Home without header art, a splash window at launch |
 | 2026-10-23 | `packages/core`: the 4am day boundary across zones and DST, day files with frontmatter that keeps unknown fields, sealing and the seal hash, word counts and bloom sizes; tested on Linux, macOS and Windows |
 | 2026-10-23 | Journal storage in the main process: atomic writes, reading, listing, saving and sealing days, covers copied into day folders and served to the page, journal and device settings, folder watching, all behind checked IPC; screens still on sample data |
+| 2026-10-24 | Today's page saves to the journal: within half a second of a change and on blur, close and sleep, read back on launch, covers copied into the day folder; the splash shows before the app loads |
 
 ### Next
-1. Today's page: autosave to the day's file, copying covers into the day folder.
+1. The other screens read the journal: Home, Calendar, Garden and sealed days; the sample data goes.
 2. Sealing for real: the seal scheduler, and gallery covers for coverless days.
 3. Calendar, garden, search, onboarding, settings, reminder.
 4. Packaging and signing for all three platforms.
