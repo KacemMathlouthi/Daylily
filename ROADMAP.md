@@ -22,17 +22,18 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 
 | # | Item | Why | Impact | Effort | Feasibility |
 |---|---|---|---|---|---|
-| 1 | **Test 0.1.0 on real machines** | The installers have never been run by a person. The Windows reminder notification needs the installed app to show at all. | High | S | Ready |
-| 2 | **Changelog page** | Designed in Paper ("Changelog"). Written by hand for now, one entry per release, alongside the GitHub Releases. | Medium | M | Blocked: design approval |
-| 3 | **Roadmap page** | Designed in Paper ("Roadmap"). Shows this file's direction publicly, as growth stages. | Medium | M | Blocked: design approval |
-| 4 | **Download page with real links** | It shows sample sizes and checksums today. It should offer the latest release's real files, picking the visitor's OS. | High | S | Ready |
+| 1 | ~~**Test 0.1.0 on real machines**~~ | Installed and checked by hand on real machines. | High | S | ✓ Done, Oct 24 |
+| 2 | ~~**Changelog page**~~ | `/changelog`, written by hand, one entry per release, with the next one "being written" and links to the roadmap and to suggest a change. | Medium | M | ✓ Done, Oct 24 (#41) |
+| 3 | ~~**Roadmap page**~~ | `/roadmap`: everything under "Later" below, all in progress. Keep it in step with this file. | Medium | M | ✓ Done, Oct 24 (#41) |
+| 4 | ~~**Download page with real links**~~ | Reads the latest GitHub Release hourly and picks the visitor's computer. Shows the real files once the repository is public (4a). | High | S | ✓ Done, Oct 24 (#41) |
+| 4a | **Make the repository public** | Until then GitHub hides the release from the website and from visitors, so every download link leads nowhere. | High | S | Blocked: the owner's call |
 | 5 | **Buy the domain, link Vercel** | `daylily.so` (CLAUDE.md §12). Everything public should live on our own name. A quick trademark search first. | High | S | Blocked: purchase |
-| 6 | **Download links on our domain** | `daylily.so/download/mac` and so on redirect to the latest release asset. Links in the README, videos and posts never break when versions change. | Medium | S | After 5 |
+| 6 | **Download links on our domain** | `daylily.so/download/mac` and so on redirect to the latest release asset. Links in the README, videos and posts never break when versions change. | Medium | S | After 4a and 5 |
 | 7 | **README** | The repo's front page: the mark, a screenshot or short video, the principles, download links, how to build. Designed like the website, not a wall of text. | High | S | Ready |
 | 8 | **Repo description, topics, website link** | `journal`, `diary`, `electron`, `markdown`, `local-first`, `privacy` and so on. Helps people find it. | Low | S | Ready |
 | 9 | **Community files** | `CONTRIBUTING.md`, issue and PR templates, `SECURITY.md` (how to report a vulnerability), Discussions turned on. | Medium | S | Ready |
-| 10 | **SEO and sharing** | An Open Graph image per page, titles and descriptions, `sitemap.xml`, `robots.txt`, structured data for the app. | Medium | S | After 5 |
-| 11 | **Landing page's app mock-up** | The sidebar in the landing page's picture of the app is out of date. | Low | S | Ready |
+| 10 | **SEO and sharing** | An Open Graph image per page, titles and descriptions, `sitemap.xml`, `robots.txt`, structured data for the app, and an RSS feed for the changelog. | Medium | S | After 5 |
+| 11 | **Landing page's app mock-up** | The sidebar in the landing page's picture of the app is out of date. While there, bring Paper up to date with the site: the header's Changelog and Roadmap links, and the Download page's two Mac files and checksums link. | Low | S | Ready |
 | 12 | **End-to-end tests on the packaged app** | Playwright driving the real app: survive a force-quit mid-sentence, seal across 4am, sleep, a closed app and a time-zone change. Losing words is the worst bug Daylily can have. | High | L | Ready |
 | 13 | **Auto-update, checked on the splash** | The splash already shows real loading progress, so it can check for an update. Download quietly, install on the next quit, never block writing. Ask before installing; the notes come from the changelog. Works unsigned on Windows and Linux; **macOS only updates a signed app**, so there it waits for signing (Later). | High | M | Ready, macOS blocked on signing |
 | 14 | **Polish pass** | Every state designed (empty, error, very long pages, first run); keyboard and screen readers; dark mode checked against Paper. | Medium | M | Ready |
@@ -120,7 +121,7 @@ Each one off until turned on, and plain about what it sends.
 
 ## Decisions waiting on the owner
 
-- Approve the Changelog and Roadmap designs in Paper (2, 3).
+- Make the repository public (4a).
 - Buy `daylily.so` (5).
 - What search should feel like (15).
 - Thoughts and notes: whether, and in what shape (23).
