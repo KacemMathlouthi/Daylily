@@ -1,4 +1,4 @@
-import type { FlowerColor } from "@daylily/ui/components/garden";
+import type { FlowerColor } from "@daylily/core/flower";
 import { type DayKey, dayKey, fromKey, todayKey } from "../lib/month";
 
 /**

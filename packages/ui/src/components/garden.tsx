@@ -1,9 +1,7 @@
-import { bloomSize } from "@daylily/core/flower";
+import { bloomSize, type FlowerColor } from "@daylily/core/flower";
 import type { CSSProperties, ReactElement, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { DaylilyMark } from "./daylily-mark";
-
-export type FlowerColor = "daylily" | "petal" | "saffron" | "cornflower";
 
 /**
  * A written day becomes a flower; a missed day is `null`, bare soil. "upcoming" is a

@@ -1,8 +1,5 @@
-import {
-  type FlowerColor,
-  type GardenDay,
-  isFlower,
-} from "@daylily/ui/components/garden";
+import type { FlowerColor } from "@daylily/core/flower";
+import { type GardenDay, isFlower } from "@daylily/ui/components/garden";
 
 const TODAY = new Date(2026, 9, 20);
 const DAYS_IN_YEAR_VIEW = 52 * 7;
