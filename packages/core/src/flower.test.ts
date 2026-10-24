@@ -38,9 +38,10 @@ describe("flowerColor", () => {
   });
 
   it("lets vivid colour outweigh dull colour", () => {
-    // A grey-brown table under a few bright orange flowers
+    // A dull blue-grey wall, coloured enough to vote, under a few bright orange
+    // flowers: counted pixel by pixel the wall would win
     const dullTable = image(
-      ...repeat(80, [120, 110, 100]),
+      ...repeat(80, [100, 110, 140]),
       ...repeat(20, [240, 100, 30])
     );
     expect(flowerColor(dullTable)).toBe("daylily");

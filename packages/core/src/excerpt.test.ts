@@ -24,6 +24,28 @@ describe("pageExcerpt", () => {
     );
   });
 
+  it("skips headings underlined with = or -", () => {
+    expect(pageExcerpt("Morning\n=======\n\nRain all day.")).toBe(
+      "Rain all day."
+    );
+    expect(pageExcerpt("Morning\n---\nRain all day.")).toBe("Rain all day.");
+  });
+
+  it("keeps marks that are part of the writing", () => {
+    expect(pageExcerpt("Waited about ~3 hours for the snake_case fix")).toBe(
+      "Waited about ~3 hours for the snake_case fix"
+    );
+    expect(pageExcerpt("2 * 3 is six, ~~not~~ seven")).toBe(
+      "2 * 3 is six, not seven"
+    );
+  });
+
+  it("never cuts a character in half", () => {
+    const emoji = "🌼".repeat(30);
+    const excerpt = pageExcerpt(emoji, 9);
+    expect(excerpt).toBe(`${"🌼".repeat(4)}…`);
+  });
+
   it("joins a paragraph's lines", () => {
     expect(pageExcerpt("First line\nsecond line")).toBe(
       "First line second line"
