@@ -1,0 +1,134 @@
+name: Release
+
+# After CI passes on main, semantic-release reads the merged commits and, if a
+# feat or fix arrived, tags the next version and drafts its GitHub Release. The
+# installers are then built on each OS, attached with their checksums, and the
+# release is published. A tag can also be built by hand, as the first was.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: A release tag to build the installers for, like v0.1.0
+        required: true
+
+permissions:
+  contents: read
+
+# One release at a time, never cancelled halfway
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.release.outputs.tag || inputs.tag }}
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - if: github.event_name == 'workflow_run'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - if: github.event_name == 'workflow_run'
+        uses: pnpm/action-setup@v6
+      - if: github.event_name == 'workflow_run'
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: github.event_name == 'workflow_run'
+        run: pnpm install --frozen-lockfile
+      - id: release
+        if: github.event_name == 'workflow_run'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The first release was cut by hand; with no tag yet, semantic-release would start at 1.0.0
+          if [ -z "$(git tag --list 'v*')" ]; then
+            echo "No release tag yet, so nothing is released automatically."
+            exit 0
+          fi
+          before=$(git tag --points-at HEAD --list 'v*')
+          pnpm release
+          after=$(git tag --points-at HEAD --list 'v*')
+          # Only a tag this run made is a new release
+          if [ "$after" != "$before" ]; then
+            echo "tag=$(comm -13 <(echo "$before") <(echo "$after") | head -n 1)" >> "$GITHUB_OUTPUT"
+          fi
+
+  installers:
+    needs: version
+    if: needs.version.outputs.tag != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            targets: --mac dmg --arm64 --x64
+          - os: windows-latest
+            # The Windows runner can set the .exe's icon and version, which needs Wine elsewhere
+            targets: --win nsis --x64 -c.win.signAndEditExecutable=true
+          - os: ubuntu-latest
+            targets: --linux AppImage deb --x64
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.version.outputs.tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.version.outputs.tag }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        working-directory: apps/desktop
+        run: |
+          # The version lives in the tag; the app and its installer take it from here
+          npm pkg set version="${TAG#v}"
+          pnpm exec electron-vite build
+          pnpm exec electron-builder ${{ matrix.targets }} --publish never
+      - name: Attach to the release
+        working-directory: apps/desktop/release
+        run: |
+          # Each runner makes only its own kind of installer
+          shopt -s nullglob
+          installers=(Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb)
+          gh release upload "$TAG" "${installers[@]}" --clobber
+
+  publish:
+    needs: [version, installers]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.version.outputs.tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checksums
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir installers
+          (cd installers && sha256sum -- * > ../SHA256SUMS)
+          gh release upload "$TAG" SHA256SUMS --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Publish
+        run: gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
