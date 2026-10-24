@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/KacemMathlouthi/Daylily/discussions
+    about: Ask anything, or think out loud with others.
+  - name: Report a security problem
+    url: https://github.com/KacemMathlouthi/Daylily/security/advisories/new
+    about: Privately, please. Never in a public issue.
