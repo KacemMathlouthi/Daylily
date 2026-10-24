@@ -20,6 +20,7 @@ export const CHANNELS = {
   appFlush: "app:flush",
   appFlushed: "app:flushed",
   appInfo: "app:info",
+  appOpenToday: "app:open-today",
   appReady: "app:ready",
   deviceGet: "device:get",
   deviceSet: "device:set",
@@ -83,6 +84,8 @@ export interface DaylilyApi {
      * nothing unsaved is lost; the window waits for it, up to a few seconds.
      */
     onFlush: (save: () => Promise<void>) => void;
+    /** Calls `listener` when the app is asked to open today's page, as from the reminder. Returns a way to stop. */
+    onOpenToday: (listener: () => void) => () => void;
     /** Tells the main process the app has painted, so the splash can hand over. */
     ready: () => void;
   };

@@ -49,11 +49,14 @@ function broadcast(channel: string, ...args: unknown[]) {
  */
 export function registerJournalIpc({
   open,
+  onConfigChange,
   root: firstRoot,
   settings,
 }: {
   /** A journal on the folder at `root`. */
   open: (root: string) => Journal;
+  /** Called when the journal's preferences change: changed in Settings, or another journal opened. */
+  onConfigChange: () => void;
   root: string;
   settings: DeviceSettingsStore;
 }) {
@@ -72,6 +75,8 @@ export function registerJournalIpc({
     watcher = watchJournal(journal.root, (days) =>
       broadcast(CHANNELS.journalChanged, days)
     );
+    // Its own preferences hold from now, whether or not the device remembers the move
+    onConfigChange();
     await settings.write({ journalPath: journal.root });
     broadcast(CHANNELS.journalSwitched);
   }
@@ -182,9 +187,14 @@ export function registerJournalIpc({
     return journal.saveCover(day, await readFile(path), extension);
   });
 
-  handle(CHANNELS.journalSetConfig, (_event, changes) =>
-    writeConfig(journal.root, configChangesSchema.parse(changes))
-  );
+  handle(CHANNELS.journalSetConfig, async (_event, changes) => {
+    const config = await writeConfig(
+      journal.root,
+      configChangesSchema.parse(changes)
+    );
+    onConfigChange();
+    return config;
+  });
 
   return () => journal;
 }

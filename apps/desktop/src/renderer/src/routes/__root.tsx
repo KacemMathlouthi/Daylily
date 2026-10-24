@@ -60,7 +60,14 @@ function useAppShortcuts() {
       }
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    // The evening reminder, clicked, opens today's page
+    const stopOpening = window.daylily.app.onOpenToday(() =>
+      navigate({ to: "/today" })
+    );
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      stopOpening();
+    };
   }, [navigate]);
 }
 

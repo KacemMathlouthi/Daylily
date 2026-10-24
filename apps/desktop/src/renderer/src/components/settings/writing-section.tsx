@@ -1,6 +1,6 @@
 import { Switch } from "@daylily/ui/primitives/switch";
-import { useState } from "react";
-import { useGhostPrompts } from "../../lib/preferences";
+import { useCallback } from "react";
+import { useGhostPrompts, useJournalConfig } from "../../lib/preferences";
 import { useNow } from "../../lib/use-now";
 import { SealCountdown } from "../seal-countdown";
 import {
@@ -14,8 +14,11 @@ import {
 export function WritingSection() {
   const now = useNow();
   const [nudges, setNudges] = useGhostPrompts();
-  // Held here until the journal's config file exists
-  const [galleryCovers, setGalleryCovers] = useState(true);
+  const [config, change] = useJournalConfig();
+  const setGalleryCovers = useCallback(
+    (galleryCovers: boolean) => change({ galleryCovers }),
+    [change]
+  );
 
   return (
     <>
@@ -58,7 +61,7 @@ export function WritingSection() {
           >
             <Switch
               aria-label="Give coverless days a gallery cover"
-              checked={galleryCovers}
+              checked={config.galleryCovers}
               onCheckedChange={setGalleryCovers}
             />
           </SettingsRow>

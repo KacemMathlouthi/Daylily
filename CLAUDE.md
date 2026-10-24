@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app writes, saves, reads and seals a real journal folder; search, onboarding and the reminder are next. |
+| **Status** | Website live. Desktop app writes, saves, reads and seals a real journal folder, and reminds in the evening; search, onboarding and packaging are next. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -242,8 +242,12 @@ keychain and **never** into the journal folder.
   disk is sampled, each pixel voting for the flower nearest its hue. Computed values are cached in
   `.daylily/cache/` and are derivable, never stored in the day file.
 - **Search:** in-memory index built on launch from the files, cached, updated on save. Works fully offline.
-- **Reminder:** on by default at 21:00, *"How was your day?"*. Skipped if today already has words. Never mentions
-  missed days. Changeable or off in Settings.
+- **Reminder:** on by default at 21:00, *"How was your day?"*, once a day. Skipped if today already has words or
+  Daylily is the focused window. Never mentions missed days. Changeable or off in Settings. A reminder missed while
+  the computer slept comes on waking if under two hours late and the day hasn't ended; opening the app after the time counts as the visit.
+  While it's on, closing the window keeps Daylily running in the tray (menu bar on macOS) with "Open Daylily" and
+  "Quit Daylily"; turned off, closing quits as before. Only one Daylily runs at a time: opening it again shows the
+  window. Clicking the reminder opens today's page.
 - **External changes:** the app watches the journal folder and reflects edits made by other tools.
 
 ### 3.6 Definition of done for v1
@@ -553,12 +557,14 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Daylily's own title strip on Windows and Linux (Paper 12b); the garden ends on plain paper (06d) |
 | 2026-10-24 | Days seal for real: on launch, on wake, on focus and just after 4am, each at its own 4am where it was written, after the page's last save, with a random gallery cover for a day written without one; the gallery moved to `resources/covers` so sealing can reach it |
 | 2026-10-24 | A sealed day changed elsewhere says "Edited outside Daylily" (04d); a file that can't be read explains itself and shows the file (04e); a day without a cover shows its flower on its tile, pale when unreadable (05f) |
+| 2026-10-24 | The evening reminder, from the tray while the window is closed; ghost prompts, gallery covers and the reminder are kept in the journal's config |
 
 ### Next
-1. Search across all days.
+1. Search across all days (design in Paper first).
 2. Onboarding: choosing the folder on first run.
-3. The evening reminder.
-4. Packaging and signing for all three platforms.
+3. Packaging and signing for all three platforms. Then check the evening reminder's notification on Windows from
+   the installer: it's untested there, and the unpacked build can't show it, since Windows only shows notifications
+   from an app with a Start Menu entry under its id (`app.daylily.desktop`), which the installer creates.
 
 ---
 
