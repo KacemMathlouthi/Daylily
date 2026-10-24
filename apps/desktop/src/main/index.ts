@@ -7,6 +7,7 @@ import { registerIpc, whenAppReady } from "./ipc";
 import { registerJournalIpc } from "./journal/ipc";
 import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
 import { createJournal } from "./journal/store";
+import { sealAsDaysEnd } from "./seal-scheduler";
 import { type DeviceSettingsStore, deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
 import { registerWindowIpc, reportMaximized } from "./window-ipc";
@@ -86,7 +87,10 @@ async function launch(settings: DeviceSettingsStore) {
   }, READY_FALLBACK_MS);
 }
 
-/** Opens the journal this computer uses, and the door to it from the page. */
+/**
+ * Opens the journal this computer uses, the door to it from the page, and seals
+ * its days as they end.
+ */
 async function openJournal(settings: DeviceSettingsStore) {
   const current = registerJournalIpc({
     open: (root) =>
@@ -99,6 +103,7 @@ async function openJournal(settings: DeviceSettingsStore) {
     settings,
   });
   serveJournalAssets(current);
+  sealAsDaysEnd({ clock: systemClock, journal: current });
 }
 
 registerJournalScheme();
