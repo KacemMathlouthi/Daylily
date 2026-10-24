@@ -548,9 +548,10 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-23 | Journal storage in the main process: atomic writes, reading, listing, saving and sealing days, covers copied into day folders and served to the page, journal and device settings, folder watching, all behind checked IPC; screens still on sample data |
 | 2026-10-24 | Today's page saves to the journal: within half a second of a change and on blur, close and sleep, read back on launch, covers copied into the day folder; the splash shows before the app loads |
 | 2026-10-24 | Every screen reads the journal: Home, Calendar, Garden and sealed days follow the folder as it changes; flowers take their colour from the cover (gallery covers carry a colour chosen by eye, photos are sampled), cached in `.daylily/cache/flowers.json`; the sample data lives only in the seed script |
+| 2026-10-24 | Settings › Journal for real: the folder, its days and size on disk, "Show in folder", and "Change…" moving the journal to another folder while running (unsaved words are saved first; nothing in the old folder moves) |
 
 ### Next
-1. Settings › Journal for real: the folder, its size, show it, change it. Design the "edited outside" and unreadable-day states in Paper.
+1. Design in Paper, then build: the "edited outside Daylily" marker, a day whose file can't be read, and a day written without a cover.
 2. Sealing for real: the seal scheduler, and gallery covers for coverless days.
 3. Calendar, garden, search, onboarding, settings, reminder.
 4. Packaging and signing for all three platforms.
