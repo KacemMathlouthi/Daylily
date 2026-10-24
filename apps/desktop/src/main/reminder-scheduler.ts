@@ -39,6 +39,9 @@ export function remindInTheEvening({
   let shown: Notification | null = null;
 
   async function remind(day: DayKey) {
+    if (remindedOn === day) {
+      return;
+    }
     remindedOn = day;
     if (BrowserWindow.getFocusedWindow()) {
       return;
@@ -57,9 +60,18 @@ export function remindInTheEvening({
     shown.show();
   }
 
+  // Each look supersedes the ones before it, so only the latest sets a timer
+  let looks = 0;
+
+  /** Gives the reminder if it's due now, then waits for the next one. */
   async function schedule() {
+    looks += 1;
+    const look = looks;
     clearTimeout(timer);
     const { reminder } = await readConfig(journal().root);
+    if (look !== looks) {
+      return;
+    }
     onEnabledChange(reminder.enabled);
     // A new time is a new reminder, even on a day that had one
     if (reminder.time !== remindAt) {
@@ -70,33 +82,30 @@ export function remindInTheEvening({
       return;
     }
     const now = clock.now();
-    let next = nextReminder({
+    const next = nextReminder({
       now,
       remindedOn,
       time: reminder.time,
       zone: clock.timeZone(),
     });
-    if (opening && next.at <= now) {
+    const due = next.at <= now;
+    if (due && opening) {
+      // Opened after the reminder's time: Daylily came anyway
       remindedOn = next.day;
-      next = nextReminder({
-        now,
-        remindedOn,
-        time: reminder.time,
-        zone: clock.timeZone(),
-      });
+    } else if (due) {
+      await remind(next.day).catch((error) =>
+        console.error("Could not give the reminder", error)
+      );
     }
     opening = false;
-    const wait = next.at.getTime() - now.getTime();
+    if (due) {
+      check();
+      return;
+    }
+    // Woken a little early or late, it looks again against the clock as it is then
     timer = setTimeout(
-      async () => {
-        if (wait <= LONGEST_WAIT_MS) {
-          await remind(next.day).catch((error) =>
-            console.error("Could not give the reminder", error)
-          );
-        }
-        check();
-      },
-      Math.max(0, Math.min(wait, LONGEST_WAIT_MS))
+      check,
+      Math.min(next.at.getTime() - now.getTime(), LONGEST_WAIT_MS)
     );
   }
 
