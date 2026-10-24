@@ -1,4 +1,4 @@
-import { Document, isMap, parseDocument } from "yaml";
+import { Document, isMap, isScalar, parseDocument } from "yaml";
 import { z } from "zod";
 import { fail, ok, type Result } from "./result";
 import { countMarkdownWords } from "./words";
@@ -166,6 +166,29 @@ export function readDayFile(text: string): Result<DayFile, DayFileError> {
   });
 }
 
+/**
+ * Sets a field, and puts a new one where the spec lists it: before the first of
+ * Daylily's fields that follows it, so a title added after the first words still
+ * sits on top. Fields other tools added keep their places.
+ */
+function place(doc: Document, field: Field, value: string | number) {
+  const map = doc.contents;
+  if (!isMap(map) || doc.has(field)) {
+    doc.set(field, value);
+    return;
+  }
+  const later: readonly string[] = FIELDS.slice(FIELDS.indexOf(field) + 1);
+  const next = map.items.findIndex(
+    (item) => isScalar(item.key) && later.includes(String(item.key.value))
+  );
+  const pair = doc.createPair(field, value);
+  if (next === -1) {
+    map.items.push(pair);
+  } else {
+    map.items.splice(next, 0, pair);
+  }
+}
+
 function rewrite(
   text: string,
   changes: FrontmatterChanges,
@@ -182,7 +205,7 @@ function rewrite(
     if (value === null) {
       doc.delete(field);
     } else if (value !== undefined) {
-      doc.set(field, value);
+      place(doc, field, value);
     }
   }
 

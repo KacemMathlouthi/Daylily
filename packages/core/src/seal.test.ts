@@ -141,8 +141,10 @@ describe("sealHash", () => {
 describe("sealDayFile", () => {
   it("records the time and hash, and keeps the page as written", async () => {
     const file = await sealed(OPEN_DAY, "cover.jpg");
+    // In the spec's order: the cover after the title, the seal before the app
+    expect(file).toContain("title: The long way home\ncover: cover.jpg\n");
     expect(file).toContain(
-      "\ncover: cover.jpg\nsealed: 2026-10-22T04:00:00+01:00\nhash: sha256:"
+      "words: 9\nsealed: 2026-10-22T04:00:00+01:00\nhash: sha256:"
     );
     expect(
       file.endsWith("\n---\n\nWe took the river path.\n\nThe water was high.\n")
