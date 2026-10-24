@@ -121,3 +121,9 @@ export function updateTodayPage(
       : null;
   });
 }
+
+/** Starts over, as when the journal moves to another folder: pages are read again from there. */
+export function forgetPages() {
+  store.set(new Map());
+  loads.set(new Map());
+}

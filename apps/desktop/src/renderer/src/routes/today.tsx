@@ -153,9 +153,12 @@ function TodayScreen() {
     },
     [shownDay]
   );
+  // Again whenever it's forgotten, as when the journal moves to another folder
   useEffect(() => {
-    loadPage(shownDay);
-  }, [shownDay]);
+    if (load.state === "loading") {
+      loadPage(shownDay);
+    }
+  }, [shownDay, load.state]);
 
   const recover = useCallback(
     (cover: PageCover | null) => {

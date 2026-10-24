@@ -127,3 +127,13 @@ export function markSaved(day: DayKey) {
 export function useSaveState(day: DayKey): SaveState | undefined {
   return states.use().get(day);
 }
+
+/** Starts over, as when the journal moves to another folder; anything unsaved was saved first. */
+export function forgetSaves() {
+  for (const timer of timers.values()) {
+    clearTimeout(timer);
+  }
+  timers.clear();
+  readers.clear();
+  states.set(new Map());
+}

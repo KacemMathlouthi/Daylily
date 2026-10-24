@@ -7,7 +7,9 @@ import {
   type ListedDay,
   type StoredDay,
 } from "../../../shared/journal";
+import { forgetSaves } from "./autosave";
 import type { DayKey } from "./month";
+import { forgetPages } from "./today-page";
 
 /** A written day as the screens show it: calendar tiles, flowers, cards. */
 export interface JournalDay {
@@ -118,6 +120,18 @@ function applyRead(
 }
 
 /**
+ * Keeps the screens in step with the journal: when it moves to another folder,
+ * everything is read again from there.
+ */
+export function followJournalMoves(client: QueryClient) {
+  return window.daylily.journal.onSwitch(() => {
+    forgetSaves();
+    forgetPages();
+    client.resetQueries({ queryKey: ["journal"] });
+  });
+}
+
+/**
  * Keeps the screens in step with the folder: when files change, by Daylily or
  * any other app, the days they belong to are read again.
  */
@@ -153,6 +167,7 @@ export function followJournal(client: QueryClient) {
     for (const day of changed) {
       client.invalidateQueries({ queryKey: dayKeyOf(day) });
     }
+    client.invalidateQueries({ queryKey: ["journal", "stats"] });
   });
 }
 

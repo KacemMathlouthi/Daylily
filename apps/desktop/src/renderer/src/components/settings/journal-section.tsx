@@ -1,5 +1,7 @@
 import { Button } from "@daylily/ui/primitives/button";
+import { useQuery } from "@tanstack/react-query";
 import { Folder } from "lucide-react";
+import { useCallback } from "react";
 import { useJournalListing } from "../../lib/journal";
 import { useJournalInfo } from "../../lib/journal-info";
 import { OUTLINED } from "../controls";
@@ -16,10 +18,33 @@ const ON_DISK = [
   { path: ".daylily/config.json", what: "Journal preferences" },
 ];
 
+/** "41 MB": a size the way a file manager would say it. */
+const UNITS = [
+  { digits: 1, size: 1_000_000_000, unit: "gigabyte" },
+  { digits: 0, size: 1_000_000, unit: "megabyte" },
+  { digits: 0, size: 1000, unit: "kilobyte" },
+] as const;
+
+function sizeLabel(bytes: number) {
+  const { size, unit, digits } =
+    UNITS.find((step) => bytes >= step.size) ?? UNITS[2];
+  return new Intl.NumberFormat("en", {
+    maximumFractionDigits: digits,
+    style: "unit",
+    unit,
+  }).format(bytes / size);
+}
+
 /** Paper's "09a": where the journal lives and what's in it. */
 export function JournalSection() {
   const info = useJournalInfo();
   const { days, ready } = useJournalListing();
+  const { data: stats } = useQuery({
+    queryFn: () => window.daylily.journal.stats(),
+    queryKey: ["journal", "stats"],
+  });
+  const show = useCallback(() => window.daylily.journal.show(), []);
+  const change = useCallback(() => window.daylily.journal.change(), []);
   return (
     <>
       <SettingsHeading title="Journal">
@@ -44,19 +69,20 @@ export function JournalSection() {
               {ready
                 ? `${days.size} ${days.size === 1 ? "day" : "days"} · `
                 : ""}
-              plain markdown
+              {stats ? `${sizeLabel(stats.bytes)} · ` : ""}plain markdown
             </span>
           </div>
-          {/* The folder picker arrives with the storage layer */}
           <div className="flex shrink-0 gap-2">
             <Button
               className={`${OUTLINED} px-3 font-medium text-caption text-ink`}
+              onClick={show}
               variant="ghost"
             >
               Show in folder
             </Button>
             <Button
               className={`${OUTLINED} px-3 font-medium text-caption text-ink`}
+              onClick={change}
               variant="ghost"
             >
               Change…
