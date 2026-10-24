@@ -40,7 +40,7 @@ days are plain markdown files in a folder you own.
 2. **It draws more out of you.** It opens on *"How was your day?"* and, when you pause, asks a little more.
 3. **Your days grow into a garden.** Every day you write plants a flower.
 4. **Your files are yours.** Plain markdown in a folder you own. No lock-in, ever.
-5. **AI asks. It never writes for you.** Off until you turn it on, one feature at a time.
+5. **AI asks. It never writes for you.** When it comes, it stays off until you turn it on, one feature at a time.
 6. **Welcome back, never guilt.** No streaks, no wilting. A missed day is bare soil.
 
 The full story is in the [manifesto](https://daylily-silk.vercel.app/manifesto).
@@ -99,7 +99,7 @@ Want to help? Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 Search, a welcome for your first run and updates that install themselves are next. Then richer days, AI that asks but
 never writes, and your journal everywhere you write. See the [roadmap](https://daylily-silk.vercel.app/roadmap) and the
 [changelog](https://daylily-silk.vercel.app/changelog), and
-[suggest a change](https://github.com/KacemMathlouthi/Daylily/issues/new/choose) anytime.
+[suggest a change](https://github.com/KacemMathlouthi/Daylily/issues/new?template=suggestion.yml) anytime.
 
 ## License
 

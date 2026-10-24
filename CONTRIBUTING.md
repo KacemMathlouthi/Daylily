@@ -37,7 +37,8 @@ The repository is a monorepo:
 
 - **Keep words safe.** Losing someone's writing is the worst bug Daylily can have. Writes are atomic, sealed days are
   never rewritten, and unknown frontmatter is preserved.
-- **Time goes through the clock.** Nothing reads the system clock directly; tests pass in their own.
+- **Time goes through the clock** in `packages/core` and the main process: they take a clock instead of reading the
+  system's, so tests can pass in their own.
 - **Tests describe behaviour,** like "seals yesterday on launch after 4am". A bug fix starts with a failing test.
 - **Use the design tokens.** No hard-coded colours, sizes or shadows in components.
 - **No em dashes** in anything a person reads in the app or on the site.
@@ -45,7 +46,7 @@ The repository is a monorepo:
 Before you push, run:
 
 ```sh
-pnpm fix && pnpm check && pnpm knip && pnpm typecheck && pnpm test
+pnpm fix && pnpm check && pnpm knip && pnpm typecheck && pnpm build && pnpm test
 ```
 
 ## Commits and pull requests
@@ -57,7 +58,7 @@ feat(desktop): open today's page from the reminder
 fix(core): seal days written across a time-zone change
 ```
 
-Types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`. Merged commits decide the next
+Types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`, `revert`. Merged commits decide the next
 release, and their titles become its notes, so write them for the people who use the app. The `web` and `site` scopes
 never release the app.
 
