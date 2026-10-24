@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Share } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import meadow from "../assets/meadow.jpg";
 import { OUTLINED } from "../components/controls";
 import { hourSpan } from "../components/garden/format";
 import { GardenBoard } from "../components/garden/garden-board";
@@ -75,18 +74,7 @@ function GardenScreen() {
   ];
 
   return (
-    <Page
-      backdrop={
-        <img
-          alt=""
-          className="mask-[linear-gradient(transparent,rgb(0_0_0/0.7)_45%,black)] pointer-events-none absolute inset-x-0 bottom-0 h-75 w-full object-cover object-bottom"
-          height={941}
-          src={meadow}
-          width={1672}
-        />
-      }
-      className="gap-5.5"
-    >
+    <Page className="gap-5.5">
       <header className="flex items-center justify-between gap-6">
         <div className="flex flex-col gap-0.5">
           <h1 className="flex items-baseline gap-2.5 font-display text-display-xs leading-11 tracking-heading-sm">
@@ -128,7 +116,7 @@ function GardenScreen() {
         ))}
       </div>
 
-      <p className="pt-17.5 pb-40 text-center font-display text-ink-muted text-title-sm italic leading-9">
+      <p className="pt-17.5 pb-16 text-center font-display text-ink-muted text-title-sm italic leading-9">
         Nothing here wilts. Come back whenever you like.
       </p>
     </Page>
