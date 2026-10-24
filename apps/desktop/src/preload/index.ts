@@ -61,8 +61,14 @@ const api: DaylilyApi = {
     },
     pickCover: (day) => ipcRenderer.invoke(CHANNELS.journalPickCover, day),
     read: (day) => ipcRenderer.invoke(CHANNELS.journalRead, day),
-    saveCover: (day, image, extension) =>
-      ipcRenderer.invoke(CHANNELS.journalSaveCover, day, image, extension),
+    saveCover: (day, image, extension, color) =>
+      ipcRenderer.invoke(
+        CHANNELS.journalSaveCover,
+        day,
+        image,
+        extension,
+        color
+      ),
     setConfig: (changes) =>
       ipcRenderer.invoke(CHANNELS.journalSetConfig, changes),
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),

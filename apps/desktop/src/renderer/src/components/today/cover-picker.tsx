@@ -120,9 +120,14 @@ export function CoverPicker({
   const fromGallery = useCallback(
     (id: GalleryId) =>
       copyIn(async () => {
-        const url = GALLERY.find((item) => item.id === id)?.url ?? "";
-        const image = new Uint8Array(await (await fetch(url)).arrayBuffer());
-        return window.daylily.journal.saveCover(day, image, "jpg");
+        const item = GALLERY.find((entry) => entry.id === id);
+        if (!item) {
+          return null;
+        }
+        const image = new Uint8Array(
+          await (await fetch(item.url)).arrayBuffer()
+        );
+        return window.daylily.journal.saveCover(day, image, "jpg", item.color);
       }, id),
     [copyIn, day]
   );

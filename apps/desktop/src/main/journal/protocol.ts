@@ -8,7 +8,13 @@ import type { Journal } from "./store";
 export function registerJournalScheme() {
   protocol.registerSchemesAsPrivileged([
     {
-      privileges: { secure: true, standard: true, supportFetchAPI: true },
+      // corsEnabled so the page can read a cover's pixels to colour its flower
+      privileges: {
+        corsEnabled: true,
+        secure: true,
+        standard: true,
+        supportFetchAPI: true,
+      },
       scheme: JOURNAL_SCHEME,
     },
   ]);
@@ -16,12 +22,16 @@ export function registerJournalScheme() {
 
 /** Serves a day's cover and images to the page, and nothing else from the journal. */
 export function serveJournalAssets(journal: Journal) {
-  protocol.handle(JOURNAL_SCHEME, (request) => {
+  protocol.handle(JOURNAL_SCHEME, async (request) => {
     const asset = parseAssetUrl(request.url);
     if (!asset) {
       return new Response(null, { status: 404 });
     }
     const file = journal.dayAsset(asset.day, asset.name);
-    return net.fetch(pathToFileURL(file).toString());
+    const response = await net.fetch(pathToFileURL(file).toString());
+    // Only Daylily's own pages load this scheme; they may read the pixels
+    const headers = new Headers(response.headers);
+    headers.set("Access-Control-Allow-Origin", "*");
+    return new Response(response.body, { headers, status: response.status });
   });
 }

@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
@@ -21,7 +21,7 @@ import type {
   UnreadableDay,
 } from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
-import { flowerCache } from "./flower-cache";
+import { fileStamp, flowerCache } from "./flower-cache";
 
 const YEAR = /^\d{4}$/;
 /** `2026-10-21T19:02:11+01:00`: the hour sits after the T, on the clock where it was written. */
@@ -102,18 +102,8 @@ export function createJournal({
     return next;
   }
 
-  /** The cover file's size and time, so a colour sampled from an older cover isn't reused. */
-  async function coverStamp(day: DayKey, cover: string | null) {
-    if (cover === null) {
-      return null;
-    }
-    try {
-      const { mtimeMs, size } = await stat(dayAsset(day, cover));
-      return `${size}-${Math.round(mtimeMs)}`;
-    } catch {
-      return null;
-    }
-  }
+  const coverStamp = (day: DayKey, cover: string | null) =>
+    cover === null ? Promise.resolve(null) : fileStamp(dayAsset(day, cover));
 
   async function toStored(day: DayKey, text: string) {
     const file = readDayFile(text);
@@ -147,6 +137,24 @@ export function createJournal({
   function writable(day: DayKey, existing: string | null) {
     const now = today(clock);
     return day === now || (day < now && existing !== null);
+  }
+
+  /** Why a day's cover can't change now, or null when it can. */
+  function coverLocked(
+    day: DayKey,
+    existing: string | null
+  ): JournalError | null {
+    if (!writable(day, existing)) {
+      return { day, kind: "not-writable" };
+    }
+    if (existing === null) {
+      return null;
+    }
+    const file = readDayFile(existing);
+    if (!file.ok) {
+      return file.error;
+    }
+    return file.value.meta.sealed ? { kind: "sealed" } : null;
   }
 
   async function guarded<T>(
@@ -217,28 +225,27 @@ export function createJournal({
     /**
      * Copies a cover image into a day's folder as `cover.<ext>`, returning its
      * name. The page's next save records it. A sealed day's cover never changes.
+     * A gallery cover brings its flower colour, so it isn't sampled.
      */
     saveCover(
       day: DayKey,
       bytes: Uint8Array,
-      extension: CoverExtension
+      extension: CoverExtension,
+      color?: FlowerColor
     ): Promise<Result<string, JournalError>> {
       const path = dayFile(day);
       return queued(path, () =>
         guarded(async () => {
-          const existing = await readIfThere(path);
-          if (!writable(day, existing)) {
-            return fail({ day, kind: "not-writable" });
-          }
-          const file = existing === null ? null : readDayFile(existing);
-          if (file && !file.ok) {
-            return file;
-          }
-          if (file?.value.meta.sealed) {
-            return fail({ kind: "sealed" });
+          const locked = coverLocked(day, await readIfThere(path));
+          if (locked) {
+            return fail(locked);
           }
           const name = `cover.${extension}`;
           await writeFileAtomic(dayAsset(day, name), bytes);
+          const stamp = await coverStamp(day, name);
+          if (color && stamp) {
+            await flowers.set(day, stamp, color);
+          }
           return ok(name);
         })
       );

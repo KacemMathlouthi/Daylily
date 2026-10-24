@@ -27,6 +27,29 @@ describe("flowerCache", () => {
     expect(await cache.get("2026-10-21", "480-2")).toBeNull();
   });
 
+  it("keeps every colour set at once", async () => {
+    const cache = flowerCache(root);
+    const days = Array.from(
+      { length: 30 },
+      (_, index) => `2026-01-${String(index + 1).padStart(2, "0")}`
+    );
+    await Promise.all(days.map((day) => cache.set(day, "1-1", "saffron")));
+    await cache.flush();
+    const reread = flowerCache(root);
+    const colors = await Promise.all(days.map((day) => reread.get(day, "1-1")));
+    expect(colors.every((color) => color === "saffron")).toBe(true);
+  });
+
+  it("removes its file once it holds nothing", async () => {
+    const cache = flowerCache(root);
+    await cache.set("2026-10-21", "1-1", "petal");
+    await cache.flush();
+    await cache.forget(["2026-10-21"]);
+    await expect(
+      readFile(join(root, ".daylily", "cache", "flowers.json"))
+    ).rejects.toThrow();
+  });
+
   it("writes to .daylily/cache, where the next launch reads it", async () => {
     const cache = flowerCache(root);
     await cache.set("2026-10-21", "120-1", "cornflower");

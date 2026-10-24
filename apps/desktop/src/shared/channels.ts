@@ -96,11 +96,15 @@ export interface DaylilyApi {
     pickCover: (day: string) => Promise<Result<string, JournalError> | null>;
     /** A day's page and fields, or null when nothing was written. */
     read: (day: string) => Promise<Result<StoredDay | null, JournalError>>;
-    /** Copies a cover into the day's folder; the name it returns goes in the next save. */
+    /**
+     * Copies a cover into the day's folder; the name it returns goes in the next
+     * save. A gallery cover passes its set flower colour.
+     */
     saveCover: (
       day: string,
       image: Uint8Array,
-      extension: CoverExtension
+      extension: CoverExtension,
+      color?: FlowerColor
     ) => Promise<Result<string, JournalError>>;
     setConfig: (changes: JournalConfigChanges) => Promise<JournalConfig>;
     /** Saves a day's page. Null when an empty page left nothing to save. */

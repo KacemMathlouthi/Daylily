@@ -205,6 +205,21 @@ describe("flower colours", () => {
   });
 });
 
+describe("gallery colours", () => {
+  it("keeps the colour a gallery cover brings, without sampling", async () => {
+    const day = key("2026-10-21");
+    await journal.saveCover(
+      day,
+      new Uint8Array([1, 2, 3]),
+      "jpg",
+      "cornflower"
+    );
+    await journal.writeDay(day, { ...page("Words."), cover: "cover.jpg" });
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value?.color).toBe("cornflower");
+  });
+});
+
 describe("listDays", () => {
   it("is empty before the journal folder exists", async () => {
     const missing = createJournal({

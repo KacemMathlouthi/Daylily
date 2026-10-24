@@ -70,11 +70,12 @@ export function registerJournalIpc(journal: Journal) {
     journal.writeDay(daySchema.parse(day), pageSchema.parse(page))
   );
 
-  handle(CHANNELS.journalSaveCover, (_event, day, image, extension) =>
+  handle(CHANNELS.journalSaveCover, (_event, day, image, extension, color) =>
     journal.saveCover(
       daySchema.parse(day),
       coverImageSchema.parse(image),
-      coverExtensionSchema.parse(extension)
+      coverExtensionSchema.parse(extension),
+      flowerColorSchema.optional().parse(color)
     )
   );
 
