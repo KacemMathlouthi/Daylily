@@ -256,7 +256,7 @@ keychain and **never** into the journal folder.
 - Pages survive a crash or force-quit mid-sentence with at most the last ~500ms lost.
 - Days seal correctly across the 4am boundary, sleep, closed app and time-zone change (covered by tests).
 - Every file the app writes opens cleanly in any markdown editor.
-- Signed builds for macOS (dmg), Windows (exe / msi) and Linux (AppImage, deb), using the icons in `brand/icon/`.
+- Signed builds for macOS (dmg), Windows (exe / msi) and Linux (AppImage, deb), using the icons in `apps/desktop/resources/`.
 - Light and dark themes match the Paper designs.
 
 ---
@@ -296,7 +296,7 @@ packages/ui/         the shared UI, used by every app
   src/components/      Daylily components: Flower, Garden, DayCover, Logo, the page editor's view and toolbar…
   src/editor/          the journal page editor on Tiptap: markdown in and out, ghost prompts, word counts
 packages/core/       pure domain logic: days, sealing, hashing, frontmatter, flowers (no DOM, no Node)
-brand/               brand and product assets
+brand/               brand sources, local only (ignored by git)
 ```
 
 - Packages are imported by path, never through barrel files: `@daylily/ui/primitives/button`.
@@ -499,7 +499,8 @@ screenshots.
 
 ### Logo
 A single six-petal daylily. The flat mark works as a 16px favicon (`apps/web/app/icon.svg`). The textured,
-hand-printed mark is for the app icon and large uses (`brand/landing/spots/mark-textured.png`).
+hand-printed mark is for the app icon and large uses (`apps/web/public/images/art/mark-textured.png`; the full-size
+source is in the local `brand/`).
 
 ---
 
@@ -526,18 +527,14 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 
 | Path | Contents |
 |---|---|
-| `brand/brand-identity.png`, `logo.png`, `logo-mark.png`, `palette.png` | Original brand identity |
-| `brand/brand-art.png`, `brand-art-2.png`, `brand-art-3.png` | Hand-printed botanical art pieces, no text |
-| `brand/main-view-*.png`, `calendar-*.png` | Early generated mockups (reference only; the Paper designs supersede them) |
-| `brand/landing/hero-meadow.png`, `footer-dusk.png` | Landing hero and footer art |
-| `brand/landing/covers/` | Nine day covers (bike, book, cake, cottage, path, rain, river, tea, train), a muted rain variant and a wide path cover. Seed for the v1 cover gallery. |
-| `brand/landing/spots/` | Spot illustrations (seal, sprout, pages) and the transparent textured mark |
-| `brand/landing/textures/` | Torn paper edge, grain, garden contribution graph (PNG and SVG) |
-| `brand/landing/*-sheet.png` | Source sheets the covers and spots were cut from |
-| `brand/social-preview.jpg` | The repository's social preview (1280 × 640), uploaded by hand in GitHub's settings |
-| `brand/icon/` | App icons: `daylily.icns` (macOS), `daylily.ico` (Windows, 16–256px), `linux-{16…512}.png`, and 1024px masters for each platform |
-| `apps/web/public/images/` | Web-sized copies of the art and covers used by the landing page |
+| `apps/web/public/images/` | Web-sized art, covers, the textured mark and the app icons used by the website |
+| `apps/desktop/resources/` | The app's icons (`icon.icns`, `icon.ico`, `icons/NxN.png`) and the cover gallery (`covers/`) |
 | `.github/readme/` | The README's images, exported from Paper ("v5 README") |
+
+**`brand/` is local, not in git.** The brand sources live on the maintainer's machine: the original identity, the
+hand-printed art (`brand-art*.png`), the landing art and the sheets it was cut from, the covers and spot
+illustrations, the icon masters, and the GitHub social preview. When the app or the site needs one of them, a
+web-sized copy goes into the folders above. It was in the repository until 2026-10-25, so older commits still hold it.
 
 `*.mcpb` bundles and `.playwright-mcp/` are ignored.
 
