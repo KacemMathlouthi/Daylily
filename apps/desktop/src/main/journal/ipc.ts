@@ -45,6 +45,22 @@ export function registerJournalIpc(journal: Journal) {
     }
   });
 
+  // Colours sampled in the last moment before quitting are written first
+  let cacheSaved = false;
+  app.on("will-quit", (event) => {
+    if (cacheSaved) {
+      return;
+    }
+    event.preventDefault();
+    journal
+      .flushCache()
+      .catch((error) => console.error("Could not save flower colours", error))
+      .finally(() => {
+        cacheSaved = true;
+        app.quit();
+      });
+  });
+
   handle(CHANNELS.journalInfo, async () => ({
     config: await readConfig(journal.root),
     displayRoot: tildeHome(journal.root),

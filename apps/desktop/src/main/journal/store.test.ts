@@ -43,6 +43,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  // Colours are written a moment later; write them before the folder goes
+  await journal.flushCache();
   await rm(root, { force: true, recursive: true });
 });
 

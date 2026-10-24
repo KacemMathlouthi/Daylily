@@ -83,5 +83,5 @@ export const flowerColorSchema = z.enum([
   "cornflower",
 ]);
 
-/** A cover file's stamp, as the main process gave it: its size and time. */
-export const coverStampSchema = z.string().regex(/^\d+-\d+$/);
+/** A cover file's stamp, as the main process gave it: its size and time, which can be fractional or before 1970. */
+export const coverStampSchema = z.string().regex(/^\d+--?\d+(?:\.\d+)?$/);

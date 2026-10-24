@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -25,6 +25,17 @@ describe("flowerCache", () => {
     expect(await cache.get("2026-10-21", "120-1")).toBe("petal");
     // A different cover file needs sampling again
     expect(await cache.get("2026-10-21", "480-2")).toBeNull();
+    await cache.flush();
+  });
+
+  it("never saves over colours it couldn't read", async () => {
+    const file = join(root, ".daylily", "cache", "flowers.json");
+    // A folder where the file should be: reading fails, and not as "missing"
+    await mkdir(file, { recursive: true });
+    const cache = flowerCache(root);
+    await cache.set("2026-10-21", "1-1", "petal");
+    await cache.flush();
+    expect(await cache.get("2026-10-21", "1-1")).toBeNull();
   });
 
   it("keeps every colour set at once", async () => {

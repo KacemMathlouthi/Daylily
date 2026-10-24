@@ -69,10 +69,10 @@ async function removeEmptyFolders(paths: string[]) {
 
 const results = await Promise.all(manifest.files.map(removeIfUnchanged));
 await removeEmptyFolders(manifest.files.map((file) => file.path));
-// Their flower colours go too; a day still there keeps its colour
+// Their flower colours go too, also for pages already deleted; a day someone changed keeps its colour
 const removedDays = manifest.files
   .filter(
-    (file, index) => results[index] === "removed" && file.path.endsWith(".md")
+    (file, index) => results[index] !== "changed" && file.path.endsWith(".md")
   )
   .map((file) => file.path.split("/").at(-1)?.replace(".md", "") ?? "");
 await flowerCache(journal).forget(removedDays);
