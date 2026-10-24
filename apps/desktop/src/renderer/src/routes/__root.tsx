@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
+import { TITLE_STRIP_HEIGHT, TitleStrip } from "../components/title-strip";
 import { useFocusMode } from "../lib/focus-mode";
 import { useFlowerColors } from "../lib/journal";
 
@@ -17,10 +18,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   }
 );
 
-/** Paper's sidebar is 248px wide, and 56px as a rail */
-const SIDEBAR_SIZE = {
+/** Windows and Linux get Daylily's own title strip; macOS keeps its traffic lights. */
+const HAS_TITLE_STRIP = window.daylily.platform !== "darwin";
+
+/** Paper's sidebar is 248px wide, and 56px as a rail; both start below the title strip */
+const SHELL_SIZE = {
   "--sidebar-width": "15.5rem",
   "--sidebar-width-icon": "3.5rem",
+  "--title-strip": HAS_TITLE_STRIP ? TITLE_STRIP_HEIGHT : "0px",
 } as CSSProperties;
 
 /** Kept in this computer's settings, so the app reopens as it was left. */
@@ -35,14 +40,23 @@ function useSidebarOpen() {
   return [open, change] as const;
 }
 
-/** ⌘N / Ctrl+N opens today's page from anywhere, as Home's button promises. */
-function useNewPageShortcut() {
+/**
+ * ⌘N / Ctrl+N opens today's page from anywhere, as Home's button promises, and
+ * ⌘, / Ctrl+, opens Settings, as the File menu says.
+ */
+function useAppShortcuts() {
   const navigate = useNavigate();
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "n" && (event.metaKey || event.ctrlKey)) {
+      if (!(event.metaKey || event.ctrlKey)) {
+        return;
+      }
+      if (event.key === "n") {
         event.preventDefault();
         navigate({ to: "/today" });
+      } else if (event.key === ",") {
+        event.preventDefault();
+        navigate({ search: { section: "journal" }, to: "/settings" });
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -54,16 +68,17 @@ function AppShell() {
   const [open, setOpen] = useSidebarOpen();
   useFlowerColors(Route.useRouteContext().queryClient);
   const [focused] = useFocusMode();
-  useNewPageShortcut();
+  useAppShortcuts();
 
   return (
     <TooltipProvider>
       <SidebarProvider
-        className="h-full min-h-0"
+        className="h-full min-h-0 pt-(--title-strip)"
         onOpenChange={setOpen}
         open={open}
-        style={SIDEBAR_SIZE}
+        style={SHELL_SIZE}
       >
+        {HAS_TITLE_STRIP ? <TitleStrip /> : null}
         {/* Focus mode leaves only the page */}
         {focused ? null : <AppSidebar />}
         <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">

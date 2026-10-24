@@ -150,7 +150,11 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className="select-none" collapsible="icon">
+    <Sidebar
+      // Below the title strip on Windows and Linux; it's 0 on macOS
+      className="top-(--title-strip) h-[calc(100svh-var(--title-strip))] select-none"
+      collapsible="icon"
+    >
       <SidebarHeader className="gap-4.5 px-3 pt-3.5">
         {/* Room for the macOS traffic lights; the only part of the sidebar that drags the window */}
         {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}

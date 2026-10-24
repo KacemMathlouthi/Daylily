@@ -1,6 +1,10 @@
 import { parseDayKey } from "@daylily/core/day";
 import { z } from "zod";
-import type { AppInfo, JournalConfigChanges } from "./channels";
+import {
+  type AppInfo,
+  type JournalConfigChanges,
+  WINDOW_ACTIONS,
+} from "./channels";
 import { COVER_EXTENSIONS, COVER_NAME, REMINDER_TIME } from "./journal";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
@@ -85,3 +89,5 @@ export const flowerColorSchema = z.enum([
 
 /** A cover file's stamp, as the main process gave it: its size and time, which can be fractional or before 1970. */
 export const coverStampSchema = z.string().regex(/^\d+--?\d+(?:\.\d+)?$/);
+
+export const windowActionSchema = z.enum(WINDOW_ACTIONS);
