@@ -4,13 +4,14 @@ export type Theme = "light" | "dark";
 /** What the person chose: a theme, or to follow the system. */
 export type ThemePreference = Theme | "system";
 
-/** Machine-local for now; the journal's own config takes over once storage exists. */
-const STORAGE_KEY = "daylily:theme";
 const SYSTEM_DARK = "(prefers-color-scheme: dark)";
+const PREFERENCES: readonly string[] = ["light", "dark", "system"];
 
-function storedTheme(): Theme | null {
-  const value = localStorage.getItem(STORAGE_KEY);
-  return value === "light" || value === "dark" ? value : null;
+/** A preference from anywhere outside the code, such as the splash's address; the system's when it isn't one. */
+export function asThemePreference(value: string | null): ThemePreference {
+  return value !== null && PREFERENCES.includes(value)
+    ? (value as ThemePreference)
+    : "system";
 }
 
 function systemTheme(): Theme {
@@ -24,6 +25,8 @@ interface ThemeState {
 
 let state: ThemeState = { preference: "system", theme: "light" };
 const listeners = new Set<() => void>();
+/** Where a choice is kept: this computer's settings, through the main process. */
+let save: (preference: ThemePreference) => void = () => undefined;
 
 /** The tokens switch on `.dark`; color-scheme keeps scrollbars and form controls in step. */
 function apply(next: ThemeState) {
@@ -36,23 +39,32 @@ function apply(next: ThemeState) {
   }
 }
 
-/** Saves a choice, or forgets it to follow the system again. */
+function applyPreference(preference: ThemePreference) {
+  apply({
+    preference,
+    theme: preference === "system" ? systemTheme() : preference,
+  });
+}
+
+/** Applies a choice and keeps it, or forgets it to follow the system again. */
 function choose(preference: ThemePreference) {
-  if (preference === "system") {
-    localStorage.removeItem(STORAGE_KEY);
-    apply({ preference, theme: systemTheme() });
-  } else {
-    localStorage.setItem(STORAGE_KEY, preference);
-    apply({ preference, theme: preference });
-  }
+  applyPreference(preference);
+  save(preference);
 }
 
 /**
  * Applies the saved choice, or the system's, and keeps following the system
- * while it changes until a theme of our own is chosen.
+ * while it changes until a theme of our own is chosen. `keep` saves new choices;
+ * a page that never changes the theme, like the splash, leaves it out.
  */
-export function startTheme() {
-  choose(storedTheme() ?? "system");
+export function startTheme(
+  preference: ThemePreference,
+  keep?: (preference: ThemePreference) => void
+) {
+  if (keep) {
+    save = keep;
+  }
+  applyPreference(preference);
   matchMedia(SYSTEM_DARK).addEventListener("change", () => {
     if (state.preference === "system") {
       apply({ preference: "system", theme: systemTheme() });

@@ -1,3 +1,5 @@
+import type { PageCover } from "./today-page";
+
 const FILES = import.meta.glob<string>("../assets/covers/*.jpg", {
   eager: true,
   import: "default",
@@ -19,7 +21,7 @@ const ORDER = [
   ["train", "Autumn hills from a train window"],
 ] as const;
 
-type GalleryId = (typeof ORDER)[number][0];
+export type GalleryId = (typeof ORDER)[number][0];
 
 export interface GalleryCover {
   id: GalleryId;
@@ -36,19 +38,8 @@ export const GALLERY: readonly GalleryCover[] = ORDER.map(([id, label]) => {
   return { id, label, url };
 });
 
-/** A day's cover: one from the gallery, or a picture of the writer's own. */
-export type Cover =
-  | { source: "gallery"; id: GalleryId }
-  | { source: "computer"; name: string; url: string };
-
-export function coverUrl(cover: Cover) {
-  return cover.source === "gallery"
-    ? (GALLERY.find((item) => item.id === cover.id)?.url ?? "")
-    : cover.url;
-}
-
-export function coverLabel(cover: Cover) {
-  return cover.source === "gallery"
-    ? (GALLERY.find((item) => item.id === cover.id)?.label ?? "Today’s cover")
-    : cover.name;
+/** What a day's cover shows, for screen readers. */
+export function coverLabel(cover: PageCover) {
+  const gallery = GALLERY.find((item) => item.id === cover.galleryId);
+  return gallery?.label ?? "The day’s cover";
 }

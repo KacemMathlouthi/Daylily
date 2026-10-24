@@ -14,6 +14,7 @@ import {
   usePastDay,
 } from "../lib/days";
 import { useFocusChrome } from "../lib/focus-mode";
+import { dayFileLabel, useJournalInfo } from "../lib/journal-info";
 import { dayKey, fromKey, todayKey } from "../lib/month";
 import { useNotice } from "../lib/use-notice";
 import { useToday } from "../lib/use-today";
@@ -55,12 +56,13 @@ function SealedDayScreen() {
     setNotice("The page is copied as markdown.");
   }, [markdown, setNotice, title]);
 
+  const info = useJournalInfo();
   let label = "A rested day · nothing in your journal for it";
   if (day.kind === "written") {
     label =
       day.source === "journal"
         ? `Read-only · ${journalPath(key)}`
-        : "Read-only · kept in memory until Daylily writes to your journal";
+        : `Read-only · ${info ? dayFileLabel(info, key) : "in your journal"}`;
   }
 
   return (

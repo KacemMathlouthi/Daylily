@@ -182,6 +182,24 @@ Old words.
     expect(file).not.toContain("Old words.");
   });
 
+  it("puts a title and cover added later in their place, not at the end", () => {
+    const first = written(
+      null,
+      { ...page, title: "" },
+      stamp("2026-10-21T18:02:11Z")
+    );
+    const later = written(
+      `${first.replace("---\n", "---\nmood: calm\n")}`,
+      { ...page, cover: "cover.jpg" },
+      stamp("2026-10-21T18:05:00Z")
+    );
+    expect(
+      later.startsWith(
+        "---\nmood: calm\ntitle: The long way home\ncover: cover.jpg\ncreated: "
+      )
+    ).toBe(true);
+  });
+
   it("removes the title and cover when they're cleared", () => {
     const withBoth = written(
       null,

@@ -64,8 +64,19 @@ export interface JournalConfig {
 
 export interface JournalInfo {
   config: JournalConfig;
+  /** The journal folder, with the home folder as `~`, for showing where things are. */
+  displayRoot: string;
   /** The journal folder, for Settings. */
   root: string;
+  /** This system's path separator, for showing paths the way it writes them. */
+  separator: string;
+}
+
+/** What this computer remembers about the app, rather than the journal. */
+export interface DeviceState {
+  sidebarOpen: boolean;
+  /** A theme, or to follow the system's. */
+  theme: "light" | "dark" | "system";
 }
 
 /** The scheme the page loads a day's images through; nothing else in the journal is served. */

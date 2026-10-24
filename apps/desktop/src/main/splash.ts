@@ -4,17 +4,38 @@ import { BrowserWindow } from "electron";
 /** Long enough for the bloom and the name to appear, even when the app loads at once. */
 const MIN_SPLASH_MS = 1400;
 const FADE_MS = 280;
-/** If the splash can't paint by then, the app opens without it rather than waiting. */
+/** If the splash hasn't painted by then, it shows anyway and the app starts loading. */
 const SHOW_TIMEOUT_MS = 2000;
+/**
+ * Windows doesn't paint a hidden window, so a splash waiting for its first paint
+ * would wait for nothing. There it's shown at once, fully transparent, and made
+ * visible once it has drawn.
+ */
+const SHOW_TRANSPARENT = process.platform === "win32";
+const TWO_FRAMES =
+  "new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))";
 const FADE_STEPS = 14;
 
-/** Loads one of the renderer's pages: from the dev server, or from the built files. */
-export function loadPage(window: BrowserWindow, page: "index" | "splash") {
+/** Loads one of the renderer's pages, from the dev server or the built files, with an optional query. */
+export function loadPage(
+  window: BrowserWindow,
+  page: "index" | "splash",
+  query: Record<string, string> = {}
+) {
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   if (devUrl) {
-    return window.loadURL(page === "index" ? devUrl : `${devUrl}/${page}.html`);
+    const url = new URL(page === "index" ? devUrl : `${devUrl}/${page}.html`);
+    for (const [key, value] of Object.entries(query)) {
+      url.searchParams.set(key, value);
+    }
+    return window.loadURL(url.toString());
   }
-  return window.loadFile(join(import.meta.dirname, `../renderer/${page}.html`));
+  return window.loadFile(
+    join(import.meta.dirname, `../renderer/${page}.html`),
+    {
+      query,
+    }
+  );
 }
 
 /**
@@ -25,10 +46,13 @@ export function loadPage(window: BrowserWindow, page: "index" | "splash") {
 export function openSplash({
   icon,
   background,
+  theme,
 }: {
   icon: string;
   /** The paper colour, so the window never flashes white before it paints. */
   background: string;
+  /** The theme the app will open in; the splash has no bridge, so it reads it from its address. */
+  theme: string;
 }) {
   // Counted from when it appears, so a slow first paint doesn't eat into the bloom
   let shownAt: number | null = null;
@@ -42,8 +66,9 @@ export function openSplash({
     icon,
     maximizable: false,
     minimizable: false,
+    opacity: SHOW_TRANSPARENT ? 0 : 1,
     resizable: false,
-    show: false,
+    show: SHOW_TRANSPARENT,
     title: "Daylily",
     webPreferences: {
       contextIsolation: true,
@@ -52,15 +77,29 @@ export function openSplash({
     },
     width: 300,
   });
-  const shown = new Promise<void>((resolve) => {
-    splash.once("ready-to-show", () => {
-      if (!splash.isDestroyed()) {
-        shownAt = Date.now();
-        splash.show();
-      }
-      resolve();
-    });
+  const painted = new Promise<void>((resolve) => {
+    if (SHOW_TRANSPARENT) {
+      // Already on screen, so its frames run: two of them after load means it has drawn
+      splash.webContents.once("did-finish-load", () => {
+        splash.webContents
+          .executeJavaScript(TWO_FRAMES)
+          .then(() => resolve(), resolve);
+      });
+    } else {
+      splash.once("ready-to-show", () => resolve());
+    }
     setTimeout(resolve, SHOW_TIMEOUT_MS);
+  });
+  const shown = painted.then(() => {
+    if (splash.isDestroyed()) {
+      return;
+    }
+    shownAt = Date.now();
+    if (SHOW_TRANSPARENT) {
+      splash.setOpacity(1);
+    } else {
+      splash.show();
+    }
   });
 
   // Numbers only, set by this process; the page listens for the event
@@ -74,7 +113,7 @@ export function openSplash({
     }
   };
   splash.webContents.on("did-finish-load", send);
-  loadPage(splash, "splash");
+  loadPage(splash, "splash", { theme });
 
   return {
     /** Shows the app, then fades the splash away once it has been up long enough. */
@@ -82,7 +121,7 @@ export function openSplash({
       progress = 100;
       send();
       if (shownAt === null) {
-        // It never appeared; showing it now would only flash it
+        // The splash went away before it could show; the app opens on its own
         splash.destroy();
         app.show();
         return;

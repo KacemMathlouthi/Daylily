@@ -1,11 +1,13 @@
 import { join } from "node:path";
 import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
+import { registerDeviceIpc } from "./device-ipc";
+import { saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
 import { registerIpc, whenAppReady } from "./ipc";
 import { registerJournalIpc } from "./journal/ipc";
 import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
 import { createJournal } from "./journal/store";
-import { deviceSettings } from "./settings";
+import { type DeviceSettingsStore, deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
 
 const PAPER = "#f4eee3";
@@ -50,13 +52,18 @@ function createWindow() {
   });
   window.webContents.on("will-navigate", (event) => event.preventDefault());
 
+  saveBeforeClosing(window);
   loadPage(window, "index");
   return window;
 }
 
 /** Opens the app behind the splash, which follows its loading and hands over when it has painted. */
-async function launch() {
-  const splash = openSplash({ background: PAPER, icon: ICON });
+async function launch(settings: DeviceSettingsStore) {
+  const splash = openSplash({
+    background: PAPER,
+    icon: ICON,
+    theme: (await settings.read()).theme,
+  });
   await splash.shown;
   const window = createWindow();
   splash.progress(15);
@@ -75,8 +82,7 @@ async function launch() {
 }
 
 /** Opens the journal this computer uses, and the door to it from the page. */
-async function openJournal() {
-  const settings = deviceSettings(app.getPath("userData"));
+async function openJournal(settings: DeviceSettingsStore) {
   const journal = createJournal({
     app: `daylily/${app.getVersion()}`,
     clock: systemClock,
@@ -89,14 +95,17 @@ async function openJournal() {
 registerJournalScheme();
 
 app.whenReady().then(async () => {
+  const settings = deviceSettings(app.getPath("userData"));
   registerIpc();
-  await openJournal();
-  launch();
+  saveOnSleepAndQuit();
+  await registerDeviceIpc(settings);
+  await openJournal(settings);
+  launch(settings);
 
   // macOS keeps apps alive without windows; clicking the dock icon opens one again
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      launch();
+      launch(settings);
     }
   });
 });

@@ -1,6 +1,6 @@
 import { parseDayKey } from "@daylily/core/day";
 import { z } from "zod";
-import type { AppInfo, JournalConfigChanges, PickedImage } from "./channels";
+import type { AppInfo, JournalConfigChanges } from "./channels";
 import { COVER_EXTENSIONS, COVER_NAME, REMINDER_TIME } from "./journal";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
@@ -29,13 +29,6 @@ export const imageNameSchema = z
   .min(1)
   .max(80)
   .regex(/^[\p{L}\p{N} ._-]+$/u);
-
-export const pickedImageSchema = z
-  .object({
-    dataUrl: z.string().startsWith("data:image/"),
-    name: z.string().min(1),
-  })
-  .nullable() satisfies z.ZodType<PickedImage | null>;
 
 /** A day the renderer names: only a real date, so it can never become a path elsewhere. */
 export const daySchema = z.string().transform((text, context) => {
@@ -77,3 +70,8 @@ export const configChangesSchema = z.strictObject({
     })
     .optional(),
 }) satisfies z.ZodType<JournalConfigChanges>;
+
+export const deviceChangesSchema = z.strictObject({
+  sidebarOpen: z.boolean().optional(),
+  theme: z.enum(["light", "dark", "system"]).optional(),
+});

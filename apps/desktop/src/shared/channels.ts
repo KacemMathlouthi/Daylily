@@ -2,6 +2,7 @@ import type { PageContent } from "@daylily/core/day-file";
 import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
+  DeviceState,
   JournalConfig,
   JournalError,
   JournalInfo,
@@ -15,16 +16,20 @@ import type {
  * preload stays free of runtime dependencies.
  */
 export const CHANNELS = {
+  appFlush: "app:flush",
+  appFlushed: "app:flushed",
   appInfo: "app:info",
   appReady: "app:ready",
+  deviceGet: "device:get",
+  deviceSet: "device:set",
   journalChanged: "journal:changed",
   journalInfo: "journal:info",
   journalList: "journal:list",
+  journalPickCover: "journal:pick-cover",
   journalRead: "journal:read",
   journalSaveCover: "journal:save-cover",
   journalSetConfig: "journal:set-config",
   journalWrite: "journal:write",
-  pickCover: "cover:pick",
   saveGardenImage: "garden:save-image",
 } as const;
 
@@ -33,14 +38,6 @@ export interface AppInfo {
   /** A first name from the OS account, for greetings; null when it doesn't read as one. */
   userName: string | null;
   version: string;
-}
-
-/** An image chosen from the computer, held in memory until days are saved as files. */
-export interface PickedImage {
-  /** The image itself, as a data: URL the page can show. */
-  dataUrl: string;
-  /** The file's name, for display. */
-  name: string;
 }
 
 /** Fields to change; any left out, or undefined, stay as they are. */
@@ -54,12 +51,21 @@ export type JournalConfigChanges = Changes<Omit<JournalConfig, "reminder">> & {
 export interface DaylilyApi {
   app: {
     info: () => Promise<AppInfo>;
+    /**
+     * Runs `save` when the app is about to close or the computer to sleep, so
+     * nothing unsaved is lost; the window waits for it, up to a few seconds.
+     */
+    onFlush: (save: () => Promise<void>) => void;
     /** Tells the main process the app has painted, so the splash can hand over. */
     ready: () => void;
   };
-  cover: {
-    /** Opens the system's file picker for one image. Null if cancelled. */
-    pick: () => Promise<PickedImage | null>;
+  /**
+   * What this computer remembers, such as the theme: read from the main process
+   * as the page starts, so it never waits on its own storage, and saved through here.
+   */
+  device: {
+    initial: DeviceState;
+    set: (changes: Partial<DeviceState>) => Promise<void>;
   };
   garden: {
     /** Asks where to save, then writes the garden's share card. False if cancelled. */
@@ -75,6 +81,11 @@ export interface DaylilyApi {
     list: () => Promise<ListedDay[]>;
     /** Calls `listener` with the days that changed on disk, by any app. Returns a way to stop. */
     onChange: (listener: (days: string[]) => void) => () => void;
+    /**
+     * Opens the system's picker for one image and copies it into the day's folder.
+     * Null if cancelled; otherwise the cover's name, for the next save.
+     */
+    pickCover: (day: string) => Promise<Result<string, JournalError> | null>;
     /** A day's page and fields, or null when nothing was written. */
     read: (day: string) => Promise<Result<StoredDay | null, JournalError>>;
     /** Copies a cover into the day's folder; the name it returns goes in the next save. */

@@ -22,16 +22,14 @@ const SIDEBAR_SIZE = {
   "--sidebar-width-icon": "3.5rem",
 } as CSSProperties;
 
-/** Machine-local, like the window size; read once so the app reopens as it was left. */
-const SIDEBAR_OPEN_KEY = "daylily:sidebar-open";
-
+/** Kept in this computer's settings, so the app reopens as it was left. */
 function useSidebarOpen() {
   const [open, setOpen] = useState(
-    () => localStorage.getItem(SIDEBAR_OPEN_KEY) !== "false"
+    () => window.daylily.device.initial.sidebarOpen
   );
   const change = useCallback((next: boolean) => {
     setOpen(next);
-    localStorage.setItem(SIDEBAR_OPEN_KEY, String(next));
+    window.daylily.device.set({ sidebarOpen: next });
   }, []);
   return [open, change] as const;
 }
