@@ -105,7 +105,12 @@ export function registerJournalIpc({
     bytes: await journal.diskUsage(),
   }));
 
-  handle(CHANNELS.journalShow, async () => {
+  handle(CHANNELS.journalShow, async (_event, day) => {
+    // An absent day may cross the bridge as null
+    if (day !== undefined && day !== null) {
+      shell.showItemInFolder(journal.dayFile(daySchema.parse(day)));
+      return;
+    }
     // Asked to see it: the folder is made if nothing has been written yet
     await mkdir(journal.root, { recursive: true });
     await shell.openPath(journal.root);

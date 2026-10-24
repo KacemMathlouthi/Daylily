@@ -175,6 +175,9 @@ export function createJournal({
     /** Where a file in a day's folder lives, for showing its cover. */
     dayAsset,
 
+    /** Where a day's page lives, for showing it in the file manager. */
+    dayFile,
+
     /** How much the journal folder holds, every file in it, in bytes. */
     async diskUsage(): Promise<number> {
       try {
