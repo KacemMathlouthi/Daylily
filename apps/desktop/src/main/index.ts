@@ -9,6 +9,7 @@ import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
 import { createJournal } from "./journal/store";
 import { type DeviceSettingsStore, deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
+import { registerWindowIpc, reportMaximized } from "./window-ipc";
 
 const PAPER = "#f4eee3";
 
@@ -32,7 +33,10 @@ function createWindow() {
     minWidth: 900,
     show: false,
     title: "Daylily",
-    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
+    // macOS keeps its traffic lights; elsewhere Daylily draws its own title strip
+    ...(process.platform === "darwin"
+      ? { titleBarStyle: "hiddenInset" as const }
+      : { frame: false }),
     trafficLightPosition: { x: 18, y: 18 },
     webPreferences: {
       contextIsolation: true,
@@ -53,6 +57,7 @@ function createWindow() {
   window.webContents.on("will-navigate", (event) => event.preventDefault());
 
   saveBeforeClosing(window);
+  reportMaximized(window);
   loadPage(window, "index");
   return window;
 }
@@ -101,6 +106,7 @@ registerJournalScheme();
 app.whenReady().then(async () => {
   const settings = deviceSettings(app.getPath("userData"));
   registerIpc();
+  registerWindowIpc();
   saveOnSleepAndQuit();
   await registerDeviceIpc(settings);
   await openJournal(settings);

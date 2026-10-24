@@ -84,6 +84,18 @@ const api: DaylilyApi = {
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
   platform: process.platform,
+  window: {
+    act: (action) => ipcRenderer.invoke(CHANNELS.windowAction, action),
+    isMaximized: () => ipcRenderer.invoke(CHANNELS.windowMaximized),
+    onMaximizedChange: (listener) => {
+      const forward = (_event: IpcRendererEvent, maximized: boolean) =>
+        listener(maximized);
+      ipcRenderer.on(CHANNELS.windowMaximizedChanged, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.windowMaximizedChanged, forward);
+      };
+    },
+  },
 };
 
 contextBridge.exposeInMainWorld("daylily", api);

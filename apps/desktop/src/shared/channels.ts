@@ -37,6 +37,9 @@ export const CHANNELS = {
   journalSwitched: "journal:switched",
   journalWrite: "journal:write",
   saveGardenImage: "garden:save-image",
+  windowAction: "window:action",
+  windowMaximized: "window:maximized",
+  windowMaximizedChanged: "window:maximized-changed",
 } as const;
 
 export interface AppInfo {
@@ -52,6 +55,24 @@ type Changes<T> = { [K in keyof T]?: T[K] | undefined };
 export type JournalConfigChanges = Changes<Omit<JournalConfig, "reminder">> & {
   reminder?: Changes<JournalConfig["reminder"]> | undefined;
 };
+
+/** What the title strip asks of the window: its controls, and the Edit and View menus. */
+export const WINDOW_ACTIONS = [
+  "minimize",
+  "toggle-maximize",
+  "close",
+  "quit",
+  "undo",
+  "redo",
+  "cut",
+  "copy",
+  "paste",
+  "selectAll",
+  "zoom-in",
+  "zoom-out",
+  "zoom-reset",
+] as const;
+export type WindowAction = (typeof WINDOW_ACTIONS)[number];
 
 /** What the preload exposes to the renderer as `window.daylily`. */
 export interface DaylilyApi {
@@ -130,4 +151,13 @@ export interface DaylilyApi {
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;
+  /**
+   * The window itself, for the title strip Daylily draws on Windows and Linux.
+   * `onMaximizedChange` returns a way to stop listening.
+   */
+  window: {
+    act: (action: WindowAction) => Promise<void>;
+    isMaximized: () => Promise<boolean>;
+    onMaximizedChange: (listener: (maximized: boolean) => void) => () => void;
+  };
 }
