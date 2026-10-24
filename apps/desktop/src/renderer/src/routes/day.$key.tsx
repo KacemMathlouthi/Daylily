@@ -7,12 +7,7 @@ import { RestedPage } from "../components/day/rested-page";
 import { SealedPill } from "../components/day/seal-pill";
 import { SealedPage } from "../components/day/sealed-page";
 import { StatusBar, wordCount } from "../components/day/status-bar";
-import {
-  journalPath,
-  sealedLabel,
-  useNeighbours,
-  usePastDay,
-} from "../lib/days";
+import { sealedLabel, useNeighbours, usePastDay } from "../lib/days";
 import { useFocusChrome } from "../lib/focus-mode";
 import { dayFileLabel, useJournalInfo } from "../lib/journal-info";
 import { dayKey, fromKey, todayKey } from "../lib/month";
@@ -59,10 +54,7 @@ function SealedDayScreen() {
   const info = useJournalInfo();
   let label = "A rested day · nothing in your journal for it";
   if (day.kind === "written") {
-    label =
-      day.source === "journal"
-        ? `Read-only · ${journalPath(key)}`
-        : `Read-only · ${info ? dayFileLabel(info, key) : "in your journal"}`;
+    label = `Read-only · ${info ? dayFileLabel(info, key) : "in your journal"}`;
   }
 
   return (
@@ -84,12 +76,15 @@ function SealedDayScreen() {
         <article className="flex w-full max-w-170 flex-col">
           {day.kind === "written" ? (
             <SealedPage day={key} key={key} page={day} />
-          ) : (
-            <RestedPage day={key} />
-          )}
+          ) : null}
+          {day.kind === "rested" ? <RestedPage day={key} /> : null}
         </article>
       </div>
-      <StatusBar className={chrome} dot="bg-ink-ghost" label={notice ?? label}>
+      <StatusBar
+        className={chrome}
+        dot="bg-ink-ghost"
+        label={notice ?? (day.kind === "loading" ? "" : label)}
+      >
         {day.kind === "written" ? <span>{wordCount(day.words)}</span> : null}
       </StatusBar>
     </div>

@@ -9,6 +9,7 @@ import {
 import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
 import { useFocusMode } from "../lib/focus-mode";
+import { useFlowerColors } from "../lib/journal";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -51,6 +52,7 @@ function useNewPageShortcut() {
 
 function AppShell() {
   const [open, setOpen] = useSidebarOpen();
+  useFlowerColors(Route.useRouteContext().queryClient);
   const [focused] = useFocusMode();
   useNewPageShortcut();
 

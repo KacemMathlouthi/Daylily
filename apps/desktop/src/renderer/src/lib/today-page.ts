@@ -38,7 +38,7 @@ function blankPage(day: DayKey): TodayPage {
 
 /**
  * Pages by day, held here while they're written and saved to the journal as they
- * change. Earlier days stay so the sealed day can show a page from this session.
+ * change. The day before stays while it seals in place at 4am.
  */
 const store = createStore<ReadonlyMap<DayKey, TodayPage>>(new Map());
 const loads = createStore<ReadonlyMap<DayKey, PageLoad>>(new Map());
@@ -90,11 +90,6 @@ export async function loadPage(day: DayKey) {
 
 export function usePageLoad(day: DayKey): PageLoad {
   return loads.use().get(day) ?? { state: "loading" };
-}
-
-/** Every page written while the app has been open, by day. */
-export function useWrittenPages() {
-  return store.use();
 }
 
 /** Today's page; a day with nothing written opens on a blank one. */

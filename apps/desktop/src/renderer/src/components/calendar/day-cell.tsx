@@ -2,8 +2,8 @@ import { cn } from "@daylily/ui/lib/cn";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { dateFormat } from "../../lib/format";
+import type { JournalDay } from "../../lib/journal";
 import type { CalendarDay, DayKey } from "../../lib/month";
-import type { MockDay } from "../../mock/journal";
 import {
   HOVER_LIFT,
   HOVER_REST_DOT,
@@ -21,7 +21,7 @@ type Look = "outside" | "written" | "resting" | "future";
 function lookOf(
   day: CalendarDay,
   today: DayKey,
-  entry: MockDay | undefined
+  entry: JournalDay | undefined
 ): Look {
   if (!day.inMonth) {
     return "outside";
@@ -32,6 +32,17 @@ function lookOf(
   }
   // Today stays open until it's written; it never reads as missed
   return day.key < today ? "resting" : "future";
+}
+
+/** The tile's ground: soft for days outside the month, tinted for rest and for a day written without a cover. */
+function tileGround(look: Look, entry: JournalDay | undefined) {
+  if (look === "outside") {
+    return "bg-paper-sunk/45";
+  }
+  if (look === "resting" || (look === "written" && !entry?.cover)) {
+    return "bg-paper-tint";
+  }
+  return look === "future" ? "border border-line-strong border-dashed" : "";
 }
 
 /** Past days open as sealed or rested pages, today opens the writing page. */
@@ -72,7 +83,7 @@ export function DayCell({
 }: {
   day: CalendarDay;
   today: DayKey;
-  entry: MockDay | undefined;
+  entry: JournalDay | undefined;
 }) {
   const look = lookOf(day, today, entry);
   const isToday = day.key === today && day.inMonth;
@@ -91,14 +102,12 @@ export function DayCell({
           "flex aspect-19/12 w-full items-center justify-center overflow-hidden rounded-md",
           opens && HOVER_LIFT,
           look === "resting" && HOVER_REST_TILE,
-          look === "outside" && "bg-paper-sunk/45",
-          look === "resting" && "bg-paper-tint",
-          look === "future" && "border border-line-strong border-dashed",
+          tileGround(look, entry),
           isToday &&
             "ring-[1.5px] ring-daylily ring-offset-2 ring-offset-paper-page"
         )}
       >
-        {look === "written" && entry ? (
+        {look === "written" && entry?.cover ? (
           <img
             alt=""
             className={cn("size-full object-cover", HOVER_ZOOM)}

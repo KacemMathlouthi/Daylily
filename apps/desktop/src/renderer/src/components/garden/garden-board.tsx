@@ -4,7 +4,7 @@ import { cn } from "@daylily/ui/lib/cn";
 import { type CSSProperties, type ReactElement, useCallback } from "react";
 import { dateFormat } from "../../lib/format";
 import type { GardenGrid } from "../../lib/garden";
-import type { MockDay } from "../../mock/journal";
+import type { JournalDay } from "../../lib/journal";
 import { DayPeek } from "./day-peek";
 
 const MONTH_SHORT = dateFormat({ month: "short" });
@@ -23,7 +23,7 @@ export function GardenBoard({
   currentMonth,
 }: {
   grid: GardenGrid;
-  days: ReadonlyMap<string, MockDay>;
+  days: ReadonlyMap<string, JournalDay>;
   /** `YYYY-MM`, so only the current month is marked, and only in its own year. */
   currentMonth: string;
 }) {

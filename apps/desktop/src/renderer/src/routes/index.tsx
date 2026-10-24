@@ -10,11 +10,11 @@ import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
 import { gardenGrid } from "../lib/garden";
 import { greetingFor } from "../lib/greeting";
+import { type JournalDay, useJournalDays } from "../lib/journal";
 import { type DayKey, dayKey, fromKey } from "../lib/month";
 import { useTodayPage } from "../lib/today-page";
 import { useNow } from "../lib/use-now";
 import { useToday } from "../lib/use-today";
-import { MOCK_DAYS } from "../mock/journal";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
@@ -40,15 +40,15 @@ function shift(key: DayKey, days: number) {
   return date;
 }
 
-function useGlance(today: DayKey) {
+function useGlance(today: DayKey, days: ReadonlyMap<DayKey, JournalDay>) {
   return useMemo(() => {
     const now = fromKey(today);
     const end = shift(today, 6 - ((now.getDay() + 6) % 7));
     const start = shift(dayKey(end), -GLANCE_WEEKS * 7 + 1);
-    const grid = gardenGrid(start, end, today, MOCK_DAYS);
+    const grid = gardenGrid(start, end, today, days);
 
     const written = grid.keys
-      .map((key) => (key <= today ? MOCK_DAYS.get(key) : undefined))
+      .map((key) => (key <= today ? days.get(key) : undefined))
       .filter((day) => day !== undefined);
     const week = Array.from({ length: 6 }, (_, index) =>
       dayKey(shift(today, index - 6))
@@ -64,11 +64,11 @@ function useGlance(today: DayKey) {
           : 0,
         flowers: written.length,
         since: MONTH.format(start),
-        weekWritten: week.filter((key) => MOCK_DAYS.has(key)).length,
+        weekWritten: week.filter((key) => days.has(key)).length,
       },
       week,
     };
-  }, [today]);
+  }, [days, today]);
 }
 
 /** Paper's "02 Home": a greeting, today's invitation, the garden and the week. */
@@ -80,11 +80,12 @@ function HomeScreen() {
     queryFn: () => window.daylily.app.info(),
     queryKey: ["app", "info"],
   });
-  const { grid, stats, week } = useGlance(today);
+  const days = useJournalDays();
+  const { grid, stats, week } = useGlance(today, days);
   const yearAgo = fromKey(today);
   yearAgo.setFullYear(yearAgo.getFullYear() - 1);
   const memoryKey = dayKey(yearAgo);
-  const memory = MOCK_DAYS.get(memoryKey);
+  const memory = days.get(memoryKey);
 
   return (
     <Page
@@ -111,10 +112,7 @@ function HomeScreen() {
         </h1>
       </header>
 
-      <TodayCard
-        now={now}
-        written={MOCK_DAYS.has(today) || todayPage.words > 0}
-      />
+      <TodayCard now={now} written={days.has(today) || todayPage.words > 0} />
 
       <div
         className={
@@ -127,7 +125,7 @@ function HomeScreen() {
         {memory ? <OnThisDay day={memory} dayKey={memoryKey} /> : null}
       </div>
 
-      <ThisWeek days={week} entries={MOCK_DAYS} />
+      <ThisWeek days={week} entries={days} />
     </Page>
   );
 }

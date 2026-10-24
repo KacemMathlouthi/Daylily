@@ -5,7 +5,8 @@ import { type DayKey, dayKey, fromKey } from "./month";
 /** What the garden needs to know about a written day. */
 export interface GardenEntry {
   color: FlowerColor;
-  hour: number;
+  /** When writing began, if known. */
+  hour: number | null;
   words: number;
 }
 
@@ -133,7 +134,9 @@ export function gardenStats(
     words += entry.words;
     const month = key.slice(0, 7);
     perMonth.set(month, (perMonth.get(month) ?? 0) + 1);
-    perHour.set(entry.hour, (perHour.get(entry.hour) ?? 0) + 1);
+    if (entry.hour !== null) {
+      perHour.set(entry.hour, (perHour.get(entry.hour) ?? 0) + 1);
+    }
   }
 
   const most = <K>(counts: Map<K, number>) =>
