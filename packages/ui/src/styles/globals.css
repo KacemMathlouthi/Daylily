@@ -46,9 +46,6 @@
   --color-on-ink: var(--on-ink);
   --color-on-ink-2: var(--on-ink-2);
   --color-on-ink-muted: var(--on-ink-muted);
-  --color-traffic-close: var(--traffic-close);
-  --color-traffic-minimize: var(--traffic-minimize);
-  --color-traffic-zoom: var(--traffic-zoom);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
