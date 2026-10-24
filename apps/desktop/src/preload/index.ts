@@ -1,5 +1,9 @@
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from "electron";
-import { CHANNELS, type DaylilyApi } from "../shared/channels";
+import {
+  CHANNELS,
+  type DaylilyApi,
+  type UpdateState,
+} from "../shared/channels";
 import type { DeviceState } from "../shared/journal";
 
 const THEMES = new Set(["light", "dark", "system"]);
@@ -91,6 +95,20 @@ const api: DaylilyApi = {
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
   platform: process.platform,
+  updates: {
+    check: () => ipcRenderer.invoke(CHANNELS.updatesCheck),
+    dismiss: () => ipcRenderer.invoke(CHANNELS.updatesDismiss),
+    install: () => ipcRenderer.invoke(CHANNELS.updatesInstall),
+    onChange: (listener) => {
+      const forward = (_event: IpcRendererEvent, state: UpdateState) =>
+        listener(state);
+      ipcRenderer.on(CHANNELS.updatesChanged, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.updatesChanged, forward);
+      };
+    },
+    state: () => ipcRenderer.invoke(CHANNELS.updatesState),
+  },
   window: {
     act: (action) => ipcRenderer.invoke(CHANNELS.windowAction, action),
     isMaximized: () => ipcRenderer.invoke(CHANNELS.windowMaximized),

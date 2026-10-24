@@ -7,11 +7,13 @@ import { writeFileAtomic } from "./journal/atomic-write";
 
 /**
  * What belongs to this computer rather than the journal: where the journal is,
- * the theme, the sidebar. Each device keeps its own, in the app's data folder,
- * never in the journal. Read by the main process and handed to each window, as
+ * the theme, the sidebar, an update put away for now. Each device keeps its
+ * own, in the app's data folder, never in the journal. Read by the main process and handed to each window, as
  * the page's own storage can take seconds to open on Windows.
  */
 const settingsSchema = z.looseObject({
+  /** A new version whose sidebar card was put away with "Not now". */
+  dismissedUpdate: z.string().nullable().catch(null),
   journalPath: z.string().refine(isAbsolute).nullable().catch(null),
   sidebarOpen: z.boolean().catch(true),
   theme: z.enum(["light", "dark", "system"]).catch("system"),

@@ -38,6 +38,11 @@ export const CHANNELS = {
   journalSwitched: "journal:switched",
   journalWrite: "journal:write",
   saveGardenImage: "garden:save-image",
+  updatesChanged: "updates:changed",
+  updatesCheck: "updates:check",
+  updatesDismiss: "updates:dismiss",
+  updatesInstall: "updates:install",
+  updatesState: "updates:state",
   windowAction: "window:action",
   windowMaximized: "window:maximized",
   windowMaximizedChanged: "window:maximized-changed",
@@ -49,6 +54,31 @@ export interface AppInfo {
   userName: string | null;
   version: string;
 }
+
+/** Where to send someone whose copy can't replace itself: the website's stable download links. */
+export type UpdateDownload = "deb" | "mac" | "mac-intel";
+
+/**
+ * Where updating stands. `ready` and `available` both mean a new version: the
+ * first has downloaded and installs on quit (Windows, the AppImage); the second
+ * is for copies that can't replace themselves (macOS until it's signed, the
+ * Debian package) and points to the download. `dismissed` hides the sidebar's
+ * card for that version.
+ */
+export type UpdateState =
+  | { status: "off" }
+  | { status: "idle" }
+  | { status: "checking" }
+  | { status: "latest"; checkedAt: string }
+  | { status: "downloading"; percent: number; version: string }
+  | { status: "ready"; dismissed: boolean; version: string }
+  | {
+      status: "available";
+      dismissed: boolean;
+      download: UpdateDownload;
+      version: string;
+    }
+  | { status: "error" };
 
 /** Fields to change; any left out, or undefined, stay as they are. */
 type Changes<T> = { [K in keyof T]?: T[K] | undefined };
@@ -154,6 +184,18 @@ export interface DaylilyApi {
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;
+  /** New versions of Daylily, looked for at launch and every few hours. */
+  updates: {
+    /** Looks now, unless a look or a download is already under way. */
+    check: () => Promise<void>;
+    /** Hides the sidebar's card until a newer version comes. */
+    dismiss: () => Promise<void>;
+    /** Saves every page, then quits and installs the downloaded version. */
+    install: () => Promise<void>;
+    /** Calls `listener` whenever the state changes. Returns a way to stop. */
+    onChange: (listener: (state: UpdateState) => void) => () => void;
+    state: () => Promise<UpdateState>;
+  };
   /**
    * The window itself, for the title strip Daylily draws on Windows and Linux.
    * `onMaximizedChange` returns a way to stop listening.

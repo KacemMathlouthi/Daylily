@@ -28,6 +28,7 @@ describe("deviceSettings", () => {
     await settings.write({ theme: "dark" });
     await settings.write({ sidebarOpen: false });
     expect(await settings.read()).toEqual({
+      dismissedUpdate: null,
       journalPath: null,
       sidebarOpen: false,
       theme: "dark",
@@ -45,6 +46,7 @@ describe("deviceSettings", () => {
   it("starts over from a file that isn't JSON", async () => {
     await writeFile(join(folder, "settings.json"), "nope");
     expect(await deviceSettings(folder).read()).toEqual({
+      dismissedUpdate: null,
       journalPath: null,
       sidebarOpen: true,
       theme: "system",
