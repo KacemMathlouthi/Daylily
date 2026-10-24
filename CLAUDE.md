@@ -571,11 +571,12 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Releases: installers for macOS, Windows and Linux built in CI, versions and notes from the commits by semantic-release, unsigned for now; `main` protected by PRs and green CI |
 | 2026-10-24 | **Daylily 0.1.0 released** on GitHub: dmg (Apple silicon and Intel), Windows setup, AppImage and deb |
 | 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
+| 2026-10-24 | Website: Download offers the latest release's real files (read from GitHub hourly) and picks the visitor's computer; a hand-written Changelog and a Roadmap of what grows after v1, both in the header; designed in Paper first |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: test 0.1.0 on real machines, the changelog and roadmap
-pages and real download links, the domain, the README, then end-to-end tests and auto-update.
+Keep it current as items ship or move. The next few: the domain, the README, repo details and community files,
+then end-to-end tests and auto-update.
 
 ---
 
