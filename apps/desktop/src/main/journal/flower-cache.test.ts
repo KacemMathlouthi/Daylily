@@ -1,0 +1,42 @@
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { flowerCache } from "./flower-cache";
+
+let root: string;
+
+beforeEach(async () => {
+  root = await mkdtemp(join(tmpdir(), "daylily-flowers-"));
+});
+
+afterEach(async () => {
+  await rm(root, { force: true, recursive: true });
+});
+
+describe("flowerCache", () => {
+  it("knows nothing before a colour is sampled", async () => {
+    expect(await flowerCache(root).get("2026-10-21", "120-1")).toBeNull();
+  });
+
+  it("keeps a colour for the cover it was sampled from", async () => {
+    const cache = flowerCache(root);
+    await cache.set("2026-10-21", "120-1", "petal");
+    expect(await cache.get("2026-10-21", "120-1")).toBe("petal");
+    // A different cover file needs sampling again
+    expect(await cache.get("2026-10-21", "480-2")).toBeNull();
+  });
+
+  it("writes to .daylily/cache, where the next launch reads it", async () => {
+    const cache = flowerCache(root);
+    await cache.set("2026-10-21", "120-1", "cornflower");
+    await cache.flush();
+    const file = join(root, ".daylily", "cache", "flowers.json");
+    expect(JSON.parse(await readFile(file, "utf8"))).toEqual({
+      "2026-10-21": { color: "cornflower", stamp: "120-1" },
+    });
+    expect(await flowerCache(root).get("2026-10-21", "120-1")).toBe(
+      "cornflower"
+    );
+  });
+});

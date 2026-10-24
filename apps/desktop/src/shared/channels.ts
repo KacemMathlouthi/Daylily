@@ -1,4 +1,5 @@
 import type { PageContent } from "@daylily/core/day-file";
+import type { FlowerColor } from "@daylily/core/flower";
 import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
@@ -23,6 +24,7 @@ export const CHANNELS = {
   deviceGet: "device:get",
   deviceSet: "device:set",
   journalChanged: "journal:changed",
+  journalFlowerColor: "journal:flower-color",
   journalInfo: "journal:info",
   journalList: "journal:list",
   journalPickCover: "journal:pick-cover",
@@ -76,6 +78,12 @@ export interface DaylilyApi {
    * one, and writes only today, or a day that ended and hasn't sealed yet.
    */
   journal: {
+    /** Keeps the flower colour sampled from a day's cover, stamped with the cover file it came from. */
+    flowerColor: (
+      day: string,
+      stamp: string,
+      color: FlowerColor
+    ) => Promise<void>;
     info: () => Promise<JournalInfo>;
     /** Every written day, oldest first. */
     list: () => Promise<ListedDay[]>;

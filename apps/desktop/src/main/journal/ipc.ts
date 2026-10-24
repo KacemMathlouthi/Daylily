@@ -8,7 +8,9 @@ import {
   configChangesSchema,
   coverExtensionSchema,
   coverImageSchema,
+  coverStampSchema,
   daySchema,
+  flowerColorSchema,
   pageSchema,
 } from "../../shared/schemas";
 import { handle } from "../ipc";
@@ -51,6 +53,14 @@ export function registerJournalIpc(journal: Journal) {
   }));
 
   handle(CHANNELS.journalList, () => journal.listDays());
+
+  handle(CHANNELS.journalFlowerColor, (_event, day, stamp, color) =>
+    journal.setFlowerColor(
+      daySchema.parse(day),
+      coverStampSchema.parse(stamp),
+      flowerColorSchema.parse(color)
+    )
+  );
 
   handle(CHANNELS.journalRead, (_event, day) =>
     journal.readDay(daySchema.parse(day))

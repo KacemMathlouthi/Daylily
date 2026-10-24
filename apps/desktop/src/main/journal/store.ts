@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
@@ -8,6 +8,8 @@ import {
   readDayFile,
   writeDayFile,
 } from "@daylily/core/day-file";
+import { pageExcerpt } from "@daylily/core/excerpt";
+import type { FlowerColor } from "@daylily/core/flower";
 import { fail, ok, type Result } from "@daylily/core/result";
 import { sealDayFile, sealState } from "@daylily/core/seal";
 import { countMarkdownWords } from "@daylily/core/words";
@@ -19,8 +21,11 @@ import type {
   UnreadableDay,
 } from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
+import { flowerCache } from "./flower-cache";
 
 const YEAR = /^\d{4}$/;
+/** `2026-10-21T19:02:11+01:00`: the hour sits after the T, on the clock where it was written. */
+const CREATED_HOUR = /T(\d{2}):/;
 const TWO_DIGITS = /^\d{2}$/;
 
 function errorCode(error: unknown) {
@@ -67,6 +72,7 @@ export function createJournal({
   root: string;
 }) {
   const journalRoot = resolve(root);
+  const flowers = flowerCache(journalRoot);
   // One write at a time per file, so a save and the seal never interleave
   const queues = new Map<string, Promise<unknown>>();
 
@@ -96,16 +102,37 @@ export function createJournal({
     return next;
   }
 
+  /** The cover file's size and time, so a colour sampled from an older cover isn't reused. */
+  async function coverStamp(day: DayKey, cover: string | null) {
+    if (cover === null) {
+      return null;
+    }
+    try {
+      const { mtimeMs, size } = await stat(dayAsset(day, cover));
+      return `${size}-${Math.round(mtimeMs)}`;
+    } catch {
+      return null;
+    }
+  }
+
   async function toStored(day: DayKey, text: string) {
     const file = readDayFile(text);
     if (!file.ok) {
       return file;
     }
     const { body, meta } = file.value;
+    const stamp = await coverStamp(day, meta.cover);
+    const hour = meta.created
+      ? CREATED_HOUR.exec(meta.created)?.[1]
+      : undefined;
     return ok<StoredDay>({
       body,
+      color: stamp ? await flowers.get(day, stamp) : null,
       cover: meta.cover,
+      coverStamp: stamp,
       day,
+      excerpt: pageExcerpt(body),
+      hour: hour === undefined ? null : Number(hour),
       state: await sealState(file.value),
       title: meta.title,
       // Counted from the page, since another app may have changed it since
@@ -241,6 +268,10 @@ export function createJournal({
         })
       );
     },
+
+    /** Keeps the flower colour the page sampled from a day's cover. */
+    setFlowerColor: (day: DayKey, stamp: string, color: FlowerColor) =>
+      flowers.set(day, stamp, color),
 
     /**
      * Saves a day's page, starting its folder on the first save. An empty page
