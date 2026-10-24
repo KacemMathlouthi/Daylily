@@ -23,6 +23,17 @@ describe("deviceSettings", () => {
     expect(await settings.journalPath()).toBe(chosen);
   });
 
+  it("remembers the theme and sidebar, keeping the rest", async () => {
+    const settings = deviceSettings(folder);
+    await settings.write({ theme: "dark" });
+    await settings.write({ sidebarOpen: false });
+    expect(await settings.read()).toEqual({
+      journalPath: null,
+      sidebarOpen: false,
+      theme: "dark",
+    });
+  });
+
   it("ignores a journal path that isn't absolute", async () => {
     await writeFile(
       join(folder, "settings.json"),
@@ -33,6 +44,10 @@ describe("deviceSettings", () => {
 
   it("starts over from a file that isn't JSON", async () => {
     await writeFile(join(folder, "settings.json"), "nope");
-    expect(await deviceSettings(folder).read()).toEqual({ journalPath: null });
+    expect(await deviceSettings(folder).read()).toEqual({
+      journalPath: null,
+      sidebarOpen: true,
+      theme: "system",
+    });
   });
 });

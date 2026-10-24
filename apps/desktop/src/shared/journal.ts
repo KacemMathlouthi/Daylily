@@ -68,6 +68,13 @@ export interface JournalInfo {
   root: string;
 }
 
+/** What this computer remembers about the app, rather than the journal. */
+export interface DeviceState {
+  sidebarOpen: boolean;
+  /** A theme, or to follow the system's. */
+  theme: "light" | "dark" | "system";
+}
+
 /** The scheme the page loads a day's images through; nothing else in the journal is served. */
 export const JOURNAL_SCHEME = "daylily-journal";
 
