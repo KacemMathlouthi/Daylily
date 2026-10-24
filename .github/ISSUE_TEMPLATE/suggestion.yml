@@ -1,0 +1,26 @@
+name: Suggest a change
+description: An idea, a feature, or a change to the roadmap
+labels: [suggestion]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Daylily grows slowly, by the [manifesto](https://daylily-silk.vercel.app/manifesto): one page a day, your own words, files you own, and AI that asks but never writes.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters to you
+      description: The moment in your day when you'd want it.
+    validations:
+      required: true
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: Sketches, other apps that do it well, links.

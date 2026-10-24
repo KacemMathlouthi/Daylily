@@ -25,13 +25,13 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 1 | ~~**Test 0.1.0 on real machines**~~ | Installed and checked by hand on real machines. | High | S | ✓ Done, Oct 24 |
 | 2 | ~~**Changelog page**~~ | `/changelog`, written by hand, one entry per release, with the next one "being written" and links to the roadmap and to suggest a change. | Medium | M | ✓ Done, Oct 24 (#41) |
 | 3 | ~~**Roadmap page**~~ | `/roadmap`: everything under "Later" below, all in progress. Keep it in step with this file. | Medium | M | ✓ Done, Oct 24 (#41) |
-| 4 | ~~**Download page with real links**~~ | Reads the latest GitHub Release hourly and picks the visitor's computer. Shows the real files once the repository is public (4a). | High | S | ✓ Done, Oct 24 (#41) |
-| 4a | **Make the repository public** | Until then GitHub hides the release from the website and from visitors, so every download link leads nowhere. | High | S | Blocked: the owner's call |
+| 4 | ~~**Download page with real links**~~ | Reads the latest GitHub Release hourly and picks the visitor's computer. The repository is public (4a), so the files show. | High | S | ✓ Done, Oct 24 (#41) |
+| 4a | ~~**Make the repository public**~~ | Public, so the website and visitors can reach the releases. | High | S | ✓ Done, Oct 25 |
 | 5 | **Buy the domain, link Vercel** | `daylily.so` (CLAUDE.md §12). Everything public should live on our own name. A quick trademark search first. | High | S | Blocked: purchase |
-| 6 | **Download links on our domain** | `daylily.so/download/mac` and so on redirect to the latest release asset. Links in the README, videos and posts never break when versions change. | Medium | S | After 4a and 5 |
-| 7 | **README** | The repo's front page: the mark, a screenshot or short video, the principles, download links, how to build. Designed like the website, not a wall of text. | High | S | Ready |
-| 8 | **Repo description, topics, website link** | `journal`, `diary`, `electron`, `markdown`, `local-first`, `privacy` and so on. Helps people find it. | Low | S | Ready |
-| 9 | **Community files** | `CONTRIBUTING.md`, issue and PR templates, `SECURITY.md` (how to report a vulnerability), Discussions turned on. | Medium | S | Ready |
+| 6 | ~~**Download links on our domain**~~ | `/download/mac`, `mac-intel`, `windows`, `linux`, `deb` and `checksums` redirect to the latest release's file. On `daylily-silk.vercel.app` until the domain (5). | Medium | S | ✓ Done, Oct 25 |
+| 7 | ~~**README**~~ | Designed in Paper ("v5 · README"): hero, the app, three moments, download buttons, principles, install and build. The app picture is still the design mock; swap in a real screenshot. | High | S | ✓ Done, Oct 25 |
+| 8 | ~~**Repo description, topics, website link**~~ | Set, with Discussions and private vulnerability reporting on. The social preview image is uploaded by hand in Settings (10). | Low | S | ✓ Done, Oct 25 |
+| 9 | ~~**Community files**~~ | `CONTRIBUTING.md`, `SECURITY.md`, issue forms (something isn't right, suggest a change) and a pull request template. | Medium | S | ✓ Done, Oct 25 |
 | 10 | **SEO and sharing** | An Open Graph image per page, titles and descriptions, `sitemap.xml`, `robots.txt`, structured data for the app, and an RSS feed for the changelog. | Medium | S | After 5 |
 | 11 | **Landing page's app mock-up** | The sidebar in the landing page's picture of the app is out of date. While there, bring Paper up to date with the site: the header's Changelog and Roadmap links, and the Download page's two Mac files and checksums link. | Low | S | Ready |
 | 12 | **End-to-end tests on the packaged app** | Playwright driving the real app: survive a force-quit mid-sentence, seal across 4am, sleep, a closed app and a time-zone change. Losing words is the worst bug Daylily can have. | High | L | Ready |
@@ -121,7 +121,6 @@ Each one off until turned on, and plain about what it sends.
 
 ## Decisions waiting on the owner
 
-- Make the repository public (4a).
 - Buy `daylily.so` (5).
 - What search should feel like (15).
 - Thoughts and notes: whether, and in what shape (23).

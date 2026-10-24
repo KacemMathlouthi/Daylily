@@ -12,7 +12,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-24 |
+| **Last updated** | 2026-10-25 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -420,7 +420,7 @@ Work accordingly.
 
 ### Commits
 - **Title only**, conventional format: `type(scope): summary`
-  - types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`
+  - types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`, `revert`
   - imperative, lowercase, no trailing period
   - e.g. `feat(core): seal days at the 4am boundary`
 - **No description body, no `Co-Authored-By` trailer, no AI tool or session links.**
@@ -518,6 +518,7 @@ drift, sync Paper back to what was agreed.
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
+| v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
 Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases and are **not in v1**.
 
@@ -535,6 +536,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | `brand/landing/*-sheet.png` | Source sheets the covers and spots were cut from |
 | `brand/icon/` | App icons: `daylily.icns` (macOS), `daylily.ico` (Windows, 16–256px), `linux-{16…512}.png`, and 1024px masters for each platform |
 | `apps/web/public/images/` | Web-sized copies of the art and covers used by the landing page |
+| `.github/readme/` | The README's images, exported from Paper ("v5 README") |
 
 `*.mcpb` bundles and `.playwright-mcp/` are ignored.
 
@@ -572,10 +574,11 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | **Daylily 0.1.0 released** on GitHub: dmg (Apple silicon and Intel), Windows setup, AppImage and deb |
 | 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
 | 2026-10-24 | Website: Download offers the latest release's real files (read from GitHub hourly) and picks the visitor's computer; a hand-written Changelog and a Roadmap of what grows after v1, both in the header; designed in Paper first |
+| 2026-10-25 | The repository is public: a README designed in Paper, stable download links (`/download/mac` and so on), contributing guide, security policy, issue forms, Discussions, description and topics |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: the domain, the README, repo details and community files,
+Keep it current as items ship or move. The next few: SEO and sharing, the landing page's app mock-up, the domain,
 then end-to-end tests and auto-update.
 
 ---
