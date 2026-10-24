@@ -21,7 +21,7 @@ win:
   target:
     - target: dir
       arch: [x64]
-  # Editing the .exe (icon, version info) needs Wine on Linux; the CI Windows build will do it
+  # Editing the .exe (icon, version info) needs Wine on Linux; the release build on Windows turns it on
   signAndEditExecutable: false
 # The release installer: per user, no admin rights, the user picks where it goes.
 # NSIS needs Windows (or Wine) to build, so this runs on Windows or a Windows CI runner
@@ -30,3 +30,34 @@ nsis:
   perMachine: false
   allowToChangeInstallationDirectory: true
   artifactName: Daylily-${version}-setup.exe
+mac:
+  icon: resources/icon.icns
+  category: public.app-category.lifestyle
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  # Signed ad hoc until there's a Developer ID: Apple silicon won't run an app with no signature at all,
+  # and an ad hoc signature can't use the hardened runtime
+  identity: "-"
+  hardenedRuntime: false
+dmg:
+  artifactName: Daylily-${version}-${arch}.dmg
+linux:
+  # The package's name, @daylily/desktop, can't name a file
+  executableName: daylily
+  # Links the running window to its launcher entry, so docks show the right icon
+  syncDesktopName: true
+  icon: resources/icons
+  category: Office
+  synopsis: A human-first journal
+  description: One page a day, written by you, kept by you, grown into a garden.
+  maintainer: Kacem Mathlouthi <kacem.mathlouthi@insat.ucar.tn>
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+appImage:
+  artifactName: Daylily-${version}-x86_64.AppImage
+deb:
+  artifactName: daylily_${version}_amd64.deb
