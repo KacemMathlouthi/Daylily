@@ -73,6 +73,17 @@ describe("nextUpdateState", () => {
     ).toBe(ready);
   });
 
+  it("keeps a version that's out through later looks and failures", () => {
+    const out: UpdateState = {
+      dismissed: false,
+      download: "mac",
+      status: "available",
+      version: "0.2.0",
+    };
+    expect(nextUpdateState(out, { type: "checking" }, MAC)).toBe(out);
+    expect(nextUpdateState(out, { type: "failed" }, MAC)).toBe(out);
+  });
+
   it("shows a failed look as an error otherwise", () => {
     const checking: UpdateState = { status: "checking" };
     expect(nextUpdateState(checking, { type: "failed" }, SELF)).toEqual({

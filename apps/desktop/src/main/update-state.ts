@@ -17,6 +17,11 @@ export interface UpdateContext {
   download: UpdateDownload | null;
 }
 
+/** A new version known and waiting: downloaded, or out for this copy to download. */
+function isWaiting(state: UpdateState) {
+  return state.status === "ready" || state.status === "available";
+}
+
 /** The next state after `event`. Pure, so every path can be tested without Electron. */
 export function nextUpdateState(
   state: UpdateState,
@@ -26,7 +31,7 @@ export function nextUpdateState(
   switch (event.type) {
     case "checking":
       // A look while a version waits changes nothing on screen; it only confirms it
-      return state.status === "ready" || state.status === "downloading"
+      return isWaiting(state) || state.status === "downloading"
         ? state
         : { status: "checking" };
     case "none":
@@ -63,8 +68,8 @@ export function nextUpdateState(
         version: event.version,
       };
     case "failed":
-      // A version already downloaded still installs on quit, whatever a later look says
-      return state.status === "ready" ? state : { status: "error" };
+      // A version already found still stands, whatever a later look says: offline is not gone
+      return isWaiting(state) ? state : { status: "error" };
     case "dismissed":
       return state.status === "ready" || state.status === "available"
         ? { ...state, dismissed: true }
