@@ -75,8 +75,9 @@ export function registerJournalIpc({
     watcher = watchJournal(journal.root, (days) =>
       broadcast(CHANNELS.journalChanged, days)
     );
-    await settings.write({ journalPath: journal.root });
+    // Its own preferences hold from now, whether or not the device remembers the move
     onConfigChange();
+    await settings.write({ journalPath: journal.root });
     broadcast(CHANNELS.journalSwitched);
   }
 
