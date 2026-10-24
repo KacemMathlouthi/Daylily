@@ -22,14 +22,17 @@ export async function sealEndedDays({
   /** A gallery picture for a day without a cover, or null when none is given. */
   galleryCover: () => Promise<SealCover | null>;
 }): Promise<DayKey[]> {
-  const ended = (await journal.listDays()).filter(
-    (day): day is Exclude<ListedDay, UnreadableDay> =>
-      day.state === "open" && hasEnded(day.day, clock.now(), clock.timeZone())
-  );
-  if (ended.length === 0) {
+  const endedDays = async () =>
+    (await journal.listDays()).filter(
+      (day): day is Exclude<ListedDay, UnreadableDay> =>
+        day.state === "open" && hasEnded(day.day, clock.now(), clock.timeZone())
+    );
+  if ((await endedDays()).length === 0) {
     return [];
   }
   await flush();
+  // Listed again, now that the page's last saves are on disk
+  const ended = await endedDays();
   // Each day on its own: one that fails leaves the rest to seal
   const results = await Promise.all(
     ended.map(async (day) => {
