@@ -218,6 +218,7 @@ keychain and **never** into the journal folder.
 
 | Screen | Behaviour |
 |---|---|
+| **Window** | macOS keeps its traffic lights. On Windows and Linux the window has no frame: Daylily draws a slim 36px title strip with the mark, File / Edit / View / Help menus, the window's title and its own controls (Paper: 12b). |
 | **Launch** | A small frameless splash window (300 × 390) the instant the app starts: the six-petal bloom over the dusk meadow, "Opening your journal…", a progress bar that follows real loading, and a quote. The main window loads hidden behind it; the splash stays at least ~1.4s for the bloom, then fades as the app appears on Home. Paper: 01c. |
 | **Onboarding** | Three steps: *welcome*, *your folder* (choose or create the journal folder, defaulting to `~/Daylily`), *a little help* (reminder time, defaulting to 21:00; the AI options in the design are deferred). |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
@@ -549,6 +550,7 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | Today's page saves to the journal: within half a second of a change and on blur, close and sleep, read back on launch, covers copied into the day folder; the splash shows before the app loads |
 | 2026-10-24 | Every screen reads the journal: Home, Calendar, Garden and sealed days follow the folder as it changes; flowers take their colour from the cover (gallery covers carry a colour chosen by eye, photos are sampled), cached in `.daylily/cache/flowers.json`; the sample data lives only in the seed script |
 | 2026-10-24 | Settings › Journal for real: the folder, its days and size on disk, "Show in folder", and "Change…" moving the journal to another folder while running (unsaved words are saved first; nothing in the old folder moves) |
+| 2026-10-24 | Daylily's own title strip on Windows and Linux (Paper 12b); the garden ends on plain paper (06d) |
 
 ### Next
 1. Design in Paper, then build: the "edited outside Daylily" marker, a day whose file can't be read, and a day written without a cover.
