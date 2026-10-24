@@ -1,7 +1,7 @@
 export const GITHUB_URL = "https://github.com/KacemMathlouthi/Daylily";
 
 /** Where anyone can ask for something to be built, changed or reordered. */
-export const SUGGEST_URL = `${GITHUB_URL}/issues/new`;
+export const SUGGEST_URL = `${GITHUB_URL}/issues/new?template=suggestion.yml`;
 
 export const NAV_LINKS = [
   { href: "/#features", id: "features", label: "Features" },
@@ -34,7 +34,7 @@ export const FOOTER_LINKS = [
     heading: "Community",
     links: [
       { href: GITHUB_URL, label: "GitHub" },
-      { href: "#", label: "Discussions" },
+      { href: `${GITHUB_URL}/discussions`, label: "Discussions" },
       { href: "#", label: "Contact" },
     ],
   },
