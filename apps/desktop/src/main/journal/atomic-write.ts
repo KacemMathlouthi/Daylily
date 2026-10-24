@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { mkdir, open, rename, rm } from "node:fs/promises";
+import { constants } from "node:fs";
+import { copyFile, link, mkdir, open, rename, rm } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 
 /** Marks our temp files, so one left by a crash is plainly ours. */
@@ -41,12 +42,8 @@ async function syncFolder(folder: string) {
   }
 }
 
-/**
- * Writes a file so it is either the old version or the new one, never half of
- * each: into a temp file beside it, flushed to disk, then renamed over it.
- * Missing folders are created.
- */
-export async function writeFileAtomic(path: string, data: string | Uint8Array) {
+/** Writes `data` to a new temp file beside `path`, flushed to disk, and returns its path. */
+async function writeTemp(path: string, data: string | Uint8Array) {
   const folder = dirname(path);
   await mkdir(folder, { recursive: true });
   const temp = join(
@@ -61,10 +58,63 @@ export async function writeFileAtomic(path: string, data: string | Uint8Array) {
     } finally {
       await handle.close();
     }
+  } catch (error) {
+    await rm(temp, { force: true });
+    throw error;
+  }
+  return temp;
+}
+
+/**
+ * Writes a file so it is either the old version or the new one, never half of
+ * each: into a temp file beside it, flushed to disk, then renamed over it.
+ * Missing folders are created.
+ */
+export async function writeFileAtomic(path: string, data: string | Uint8Array) {
+  const temp = await writeTemp(path, data);
+  try {
     await renameWithRetry(temp, path);
   } catch (error) {
     await rm(temp, { force: true });
     throw error;
   }
-  await syncFolder(folder);
+  await syncFolder(dirname(path));
+}
+
+/** Folders that can't hold hard links: FAT drives, some network shares. */
+const NO_LINKS = new Set(["ENOSYS", "ENOTSUP", "EPERM", "EXDEV"]);
+
+/**
+ * Writes a new file, whole, only if nothing is at `path` yet, even should another
+ * app make one at the same moment. Returns false, writing nothing, when one is.
+ */
+export async function createFileAtomic(
+  path: string,
+  data: string | Uint8Array
+): Promise<boolean> {
+  const temp = await writeTemp(path, data);
+  try {
+    // A hard link appears whole and refuses a name already taken
+    await link(temp, path);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code ?? "";
+    if (code === "EEXIST") {
+      return false;
+    }
+    if (!NO_LINKS.has(code)) {
+      throw error;
+    }
+    try {
+      await copyFile(temp, path, constants.COPYFILE_EXCL);
+    } catch (copyError) {
+      if ((copyError as NodeJS.ErrnoException).code === "EEXIST") {
+        return false;
+      }
+      throw copyError;
+    }
+  } finally {
+    await rm(temp, { force: true });
+  }
+  await syncFolder(dirname(path));
+  return true;
 }

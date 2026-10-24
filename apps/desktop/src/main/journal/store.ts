@@ -1,4 +1,4 @@
-import { access, readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
@@ -20,7 +20,7 @@ import type {
   StoredDay,
   UnreadableDay,
 } from "../../shared/journal";
-import { writeFileAtomic } from "./atomic-write";
+import { createFileAtomic, writeFileAtomic } from "./atomic-write";
 import { fileStamp, flowerCache } from "./flower-cache";
 
 const YEAR = /^\d{4}$/;
@@ -40,15 +40,6 @@ async function readIfThere(path: string) {
       return null;
     }
     throw error;
-  }
-}
-
-async function exists(path: string) {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
   }
 }
 
@@ -180,11 +171,9 @@ export function createJournal({
    */
   async function giveCover(day: DayKey, cover: SealCover) {
     const name = `cover.${cover.extension}`;
-    const path = dayAsset(day, name);
-    if (await exists(path)) {
+    if (!(await createFileAtomic(dayAsset(day, name), cover.bytes))) {
       return null;
     }
-    await writeFileAtomic(path, cover.bytes);
     const stamp = await coverStamp(day, name);
     if (stamp) {
       await flowers.set(day, stamp, cover.color);
