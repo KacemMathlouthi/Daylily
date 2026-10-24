@@ -63,4 +63,17 @@ describe("writeConfig", () => {
       sync: { provider: "git" },
     });
   });
+
+  it("keeps both of two changes made at once", async () => {
+    await Promise.all([
+      writeConfig(root, { ghostPrompts: false }),
+      writeConfig(root, { reminder: { enabled: false } }),
+      writeConfig(root, { galleryCovers: false }),
+    ]);
+    expect(await readConfig(root)).toEqual({
+      galleryCovers: false,
+      ghostPrompts: false,
+      reminder: { enabled: false, time: "21:00" },
+    });
+  });
 });

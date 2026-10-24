@@ -48,8 +48,20 @@ export async function readConfig(root: string): Promise<JournalConfig> {
   }
 }
 
+// One change at a time, so two made together each build on the other
+let writing: Promise<unknown> = Promise.resolve();
+
 /** Saves preferences over the current ones, keeping fields it doesn't know. */
-export async function writeConfig(
+export function writeConfig(
+  root: string,
+  changes: JournalConfigChanges
+): Promise<JournalConfig> {
+  const write = writing.then(() => applyChanges(root, changes));
+  writing = write.catch(() => undefined);
+  return write;
+}
+
+async function applyChanges(
   root: string,
   changes: JournalConfigChanges
 ): Promise<JournalConfig> {
