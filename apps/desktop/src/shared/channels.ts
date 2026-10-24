@@ -59,10 +59,6 @@ export interface DaylilyApi {
     /** Tells the main process the app has painted, so the splash can hand over. */
     ready: () => void;
   };
-  cover: {
-    /** Opens the system's file picker for one image. Null if cancelled. */
-    pick: () => Promise<PickedImage | null>;
-  };
   /**
    * What this computer remembers, such as the theme: read from the main process
    * as the page starts, so it never waits on its own storage, and saved through here.
