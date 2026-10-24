@@ -244,7 +244,7 @@ keychain and **never** into the journal folder.
 - **Search:** in-memory index built on launch from the files, cached, updated on save. Works fully offline.
 - **Reminder:** on by default at 21:00, *"How was your day?"*, once a day. Skipped if today already has words or
   Daylily is the focused window. Never mentions missed days. Changeable or off in Settings. A reminder missed while
-  the computer slept comes on waking if under two hours late; opening the app after the time counts as the visit.
+  the computer slept comes on waking if under two hours late and the day hasn't ended; opening the app after the time counts as the visit.
   While it's on, closing the window keeps Daylily running in the tray (menu bar on macOS) with "Open Daylily" and
   "Quit Daylily"; turned off, closing quits as before. Only one Daylily runs at a time: opening it again shows the
   window. Clicking the reminder opens today's page.
