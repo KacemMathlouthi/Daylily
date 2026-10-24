@@ -11,7 +11,7 @@ const MENUS = ["File", "Edit", "View", "Help"];
 /** The window's minimise, maximise and close glyphs, drawn as the app draws them. */
 function WindowControls() {
   return (
-    <div className="flex items-stretch text-ink-muted">
+    <div aria-hidden="true" className="flex items-stretch text-ink-muted">
       <span className="flex w-11.5 items-center justify-center">
         <svg aria-hidden="true" className="size-2.5" viewBox="0 0 10 10">
           <path
@@ -68,11 +68,8 @@ export function AppWindow({
       )}
       {...props}
     >
-      <div
-        aria-hidden="true"
-        className="relative flex h-9 shrink-0 items-stretch justify-between border-line border-b bg-paper-sunk"
-      >
-        <div className="flex items-center gap-0.5 pl-3">
+      <div className="relative flex h-9 shrink-0 items-stretch justify-between border-line border-b bg-paper-sunk">
+        <div aria-hidden="true" className="flex items-center gap-0.5 pl-3">
           <DaylilyMark className="mr-2 text-daylily" size={15} />
           {MENUS.map((menu) => (
             <span
@@ -83,7 +80,8 @@ export function AppWindow({
             </span>
           ))}
         </div>
-        <span className="absolute top-0 left-1/2 flex h-full -translate-x-1/2 items-center whitespace-nowrap text-ink-subtle text-meta">
+        {/* Too narrow for it beside the controls on phones */}
+        <span className="absolute top-0 left-1/2 hidden h-full -translate-x-1/2 items-center whitespace-nowrap text-ink-subtle text-meta sm:flex">
           {title}
         </span>
         <WindowControls />
