@@ -25,8 +25,8 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 1 | ~~**Test 0.1.0 on real machines**~~ | Installed and checked by hand on real machines. | High | S | ✓ Done, Oct 24 |
 | 2 | ~~**Changelog page**~~ | `/changelog`, written by hand, one entry per release, with the next one "being written" and links to the roadmap and to suggest a change. | Medium | M | ✓ Done, Oct 24 (#41) |
 | 3 | ~~**Roadmap page**~~ | `/roadmap`: everything under "Later" below, all in progress. Keep it in step with this file. | Medium | M | ✓ Done, Oct 24 (#41) |
-| 4 | ~~**Download page with real links**~~ | Reads the latest GitHub Release hourly and picks the visitor's computer. Shows the real files once the repository is public (4a). | High | S | ✓ Done, Oct 24 (#41) |
-| 4a | **Make the repository public** | Until then GitHub hides the release from the website and from visitors, so every download link leads nowhere. | High | S | Blocked: the owner's call |
+| 4 | ~~**Download page with real links**~~ | Reads the latest GitHub Release hourly and picks the visitor's computer. The repository is public (4a), so the files show. | High | S | ✓ Done, Oct 24 (#41) |
+| 4a | ~~**Make the repository public**~~ | Public, so the website and visitors can reach the releases. | High | S | ✓ Done, Oct 25 |
 | 5 | **Buy the domain, link Vercel** | `daylily.so` (CLAUDE.md §12). Everything public should live on our own name. A quick trademark search first. | High | S | Blocked: purchase |
 | 6 | ~~**Download links on our domain**~~ | `/download/mac`, `mac-intel`, `windows`, `linux`, `deb` and `checksums` redirect to the latest release's file. On `daylily-silk.vercel.app` until the domain (5). | Medium | S | ✓ Done, Oct 25 |
 | 7 | ~~**README**~~ | Designed in Paper ("v5 · README"): hero, the app, three moments, download buttons, principles, install and build. The app picture is still the design mock; swap in a real screenshot. | High | S | ✓ Done, Oct 25 |
@@ -121,7 +121,6 @@ Each one off until turned on, and plain about what it sends.
 
 ## Decisions waiting on the owner
 
-- Make the repository public (4a).
 - Buy `daylily.so` (5).
 - What search should feel like (15).
 - Thoughts and notes: whether, and in what shape (23).

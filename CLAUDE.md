@@ -12,7 +12,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-24 |
+| **Last updated** | 2026-10-25 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -420,7 +420,7 @@ Work accordingly.
 
 ### Commits
 - **Title only**, conventional format: `type(scope): summary`
-  - types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`
+  - types: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `build`, `chore`, `perf`, `revert`
   - imperative, lowercase, no trailing period
   - e.g. `feat(core): seal days at the 4am boundary`
 - **No description body, no `Co-Authored-By` trailer, no AI tool or session links.**
