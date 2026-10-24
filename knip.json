@@ -2,6 +2,9 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": ["**/route-tree.gen.ts"],
   "workspaces": {
+    ".": {
+      "ignoreDependencies": ["conventional-changelog-conventionalcommits"]
+    },
     "apps/desktop": {
       "entry": ["src/renderer/src/routes/**/*.tsx"],
       "project": ["src/**/*.{ts,tsx,css}"],

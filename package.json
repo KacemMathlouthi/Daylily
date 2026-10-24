@@ -12,13 +12,16 @@
     "journal:unseed": "pnpm --filter @daylily/desktop journal:unseed",
     "knip": "knip",
     "prepare": "lefthook install",
+    "release": "semantic-release",
     "test": "turbo test",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "conventional-changelog-conventionalcommits": "10.4.1",
     "knip": "6.42.1",
     "lefthook": "2.2.2",
+    "semantic-release": "25.0.9",
     "turbo": "2.11.10",
     "typescript": "6.0.3",
     "ultracite": "8.0.1"
