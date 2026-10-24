@@ -23,7 +23,7 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | # | Item | Why | Impact | Effort | Feasibility |
 |---|---|---|---|---|---|
 | 1 | **Test 0.1.0 on real machines** | The installers have never been run by a person. The Windows reminder notification needs the installed app to show at all. | High | S | Ready |
-| 2 | **Changelog page** | Designed in Paper ("Changelog"). Reads the GitHub Releases at build time, so it's never out of date. | Medium | M | Blocked: design approval |
+| 2 | **Changelog page** | Designed in Paper ("Changelog"). Written by hand for now, one entry per release, alongside the GitHub Releases. | Medium | M | Blocked: design approval |
 | 3 | **Roadmap page** | Designed in Paper ("Roadmap"). Shows this file's direction publicly, as growth stages. | Medium | M | Blocked: design approval |
 | 4 | **Download page with real links** | It shows sample sizes and checksums today. It should offer the latest release's real files, picking the visitor's OS. | High | S | Ready |
 | 5 | **Buy the domain, link Vercel** | `daylily.so` (CLAUDE.md §12). Everything public should live on our own name. A quick trademark search first. | High | S | Blocked: purchase |
