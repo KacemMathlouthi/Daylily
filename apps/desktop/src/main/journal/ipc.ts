@@ -66,6 +66,7 @@ export function registerJournalIpc({
   async function switchTo(root: string) {
     // Whatever is unsaved belongs to the journal it was written in
     await flushAllPages();
+    await journal.flushCache();
     await watcher.close();
     journal = open(root);
     watcher = watchJournal(journal.root, (days) =>

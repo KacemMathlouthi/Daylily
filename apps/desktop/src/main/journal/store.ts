@@ -175,9 +175,6 @@ export function createJournal({
     /** Where a file in a day's folder lives, for showing its cover. */
     dayAsset,
 
-    /** Writes any flower colours not yet saved, such as before quitting. */
-    flushCache: () => flowers.flush(),
-
     /** How much the journal folder holds, every file in it, in bytes. */
     async diskUsage(): Promise<number> {
       try {
@@ -203,6 +200,9 @@ export function createJournal({
         throw error;
       }
     },
+
+    /** Writes any flower colours not yet saved, such as before quitting. */
+    flushCache: () => flowers.flush(),
 
     /** Every day with a file, oldest first. Days without one are bare soil. */
     async listDays(): Promise<ListedDay[]> {
