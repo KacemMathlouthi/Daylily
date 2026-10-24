@@ -10,7 +10,12 @@ import {
 import type { ReactNode } from "react";
 import { Header } from "@/components/site/header";
 import { MotionProvider } from "@/components/site/motion";
-import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  pageMetadata,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
 const display = Instrument_Serif({
   style: ["normal", "italic"],
@@ -32,12 +37,9 @@ const mono = Geist_Mono({
   variable: "--font-face-mono",
 });
 
-const description =
-  "A human-first journal. One page a day, written by you, kept by you, grown into a garden.";
-
 export const metadata: Metadata = {
   ...pageMetadata({
-    description,
+    description: SITE_DESCRIPTION,
     path: "/",
     title: "Daylily: One page a day. Yours to keep.",
   }),
