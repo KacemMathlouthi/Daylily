@@ -582,7 +582,7 @@ web-sized copy goes into the folders above. It was in the repository until 2026-
 | 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
 | 2026-10-24 | Website: Download offers the latest release's real files (read from GitHub hourly) and picks the visitor's computer; a hand-written Changelog and a Roadmap of what grows after v1, both in the header; designed in Paper first |
 | 2026-10-25 | The repository is public: a README designed in Paper, stable download links (`/download/mac` and so on), contributing guide, security policy, issue forms, Discussions, description and topics |
-| 2026-10-25 | Updates: looked for at launch and every few hours, installed on quit on Windows and the AppImage, pointed to on macOS and the Debian package; the sidebar names the journal and its folder; a polish pass (a journal's first day, the garden in a narrow window, the ghost prompt's ellipsis, a quit that could hang) |
+| 2026-10-25 | Updates: looked for at launch and every six hours, installed on quit on Windows and the AppImage, pointed to on macOS and the Debian package; the sidebar names the journal and its folder; a polish pass (a journal's first day, the garden in a narrow window, the ghost prompt's ellipsis, a quit that could hang) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
