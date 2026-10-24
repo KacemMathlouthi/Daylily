@@ -11,6 +11,12 @@ import { GITHUB_URL, NAV_LINKS } from "./links";
 
 const SCROLLED_AFTER_PX = 24;
 const LANDING_SECTIONS = ["features", "garden", "calendar"];
+/** Pages that are a link of their own in the header. */
+const PAGE_LINKS: Record<string, string> = {
+  "/changelog": "changelog",
+  "/manifesto": "manifesto",
+  "/roadmap": "roadmap",
+};
 
 /** True once the page has scrolled away from the very top. */
 function useScrolled() {
@@ -52,7 +58,7 @@ function useActiveLink(pathname: string) {
     return () => observer.disconnect();
   }, [pathname]);
 
-  return pathname === "/manifesto" ? "manifesto" : section;
+  return PAGE_LINKS[pathname] ?? section;
 }
 
 export function Header() {
