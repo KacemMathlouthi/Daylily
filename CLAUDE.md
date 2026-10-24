@@ -330,7 +330,7 @@ brand/               brand and product assets
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
 | CI | GitHub Actions: check, knip, typecheck, build and tests on every PR; installers built on each OS for PRs that change packaging |
-| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. The Releases page is the changelog; nothing is committed back. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
+| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. Nothing is committed back; the website's changelog (`apps/web/app/changelog/releases.ts`) is written by hand, an entry for each release. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
@@ -427,7 +427,7 @@ Work accordingly.
 - **Atomic:** one concern per commit, committed as you go. A commit need not build on its own when splitting keeps
   review readable.
 - **Commits make the releases.** Every merge to `main` with a `feat` releases a minor version, a `fix` (or `perf`,
-  `revert`) a patch, and their titles are the release notes, so write them for the people who use the app. Other
+  `revert`) a patch, and their titles are the release notes, so write them for the people who use the app. Each release also gets a short entry, written by hand, on the website's changelog. Other
   types release nothing. The website's scopes, `web` and `site`, never release the app.
 
 ### Versions
