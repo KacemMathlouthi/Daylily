@@ -83,13 +83,17 @@ async function launch(settings: DeviceSettingsStore) {
 
 /** Opens the journal this computer uses, and the door to it from the page. */
 async function openJournal(settings: DeviceSettingsStore) {
-  const journal = createJournal({
-    app: `daylily/${app.getVersion()}`,
-    clock: systemClock,
+  const current = registerJournalIpc({
+    open: (root) =>
+      createJournal({
+        app: `daylily/${app.getVersion()}`,
+        clock: systemClock,
+        root,
+      }),
     root: await settings.journalPath(),
+    settings,
   });
-  registerJournalIpc(journal);
-  serveJournalAssets(journal);
+  serveJournalAssets(current);
 }
 
 registerJournalScheme();

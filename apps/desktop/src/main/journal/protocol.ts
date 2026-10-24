@@ -20,14 +20,14 @@ export function registerJournalScheme() {
   ]);
 }
 
-/** Serves a day's cover and images to the page, and nothing else from the journal. */
-export function serveJournalAssets(journal: Journal) {
+/** Serves a day's cover and images to the page, from whichever journal is open, and nothing else. */
+export function serveJournalAssets(journal: () => Journal) {
   protocol.handle(JOURNAL_SCHEME, async (request) => {
     const asset = parseAssetUrl(request.url);
     if (!asset) {
       return new Response(null, { status: 404 });
     }
-    const file = journal.dayAsset(asset.day, asset.name);
+    const file = journal().dayAsset(asset.day, asset.name);
     const response = await net.fetch(pathToFileURL(file).toString());
     // Only Daylily's own pages load this scheme; they may read the pixels
     const headers = new Headers(response.headers);

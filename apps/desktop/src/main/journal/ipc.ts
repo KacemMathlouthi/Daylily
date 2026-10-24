@@ -1,7 +1,7 @@
-import { readFile, stat } from "node:fs/promises";
+import { mkdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
-import { extname, sep } from "node:path";
-import { app, BrowserWindow, dialog } from "electron";
+import { extname, resolve, sep } from "node:path";
+import { app, BrowserWindow, dialog, shell } from "electron";
 import { CHANNELS } from "../../shared/channels";
 import { COVER_EXTENSIONS, type CoverExtension } from "../../shared/journal";
 import {
@@ -13,7 +13,9 @@ import {
   flowerColorSchema,
   pageSchema,
 } from "../../shared/schemas";
+import { flushAllPages } from "../flush";
 import { handle } from "../ipc";
+import type { DeviceSettingsStore } from "../settings";
 import { readConfig, writeConfig } from "./config";
 import type { Journal } from "./store";
 import { watchJournal } from "./watch";
@@ -34,16 +36,44 @@ function coverExtension(path: string): CoverExtension | null {
   return COVER_EXTENSIONS.find((known) => known === extension) ?? null;
 }
 
+function broadcast(channel: string, ...args: unknown[]) {
+  for (const window of BrowserWindow.getAllWindows()) {
+    window.webContents.send(channel, ...args);
+  }
+}
+
 /**
  * Opens the journal to the renderer. Everything it sends is checked here, since
- * the page is never trusted with the disk.
+ * the page is never trusted with the disk. The journal can be swapped for one in
+ * another folder; returns a way to reach whichever is current.
  */
-export function registerJournalIpc(journal: Journal) {
-  const watcher = watchJournal(journal.root, (days) => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send(CHANNELS.journalChanged, days);
-    }
-  });
+export function registerJournalIpc({
+  open,
+  root: firstRoot,
+  settings,
+}: {
+  /** A journal on the folder at `root`. */
+  open: (root: string) => Journal;
+  root: string;
+  settings: DeviceSettingsStore;
+}) {
+  let journal = open(firstRoot);
+  let watcher = watchJournal(journal.root, (days) =>
+    broadcast(CHANNELS.journalChanged, days)
+  );
+
+  /** Moves to the journal in another folder; nothing in the old one is touched. */
+  async function switchTo(root: string) {
+    // Whatever is unsaved belongs to the journal it was written in
+    await flushAllPages();
+    await watcher.close();
+    journal = open(root);
+    watcher = watchJournal(journal.root, (days) =>
+      broadcast(CHANNELS.journalChanged, days)
+    );
+    await settings.write({ journalPath: journal.root });
+    broadcast(CHANNELS.journalSwitched);
+  }
 
   // Colours sampled in the last moment before quitting are written first
   let cacheSaved = false;
@@ -69,6 +99,35 @@ export function registerJournalIpc(journal: Journal) {
   }));
 
   handle(CHANNELS.journalList, () => journal.listDays());
+
+  handle(CHANNELS.journalStats, async () => ({
+    bytes: await journal.diskUsage(),
+  }));
+
+  handle(CHANNELS.journalShow, async () => {
+    // Asked to see it: the folder is made if nothing has been written yet
+    await mkdir(journal.root, { recursive: true });
+    await shell.openPath(journal.root);
+  });
+
+  handle(CHANNELS.journalChange, async (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) {
+      return false;
+    }
+    const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+      buttonLabel: "Use this folder",
+      defaultPath: journal.root,
+      properties: ["openDirectory", "createDirectory"],
+      title: "Choose your journal folder",
+    });
+    const [chosen] = filePaths;
+    if (canceled || !chosen || resolve(chosen) === journal.root) {
+      return false;
+    }
+    await switchTo(resolve(chosen));
+    return true;
+  });
 
   handle(CHANNELS.journalFlowerColor, (_event, day, stamp, color) =>
     journal.setFlowerColor(
@@ -121,5 +180,5 @@ export function registerJournalIpc(journal: Journal) {
     writeConfig(journal.root, configChangesSchema.parse(changes))
   );
 
-  return watcher;
+  return () => journal;
 }

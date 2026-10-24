@@ -30,6 +30,11 @@ function flushPage(window: BrowserWindow) {
   });
 }
 
+/** Asks every window to save what's unsaved, such as before the journal moves. */
+export async function flushAllPages() {
+  await Promise.all(BrowserWindow.getAllWindows().map(flushPage));
+}
+
 let quitting = false;
 
 /** Saves before the computer sleeps and remembers a quit, so it can resume after saving. */
