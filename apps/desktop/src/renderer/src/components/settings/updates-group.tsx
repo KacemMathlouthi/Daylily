@@ -58,14 +58,14 @@ function UpdateRow({
       );
     case "downloading":
       return (
-        <div className="flex flex-col gap-2.25 px-4 py-3.25">
+        <div className="flex flex-col">
           <SettingsRow
             description={`${state.percent}% · you can keep writing`}
             title={`Downloading Daylily ${state.version}`}
           />
-          <div className="-mt-1 h-1 overflow-hidden rounded-full bg-paper-tint">
+          <div className="mx-4 mb-3.25 h-1 overflow-hidden rounded-full bg-paper-tint">
             <div
-              className="h-full rounded-full bg-daylily transition-[width] duration-calm ease-soft"
+              className="h-full rounded-full bg-daylily transition-[width] duration-(--duration-calm) ease-soft"
               style={{ width: `${state.percent}%` }}
             />
           </div>
