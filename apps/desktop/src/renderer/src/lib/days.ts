@@ -4,17 +4,23 @@ import { dateFormat } from "./format";
 import { useJournalListing, useStoredDay } from "./journal";
 import { type DayKey, fromKey } from "./month";
 
-/** A day before today: sealed with its page, rested with nothing written, or still being read. */
+/**
+ * A day before today: sealed with its page, rested with nothing written, a file
+ * that can't be read, or still being read.
+ */
 export type PastDay =
   | { kind: "loading" }
   | {
       kind: "written";
       title: string;
       cover: { url: string; label: string } | null;
+      /** Changed in another app after it sealed: its seal no longer matches. */
+      edited: boolean;
       markdown: string;
       words: number;
     }
-  | { kind: "rested" };
+  | { kind: "rested" }
+  | { kind: "unreadable" };
 
 /** A past day from its file in the journal. */
 export function usePastDay(key: DayKey): PastDay {
@@ -26,15 +32,8 @@ export function usePastDay(key: DayKey): PastDay {
     if (stored === null) {
       return { kind: "rested" };
     }
-    // Its proper state is designed in Paper first; until then it reads as an empty page
     if (stored === "unreadable") {
-      return {
-        cover: null,
-        kind: "written",
-        markdown: "",
-        title: "",
-        words: 0,
-      };
+      return { kind: "unreadable" };
     }
     return {
       cover: stored.cover
@@ -43,6 +42,7 @@ export function usePastDay(key: DayKey): PastDay {
             url: `${journalAssetUrl(key, stored.cover)}?v=${stored.coverStamp ?? ""}`,
           }
         : null,
+      edited: stored.state === "edited",
       kind: "written",
       markdown: stored.body,
       title: stored.title,
