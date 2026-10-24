@@ -51,13 +51,23 @@ export function saveOnSleepAndQuit() {
 
 /**
  * Holds a window open until its page has saved, then closes it, and carries on
- * quitting if that's why it closed.
+ * quitting if that's why it closed. While `keepRunning` says so, closing only
+ * hides it, so Daylily stays in the tray for the evening reminder.
  */
-export function saveBeforeClosing(window: BrowserWindow) {
+export function saveBeforeClosing(
+  window: BrowserWindow,
+  keepRunning: () => boolean
+) {
   let saved = false;
   let saving = false;
   window.on("close", (event) => {
     if (saved || window.webContents.isDestroyed()) {
+      return;
+    }
+    if (!quitting && keepRunning()) {
+      event.preventDefault();
+      flushPage(window);
+      window.hide();
       return;
     }
     event.preventDefault();
