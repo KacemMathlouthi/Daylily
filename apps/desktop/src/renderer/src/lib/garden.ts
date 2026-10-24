@@ -7,6 +7,8 @@ export interface GardenEntry {
   color: FlowerColor;
   /** When writing began, if known. */
   hour: number | null;
+  /** "unreadable" draws the flower pale. */
+  state: string;
   words: number;
 }
 
@@ -82,7 +84,11 @@ export function gardenGrid(
     } else if (key > today) {
       cells.push("upcoming");
     } else if (entry) {
-      cells.push({ color: entry.color, words: entry.words });
+      cells.push({
+        color: entry.color,
+        pale: entry.state === "unreadable",
+        words: entry.words,
+      });
     } else {
       cells.push(null);
     }

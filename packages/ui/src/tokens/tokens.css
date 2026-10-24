@@ -34,6 +34,8 @@
   --soil: #8a5a3c;
   --soil-soft: #b08a6a;
   --saffron-soft: #e9c77e;
+  /* A flower whose day can't be read: there, but without its colour */
+  --flower-pale: #d9ccbc;
 
   /* Code on a page: warm and quiet, from the same palette */
   --code-keyword: #a8481a;
@@ -92,6 +94,7 @@
   --daylily-wash: #2a1a12;
   --daylily-wash-line: #4a2a1a;
   --soil-soft: #8a6a50;
+  --flower-pale: #3e332b;
   --on-ink: #241b15;
   --on-ink-2: #3a2e26;
   --on-ink-muted: #6e6054;

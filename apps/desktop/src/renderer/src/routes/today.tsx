@@ -213,7 +213,8 @@ function TodayScreen() {
           {load.state === "loading" ? null : (
             <PageView
               ghostPrompts={ghostPrompts}
-              key={shownDay}
+              // Opened afresh when another app changed the file
+              key={`${shownDay}:${page.revision}`}
               onChooseCover={openPicker}
               onTitle={retitle}
               onWrite={write}

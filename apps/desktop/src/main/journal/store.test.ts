@@ -14,7 +14,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createJournal, type Journal } from "./store";
 
 const ZONE = "Africa/Tunis";
-const SEAL = { cover: null, sealed: "2026-10-22T04:00:00+01:00" };
+/** The morning after the 21st, once it has ended. */
+const NEXT_MORNING = new Date("2026-10-22T05:00:00+01:00");
 
 const key = (text: string): DayKey => {
   const day = parseDayKey(text);
@@ -28,9 +29,10 @@ const page = (body: string, title = "") => ({ body, cover: null, title });
 
 let root: string;
 let now: Date;
+let zone: string;
 let journal: Journal;
 
-const clock: Clock = { now: () => now, timeZone: () => ZONE };
+const clock: Clock = { now: () => now, timeZone: () => zone };
 const file = (day: string) => {
   const [year = "", month = "", date = ""] = day.split("-");
   return join(root, year, month, date, `${day}.md`);
@@ -39,6 +41,7 @@ const file = (day: string) => {
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), "daylily-journal-"));
   now = new Date("2026-10-21T20:00:00+01:00");
+  zone = ZONE;
   journal = createJournal({ app: "daylily/0.1.0", clock, root });
 });
 
@@ -92,7 +95,7 @@ describe("writeDay", () => {
     expect((await journal.writeDay(day, page("Just after four."))).ok).toBe(
       true
     );
-    await journal.sealDay(day, SEAL);
+    await journal.sealDay(day, null);
     expect(await journal.writeDay(day, page("Too late now."))).toEqual({
       error: { kind: "sealed" },
       ok: false,
@@ -142,10 +145,15 @@ describe("readDay", () => {
 });
 
 describe("sealDay", () => {
+  const jpeg = new Uint8Array([0xff, 0xd8, 0xff]);
+  const gallery = { bytes: jpeg, color: "petal", extension: "jpg" } as const;
+
   it("seals after any save still on its way", async () => {
     const day = key("2026-10-21");
+    await journal.writeDay(day, page("Before four."));
+    now = NEXT_MORNING;
     const saving = journal.writeDay(day, page("The last words."));
-    const sealing = journal.sealDay(day, SEAL);
+    const sealing = journal.sealDay(day, null);
     await Promise.all([saving, sealing]);
     const read = await journal.readDay(day);
     expect(read.ok && read.value).toMatchObject({
@@ -154,12 +162,98 @@ describe("sealDay", () => {
     });
   });
 
+  it("stamps the seal with the day's end where it was written", async () => {
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("Packed for the trip."));
+    // Sealed days later, on the next launch, in another zone
+    zone = "America/New_York";
+    now = new Date("2026-10-25T12:00:00-04:00");
+    expect(await journal.sealDay(day, null)).toEqual({
+      ok: true,
+      value: "sealed",
+    });
+    expect(await readFile(file("2026-10-21"), "utf8")).toContain(
+      "sealed: 2026-10-22T04:00:00+01:00"
+    );
+  });
+
+  it("leaves a day that hasn't ended open", async () => {
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("Still writing."));
+    now = new Date("2026-10-22T03:59:00+01:00");
+    expect(await journal.sealDay(day, null)).toEqual({
+      ok: true,
+      value: "nothing",
+    });
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value?.state).toBe("open");
+  });
+
   it("has nothing to seal on a day never written", async () => {
-    expect(await journal.sealDay(key("2026-10-20"), SEAL)).toEqual({
+    expect(await journal.sealDay(key("2026-10-20"), null)).toEqual({
       ok: true,
       value: "nothing",
     });
     expect(await readdir(root)).toEqual([]);
+  });
+
+  it("seals a day once", async () => {
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("Words."));
+    now = NEXT_MORNING;
+    await journal.sealDay(day, null);
+    expect(await journal.sealDay(day, null)).toEqual({
+      error: { kind: "sealed" },
+      ok: false,
+    });
+  });
+
+  it("gives a day written without a cover the gallery's picture and its flower", async () => {
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("No picture today."));
+    now = NEXT_MORNING;
+    await journal.sealDay(day, gallery);
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value).toMatchObject({
+      color: "petal",
+      cover: "cover.jpg",
+      state: "sealed",
+    });
+    expect(
+      new Uint8Array(await readFile(journal.dayAsset(day, "cover.jpg")))
+    ).toEqual(jpeg);
+  });
+
+  it("keeps the cover a day was given", async () => {
+    const day = key("2026-10-21");
+    const own = new Uint8Array([1, 2, 3]);
+    await journal.saveCover(day, own, "png");
+    await journal.writeDay(day, { ...page("Mine."), cover: "cover.png" });
+    now = NEXT_MORNING;
+    await journal.sealDay(day, gallery);
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value?.cover).toBe("cover.png");
+    expect((await readdir(join(root, "2026", "10", "21"))).sort()).toEqual([
+      "2026-10-21.md",
+      "cover.png",
+    ]);
+  });
+
+  it("never writes over a file that happens to have the cover's name", async () => {
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("Words."));
+    const theirs = new Uint8Array([9, 9, 9]);
+    await writeFile(journal.dayAsset(day, "cover.jpg"), theirs);
+    now = NEXT_MORNING;
+    await journal.sealDay(day, gallery);
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value).toMatchObject({
+      cover: null,
+      state: "sealed",
+    });
+    expect(
+      new Uint8Array(await readFile(journal.dayAsset(day, "cover.jpg")))
+    ).toEqual(theirs);
   });
 });
 
@@ -180,8 +274,10 @@ describe("saveCover", () => {
   it("never changes a sealed day's cover", async () => {
     const day = key("2026-10-21");
     await journal.writeDay(day, page("Words."));
-    await journal.sealDay(day, SEAL);
-    // Back in a zone where it is still the 21st, after flying west
+    now = NEXT_MORNING;
+    await journal.sealDay(day, null);
+    // Back to when it was still the 21st, as after flying west
+    now = new Date("2026-10-21T20:00:00+01:00");
     expect(await journal.saveCover(day, jpeg, "jpg")).toEqual({
       error: { kind: "sealed" },
       ok: false,
@@ -267,7 +363,8 @@ describe("listDays", () => {
   it("marks sealed days edited in another app, and unreadable ones", async () => {
     const day = key("2026-10-21");
     await journal.writeDay(day, page("The water was high."));
-    await journal.sealDay(day, SEAL);
+    now = NEXT_MORNING;
+    await journal.sealDay(day, null);
     const text = await readFile(file("2026-10-21"), "utf8");
     await writeFile(file("2026-10-21"), text.replace("high", "low"));
     await mkdir(join(root, "2026", "10", "15"), { recursive: true });

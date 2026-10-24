@@ -2,7 +2,7 @@ import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { writeFileAtomic } from "./atomic-write";
+import { createFileAtomic, writeFileAtomic } from "./atomic-write";
 
 const VERSION = /^Version \d+$/;
 
@@ -62,5 +62,22 @@ describe("writeFileAtomic", () => {
     await Promise.all(writes);
     expect(await readFile(join(folder, "day.md"), "utf8")).toMatch(VERSION);
     expect(await readdir(folder)).toEqual(["day.md"]);
+  });
+});
+
+describe("createFileAtomic", () => {
+  it("writes a file that isn't there yet, leaving no temp file", async () => {
+    const path = join(folder, "10", "cover.jpg");
+    expect(await createFileAtomic(path, "Picture")).toBe(true);
+    expect(await readFile(path, "utf8")).toBe("Picture");
+    expect(await readdir(join(folder, "10"))).toEqual(["cover.jpg"]);
+  });
+
+  it("never replaces a file already there", async () => {
+    const path = join(folder, "cover.jpg");
+    await writeFile(path, "Theirs");
+    expect(await createFileAtomic(path, "Ours")).toBe(false);
+    expect(await readFile(path, "utf8")).toBe("Theirs");
+    expect(await readdir(folder)).toEqual(["cover.jpg"]);
   });
 });

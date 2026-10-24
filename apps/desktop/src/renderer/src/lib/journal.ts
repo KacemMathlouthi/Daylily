@@ -9,7 +9,7 @@ import {
 } from "../../../shared/journal";
 import { forgetSaves } from "./autosave";
 import type { DayKey } from "./month";
-import { forgetPages } from "./today-page";
+import { followPageFile, forgetPages } from "./today-page";
 
 /** A written day as the screens show it: calendar tiles, flowers, cards. */
 export interface JournalDay {
@@ -89,16 +89,18 @@ export function useJournalDays(): Days {
   return useJournalListing().days;
 }
 
-/** A day's page from its file: undefined while reading, null if nothing was written. */
+/** A day's page from its file (undefined while reading, null if nothing was written) and when it was read. */
 export function useStoredDay(day: DayKey) {
-  return useQuery({
+  const { data, dataUpdatedAt } = useQuery({
     queryFn: async (): Promise<StoredDay | "unreadable" | null> => {
       const read = await window.daylily.journal.read(day);
       return read.ok ? read.value : "unreadable";
     },
     queryKey: dayKeyOf(day),
     staleTime: Number.POSITIVE_INFINITY,
-  }).data;
+  });
+  // When it was read, so a page changed by another app is shown afresh
+  return { day: data, readAt: dataUpdatedAt };
 }
 
 /** Puts a day as just read into the listing: changed, gone, or now unreadable. */
@@ -164,6 +166,11 @@ export function followJournal(client: QueryClient) {
       }
       return next;
     });
+    for (const entry of reads) {
+      if (entry) {
+        followPageFile(entry[0], entry[1]);
+      }
+    }
     for (const day of changed) {
       client.invalidateQueries({ queryKey: dayKeyOf(day) });
     }

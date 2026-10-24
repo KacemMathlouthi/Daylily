@@ -11,7 +11,7 @@ import {
 import { pageExcerpt } from "@daylily/core/excerpt";
 import type { FlowerColor } from "@daylily/core/flower";
 import { fail, ok, type Result } from "@daylily/core/result";
-import { sealDayFile, sealState } from "@daylily/core/seal";
+import { hasEnded, sealDayFile, sealState, sealTime } from "@daylily/core/seal";
 import { countMarkdownWords } from "@daylily/core/words";
 import type {
   CoverExtension,
@@ -20,7 +20,7 @@ import type {
   StoredDay,
   UnreadableDay,
 } from "../../shared/journal";
-import { writeFileAtomic } from "./atomic-write";
+import { createFileAtomic, writeFileAtomic } from "./atomic-write";
 import { fileStamp, flowerCache } from "./flower-cache";
 
 const YEAR = /^\d{4}$/;
@@ -41,6 +41,13 @@ async function readIfThere(path: string) {
     }
     throw error;
   }
+}
+
+/** A gallery picture for a day sealed without a cover, with the flower it grows. */
+export interface SealCover {
+  bytes: Uint8Array;
+  color: FlowerColor;
+  extension: CoverExtension;
 }
 
 async function folderNames(path: string, pattern: RegExp) {
@@ -157,6 +164,45 @@ export function createJournal({
     return file.value.meta.sealed ? { kind: "sealed" } : null;
   }
 
+  /**
+   * Copies a gallery picture into a day's folder as its cover, returning its
+   * name. A file already there under that name is someone's, so it's left alone
+   * and the day keeps no cover.
+   */
+  async function giveCover(day: DayKey, cover: SealCover) {
+    const name = `cover.${cover.extension}`;
+    if (!(await createFileAtomic(dayAsset(day, name), cover.bytes))) {
+      return null;
+    }
+    const stamp = await coverStamp(day, name);
+    if (stamp) {
+      await flowers.set(day, stamp, cover.color);
+    }
+    return name;
+  }
+
+  /** A day's file as sealed: its end where it was written, a cover if it had none. */
+  async function sealText(
+    day: DayKey,
+    text: string,
+    cover: SealCover | null
+  ): Promise<Result<string, JournalError>> {
+    const file = readDayFile(text);
+    if (!file.ok) {
+      return file;
+    }
+    const { meta } = file.value;
+    if (meta.sealed) {
+      return fail({ kind: "sealed" });
+    }
+    const given =
+      meta.cover === null && cover ? await giveCover(day, cover) : null;
+    return sealDayFile(text, {
+      cover: given,
+      sealed: sealTime(day, meta.tz ?? clock.timeZone()),
+    });
+  }
+
   async function guarded<T>(
     work: () => Promise<Result<T, JournalError>>
   ): Promise<Result<T, JournalError>> {
@@ -174,6 +220,9 @@ export function createJournal({
   return {
     /** Where a file in a day's folder lives, for showing its cover. */
     dayAsset,
+
+    /** Where a day's page lives, for showing it in the file manager. */
+    dayFile,
 
     /** How much the journal folder holds, every file in it, in bytes. */
     async diskUsage(): Promise<number> {
@@ -281,21 +330,22 @@ export function createJournal({
     },
 
     /**
-     * Seals a day: its cover if it had none, the time and the hash. Finishes any
-     * save still on its way first. A day without a file has nothing to seal.
+     * Seals a day that has ended: the time it ended where it was written, the
+     * hash, and `cover` if it had none. Finishes any save still on its way first.
+     * A day without a file, or one not over yet, has nothing to seal.
      */
     sealDay(
       day: DayKey,
-      seal: { cover: string | null; sealed: string }
+      cover: SealCover | null
     ): Promise<Result<"sealed" | "nothing", JournalError>> {
       const path = dayFile(day);
       return queued(path, () =>
         guarded(async () => {
           const text = await readIfThere(path);
-          if (text === null) {
+          if (text === null || !hasEnded(day, clock.now(), clock.timeZone())) {
             return ok("nothing" as const);
           }
-          const sealed = await sealDayFile(text, seal);
+          const sealed = await sealText(day, text, cover);
           if (!sealed.ok) {
             return sealed;
           }

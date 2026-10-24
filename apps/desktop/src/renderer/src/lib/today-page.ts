@@ -1,6 +1,7 @@
+import type { GalleryId } from "../../../shared/gallery";
+import type { StoredDay } from "../../../shared/journal";
 import { journalAssetUrl } from "../../../shared/journal";
-import { markSaved, scheduleSave } from "./autosave";
-import type { GalleryId } from "./covers";
+import { hasUnsavedChanges, markSaved, scheduleSave } from "./autosave";
 import type { DayKey } from "./month";
 import { createStore } from "./store";
 
@@ -19,6 +20,8 @@ export interface TodayPage {
   day: DayKey;
   /** The page's words as markdown, the way they're written to the day's file. */
   markdown: string;
+  /** Goes up when the page is read again after another app changed its file. */
+  revision: number;
   title: string;
   words: number;
 }
@@ -33,7 +36,7 @@ export type PageLoad =
   | { state: "locked"; reason: "sealed" | "unreadable" };
 
 function blankPage(day: DayKey): TodayPage {
-  return { cover: null, day, markdown: "", title: "", words: 0 };
+  return { cover: null, day, markdown: "", revision: 0, title: "", words: 0 };
 }
 
 /**
@@ -71,21 +74,74 @@ export async function loadPage(day: DayKey) {
   }
   const file = read.value;
   if (file) {
-    setPage(day, {
-      cover: file.cover ? { name: file.cover, version: Date.now() } : null,
-      day,
-      markdown: file.body,
-      title: file.title,
-      words: file.words,
-    });
+    setPage(day, pageFrom(day, file, 0));
     markSaved(day);
   }
-  setLoad(
+  setLoad(day, loadOf(file));
+}
+
+function pageFrom(day: DayKey, file: StoredDay, revision: number): TodayPage {
+  return {
+    cover: file.cover ? { name: file.cover, version: Date.now() } : null,
     day,
-    file && file.state !== "open"
-      ? { reason: "sealed", state: "locked" }
-      : { state: "ready" }
+    markdown: file.body,
+    revision,
+    title: file.title,
+    words: file.words,
+  };
+}
+
+function loadOf(file: StoredDay | null): PageLoad {
+  return file && file.state !== "open"
+    ? { reason: "sealed", state: "locked" }
+    : { state: "ready" };
+}
+
+/**
+ * Whether the page already says what the file does, as after Daylily's own save,
+ * which trims the title and the page's blank edges.
+ */
+function matches(page: TodayPage, file: StoredDay | null) {
+  if (!file) {
+    return (
+      page.markdown.trim() === "" && page.title.trim() === "" && !page.cover
+    );
+  }
+  return (
+    page.title.trim() === file.title &&
+    (page.cover?.name ?? null) === file.cover &&
+    page.markdown.trim() === file.body.trim()
   );
+}
+
+/**
+ * Follows a day's file when it changes on disk, as when it's edited in another
+ * app: the page takes the file's words, unless it has words of its own still to
+ * save, which then win as they're written.
+ */
+export function followPageFile(
+  day: DayKey,
+  read: Awaited<ReturnType<typeof window.daylily.journal.read>>
+) {
+  if (!loads.get().has(day) || hasUnsavedChanges(day)) {
+    return;
+  }
+  if (!read.ok) {
+    setLoad(day, { reason: "unreadable", state: "locked" });
+    return;
+  }
+  const file = read.value;
+  const page = store.get().get(day) ?? blankPage(day);
+  if (!matches(page, file)) {
+    setPage(
+      day,
+      file
+        ? pageFrom(day, file, page.revision + 1)
+        : { ...blankPage(day), revision: page.revision + 1 }
+    );
+    markSaved(day);
+  }
+  setLoad(day, loadOf(file));
 }
 
 export function usePageLoad(day: DayKey): PageLoad {

@@ -4,9 +4,10 @@ import { DayArrows } from "../components/day/day-arrows";
 import { DayHeader } from "../components/day/day-header";
 import { PageMenu } from "../components/day/page-menu";
 import { RestedPage } from "../components/day/rested-page";
-import { SealedPill } from "../components/day/seal-pill";
+import { EditedMark, SealedPill } from "../components/day/seal-pill";
 import { SealedPage } from "../components/day/sealed-page";
 import { StatusBar, wordCount } from "../components/day/status-bar";
+import { UnreadablePage } from "../components/day/unreadable-page";
 import { sealedLabel, useNeighbours, usePastDay } from "../lib/days";
 import { useFocusChrome } from "../lib/focus-mode";
 import { dayFileLabel, useJournalInfo } from "../lib/journal-info";
@@ -31,7 +32,10 @@ export const Route = createFileRoute("/day/$key")({
   component: SealedDayScreen,
 });
 
-/** Paper's "04a Sealed day" and "04b Rested day": a past day, read-only. */
+/**
+ * Paper's "04a Sealed day", "04b Rested day", "04d" edited outside Daylily and
+ * "04e" a file that can't be read: a past day, read-only.
+ */
 function SealedDayScreen() {
   const { key } = Route.useParams();
   const today = useToday();
@@ -52,9 +56,14 @@ function SealedDayScreen() {
   }, [markdown, setNotice, title]);
 
   const info = useJournalInfo();
+  const file = info ? dayFileLabel(info, key) : "in your journal";
   let label = "A rested day · nothing in your journal for it";
   if (day.kind === "written") {
-    label = `Read-only · ${info ? dayFileLabel(info, key) : "in your journal"}`;
+    label = day.edited
+      ? `Read-only · ${file} · changed in another app after it sealed`
+      : `Read-only · ${file}`;
+  } else if (day.kind === "unreadable") {
+    label = `${file} · can’t be read`;
   }
 
   return (
@@ -68,16 +77,20 @@ function SealedDayScreen() {
         onFocusChange={setFocused}
         seal={
           day.kind === "written" ? (
-            <SealedPill label={sealedLabel(key, today)} />
+            <>
+              {day.edited ? <EditedMark /> : null}
+              <SealedPill label={sealedLabel(key, today)} />
+            </>
           ) : null
         }
       />
       <div className="flex grow justify-center px-8 pt-3 pb-16">
         <article className="flex w-full max-w-170 flex-col">
           {day.kind === "written" ? (
-            <SealedPage day={key} key={key} page={day} />
+            <SealedPage day={key} key={`${key}:${day.revision}`} page={day} />
           ) : null}
           {day.kind === "rested" ? <RestedPage day={key} /> : null}
+          {day.kind === "unreadable" ? <UnreadablePage day={key} /> : null}
         </article>
       </div>
       <StatusBar

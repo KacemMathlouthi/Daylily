@@ -139,8 +139,8 @@ export interface DaylilyApi {
     /** Calls `listener` when the journal moves to another folder. Returns a way to stop. */
     onSwitch: (listener: () => void) => () => void;
     setConfig: (changes: JournalConfigChanges) => Promise<JournalConfig>;
-    /** Opens the journal folder in the system's file manager. */
-    show: () => Promise<void>;
+    /** Opens the journal folder in the system's file manager, or shows a day's file in it. */
+    show: (day?: string) => Promise<void>;
     /** How much the journal takes on disk. */
     stats: () => Promise<{ bytes: number }>;
     /** Saves a day's page. Null when an empty page left nothing to save. */

@@ -79,7 +79,7 @@ const api: DaylilyApi = {
       ),
     setConfig: (changes) =>
       ipcRenderer.invoke(CHANNELS.journalSetConfig, changes),
-    show: () => ipcRenderer.invoke(CHANNELS.journalShow),
+    show: (day?: string) => ipcRenderer.invoke(CHANNELS.journalShow, day),
     stats: () => ipcRenderer.invoke(CHANNELS.journalStats),
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },

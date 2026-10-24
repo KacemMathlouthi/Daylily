@@ -46,6 +46,7 @@ const TOKENS = [
   "saffron",
   "petal",
   "cornflower",
+  "flower-pale",
 ] as const;
 type Token = (typeof TOKENS)[number];
 
@@ -191,7 +192,9 @@ function drawGraph(
     const x = left + Math.floor(index / 7) * cell + cell / 2;
     const y = gridTop + (index % 7) * cell + cell / 2;
     if (isFlower(day)) {
-      const fill = color[day.color satisfies FlowerColor];
+      const fill = day.pale
+        ? color["flower-pale"]
+        : color[day.color satisfies FlowerColor];
       drawFlower(ctx, x, y, cell * bloomScale(day.words), fill);
     } else if (day === null) {
       dot(ctx, x, y, cell * 0.09, color.soil);
