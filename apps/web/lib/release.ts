@@ -12,6 +12,16 @@ const REFRESH_SECONDS = 3600;
 
 const TAG_PREFIX = /^v/;
 
+/** How each release file is told apart; the names come from electron-builder.yml. */
+export const FILES = {
+  appImage: /\.AppImage$/,
+  checksums: /^SHA256SUMS$/,
+  deb: /\.deb$/,
+  macArm: /-arm64\.dmg$/,
+  macIntel: /-x64\.dmg$/,
+  windows: /-setup\.exe$/,
+};
+
 const releaseSchema = z.object({
   assets: z.array(
     z.object({
