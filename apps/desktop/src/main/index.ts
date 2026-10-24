@@ -32,6 +32,8 @@ const READY_FALLBACK_MS = 10_000;
 let mainWindow: BrowserWindow | null = null;
 /** Whether closing the window leaves Daylily running, for the evening reminder. */
 let keepRunning = false;
+/** Today's page was asked for while no window was there; the next one opens on it. */
+let openTodayWhenReady = false;
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -94,6 +96,10 @@ async function launch(settings: DeviceSettingsStore) {
   const stopWaiting = whenAppReady(window.webContents, () => {
     clearTimeout(fallback);
     splash.handOver(window);
+    if (openTodayWhenReady) {
+      openTodayWhenReady = false;
+      window.webContents.send(CHANNELS.appOpenToday);
+    }
   });
   fallback = setTimeout(() => {
     stopWaiting();
@@ -146,8 +152,13 @@ async function openJournal(settings: DeviceSettingsStore) {
       tray.show(enabled);
     },
     openToday: () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        showWindow(settings);
+        mainWindow.webContents.send(CHANNELS.appOpenToday);
+        return;
+      }
+      openTodayWhenReady = true;
       showWindow(settings);
-      mainWindow?.webContents.send(CHANNELS.appOpenToday);
     },
   });
 }
