@@ -15,7 +15,11 @@ export const sha256 = (data: string | Uint8Array) =>
 
 /** The journal to work on: `--journal <folder>`, or ~/Daylily as the app uses. */
 export function journalFolder() {
-  const { values } = parseArgs({ options: { journal: { type: "string" } } });
+  const { values } = parseArgs({
+    // `pnpm journal:seed -- --journal <folder>` passes the `--` along
+    args: process.argv.slice(2).filter((arg) => arg !== "--"),
+    options: { journal: { type: "string" } },
+  });
   return resolve(values.journal ?? DEFAULT_JOURNAL);
 }
 
