@@ -11,6 +11,8 @@ export type GardenDay = Flower | null | "upcoming" | "blank";
 
 export interface Flower {
   color: FlowerColor;
+  /** A day whose file can't be read: its flower is there, without its colour. */
+  pale?: boolean;
   words: number;
 }
 
@@ -18,7 +20,8 @@ export function isFlower(day: GardenDay): day is Flower {
   return typeof day === "object" && day !== null;
 }
 
-const COLOR_CLASS: Record<FlowerColor, string> = {
+/** Each flower colour as a text colour, for a mark drawn in `currentColor`. */
+export const FLOWER_CLASS: Record<FlowerColor, string> = {
   cornflower: "text-cornflower",
   daylily: "text-daylily",
   petal: "text-petal",
@@ -92,7 +95,10 @@ export function Garden({
           >
             {isFlower(day) ? (
               <DaylilyMark
-                className={cn(COLOR_CLASS[day.color], grow)}
+                className={cn(
+                  day.pale ? "text-flower-pale" : FLOWER_CLASS[day.color],
+                  grow
+                )}
                 style={{
                   ...delay,
                   height: "auto",

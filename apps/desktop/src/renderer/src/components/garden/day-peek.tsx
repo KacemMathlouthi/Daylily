@@ -29,6 +29,10 @@ export function DayPeek({
   day: JournalDay;
   cell: ReactElement;
 }) {
+  const date = LONG_DATE.format(fromKey(dayKey));
+  // A file that can't be read has no title or length to show, only that it's there
+  const unreadable = day.state === "unreadable";
+  const title = unreadable ? "Can’t be read" : day.title;
   return (
     <HoverCard>
       <HoverCardTrigger
@@ -36,7 +40,7 @@ export function DayPeek({
         delay={160}
         render={
           <Link
-            aria-label={`${day.title}, ${LONG_DATE.format(fromKey(dayKey))}`}
+            aria-label={`${title}, ${date}`}
             className="block rounded-full"
             params={{ key: dayKey }}
             to="/day/$key"
@@ -61,11 +65,10 @@ export function DayPeek({
         ) : null}
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="font-medium text-on-ink-muted text-tag leading-3.5">
-            {LONG_DATE.format(fromKey(dayKey))} · {NUMBER.format(day.words)}{" "}
-            words
+            {unreadable ? date : `${date} · ${NUMBER.format(day.words)} words`}
           </span>
           <span className="truncate font-display text-lead text-on-ink leading-5.5">
-            {day.title}
+            {title}
           </span>
           <span className="pt-0.5 font-medium text-on-ink-muted text-tag leading-3.5">
             Open day →

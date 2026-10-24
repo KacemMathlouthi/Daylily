@@ -12,6 +12,7 @@ import {
   HOVER_WARM,
   HOVER_ZOOM,
 } from "../day/hover";
+import { TileFlower } from "../day/tile-flower";
 
 const MONTH_SHORT = dateFormat({ month: "short" });
 
@@ -75,7 +76,73 @@ function DayLink({
   return <div className="flex min-w-0 flex-col gap-1.75">{children}</div>;
 }
 
-/** One day in the month grid, as in Paper's "05 Calendar". */
+/** What fills a tile: the day's cover, its flower when it has none, or the resting dot. */
+function TileArt({
+  look,
+  entry,
+}: {
+  look: Look;
+  entry: JournalDay | undefined;
+}) {
+  if (look === "resting") {
+    return (
+      <span
+        className={cn("size-1.5 rounded-full bg-soil-soft", HOVER_REST_DOT)}
+      />
+    );
+  }
+  if (look !== "written" || !entry) {
+    return null;
+  }
+  if (entry.cover) {
+    return (
+      <img
+        alt=""
+        className={cn("size-full object-cover", HOVER_ZOOM)}
+        draggable={false}
+        height={404}
+        src={entry.cover}
+        width={640}
+      />
+    );
+  }
+  return <TileFlower day={entry} />;
+}
+
+/** The words beside the day's number: its title, or why there's none. */
+function TileLabel({
+  look,
+  entry,
+}: {
+  look: Look;
+  entry: JournalDay | undefined;
+}) {
+  if (look === "resting") {
+    return (
+      <span className={cn("text-ink-faint text-xs", HOVER_REST_LABEL)}>
+        Resting
+      </span>
+    );
+  }
+  if (look !== "written" || !entry) {
+    return null;
+  }
+  if (entry.state === "unreadable") {
+    return <span className="text-ink-faint text-xs">Can’t be read</span>;
+  }
+  return (
+    <span
+      className={cn(
+        "truncate font-display text-base text-ink leading-4.75",
+        HOVER_WARM
+      )}
+    >
+      {entry.title}
+    </span>
+  );
+}
+
+/** One day in the month grid, as in Paper's "05 Calendar" and "05f". */
 export function DayCell({
   day,
   today,
@@ -107,21 +174,7 @@ export function DayCell({
             "ring-[1.5px] ring-daylily ring-offset-2 ring-offset-paper-page"
         )}
       >
-        {look === "written" && entry?.cover ? (
-          <img
-            alt=""
-            className={cn("size-full object-cover", HOVER_ZOOM)}
-            draggable={false}
-            height={404}
-            src={entry.cover}
-            width={640}
-          />
-        ) : null}
-        {look === "resting" ? (
-          <span
-            className={cn("size-1.5 rounded-full bg-soil-soft", HOVER_REST_DOT)}
-          />
-        ) : null}
+        <TileArt entry={entry} look={look} />
       </div>
       <div className="flex min-w-0 items-baseline gap-1.5">
         <span
@@ -136,21 +189,7 @@ export function DayCell({
         >
           {number}
         </span>
-        {look === "written" && entry ? (
-          <span
-            className={cn(
-              "truncate font-display text-base text-ink leading-4.75",
-              HOVER_WARM
-            )}
-          >
-            {entry.title}
-          </span>
-        ) : null}
-        {look === "resting" ? (
-          <span className={cn("text-ink-faint text-xs", HOVER_REST_LABEL)}>
-            Resting
-          </span>
-        ) : null}
+        <TileLabel entry={entry} look={look} />
       </div>
     </DayLink>
   );

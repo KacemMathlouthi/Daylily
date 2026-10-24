@@ -12,6 +12,7 @@ import {
   HOVER_WARM,
   HOVER_ZOOM,
 } from "../day/hover";
+import { TileFlower } from "../day/tile-flower";
 
 const WEEKDAY = dateFormat({ weekday: "short" });
 
@@ -65,6 +66,7 @@ export function ThisWeek({
                     width={640}
                   />
                 ) : null}
+                {entry && !entry.cover ? <TileFlower day={entry} /> : null}
                 {entry ? null : (
                   <span
                     className={cn(
