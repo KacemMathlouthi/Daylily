@@ -1,6 +1,6 @@
+import type { GalleryId } from "../../../shared/gallery";
 import { journalAssetUrl } from "../../../shared/journal";
 import { markSaved, scheduleSave } from "./autosave";
-import type { GalleryId } from "./covers";
 import type { DayKey } from "./month";
 import { createStore } from "./store";
 

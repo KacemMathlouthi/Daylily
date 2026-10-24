@@ -11,6 +11,9 @@ files:
 extraResources:
   - from: resources/icon.png
     to: icon.png
+  # The cover gallery, read by sealing to give a coverless day a picture
+  - from: resources/covers
+    to: covers
 win:
   icon: resources/icon.ico
   # An unpacked folder for everyday builds: a portable .exe re-extracts the whole runtime

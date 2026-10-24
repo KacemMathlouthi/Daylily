@@ -8,8 +8,9 @@ import {
 } from "@daylily/ui/primitives/dialog";
 import { Upload, X } from "lucide-react";
 import { useCallback, useState } from "react";
+import type { GalleryId } from "../../../../shared/gallery";
 import type { JournalError } from "../../../../shared/journal";
-import { GALLERY, type GalleryCover, type GalleryId } from "../../lib/covers";
+import { GALLERY, type GalleryCover } from "../../lib/covers";
 import type { DayKey } from "../../lib/month";
 import type { PageCover } from "../../lib/today-page";
 
