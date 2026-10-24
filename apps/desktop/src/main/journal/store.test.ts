@@ -233,7 +233,7 @@ describe("sealDay", () => {
     await journal.sealDay(day, gallery);
     const read = await journal.readDay(day);
     expect(read.ok && read.value?.cover).toBe("cover.png");
-    expect(await readdir(join(root, "2026", "10", "21"))).toEqual([
+    expect((await readdir(join(root, "2026", "10", "21"))).sort()).toEqual([
       "2026-10-21.md",
       "cover.png",
     ]);
