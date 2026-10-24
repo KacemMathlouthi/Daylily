@@ -227,7 +227,7 @@ keychain and **never** into the journal folder.
 | **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three stats and the meadow (Paper: 06c). |
 | **Search** | Full-text search across all days. Results show date, title and a snippet, and open the day. |
-| **Settings** | Journal (folder, what's on disk), Writing & sealing (ghost prompts, the 4am seal, gallery covers), Reminders (on/off, time, a preview), Appearance (light, dark, match the system; the sidebar's sun and moon switch too), About. AI hidden in v1. Paper: 09a to 09e. |
+| **Settings** | Journal (folder, what's on disk), Writing & sealing (ghost prompts, the 4am seal, gallery covers), Reminders (on/off, time, a preview), Appearance (light, dark, match the system; the sidebar's sun and moon switch too), About, with where updating stands (Paper 09f, 09g). AI hidden in v1. Paper: 09a to 09e. |
 
 ### 3.5 Behaviours
 
@@ -249,6 +249,15 @@ keychain and **never** into the journal folder.
   "Quit Daylily"; turned off, closing quits as before. Only one Daylily runs at a time: opening it again shows the
   window. Clicking the reminder opens today's page.
 - **External changes:** the app watches the journal folder and reflects edits made by other tools.
+- **Updates:** Daylily looks for a new version on its GitHub releases as the splash shows, then every six hours,
+  never in a development build. Windows and the AppImage download it quietly and install on quit, or at once
+  with "Restart now" (every page is saved first). macOS (until it's signed) and the Debian package can't replace
+  themselves, so they say a new version is out and link to its download. A quiet card above Settings says so;
+  "Not now" puts it away until the next version. Settings › About shows the state and a "Check now".
+- **Sidebar's journal:** the top of the sidebar names the journal and its folder (`~/Daylily`) and opens Settings ›
+  Journal; there's one journal, so nothing to pick.
+- **A journal's first day:** days before the earliest page (or today, in an empty journal) weren't rested, they came
+  before the journal: they show as plain ground in the calendar, Home and the garden, and never count as missed.
 
 ### 3.6 Definition of done for v1
 
@@ -330,7 +339,7 @@ brand/               brand sources, local only (ignored by git)
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
 | CI | GitHub Actions: check, knip, typecheck, build and tests on every PR; installers built on each OS for PRs that change packaging |
-| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb) and `SHA256SUMS` are attached and the GitHub Release published. Nothing is committed back; the website's changelog (`apps/web/app/changelog/releases.ts`) is written by hand, an entry for each release. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
+| Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb), the `latest*.yml` files and blockmaps that installed copies update from (electron-updater), and `SHA256SUMS` are attached and the GitHub Release published. Nothing is committed back; the website's changelog (`apps/web/app/changelog/releases.ts`) is written by hand, an entry for each release. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
 
 Dependencies are pinned to exact versions. pnpm blocks install scripts by default; allow one only when it's needed,
 in `pnpm-workspace.yaml` under `allowBuilds`.
@@ -517,7 +526,7 @@ drift, sync Paper back to what was agreed.
 |---|---|
 | v1 | First landing page draft (superseded) |
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
@@ -573,11 +582,12 @@ web-sized copy goes into the folders above. It was in the repository until 2026-
 | 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
 | 2026-10-24 | Website: Download offers the latest release's real files (read from GitHub hourly) and picks the visitor's computer; a hand-written Changelog and a Roadmap of what grows after v1, both in the header; designed in Paper first |
 | 2026-10-25 | The repository is public: a README designed in Paper, stable download links (`/download/mac` and so on), contributing guide, security policy, issue forms, Discussions, description and topics |
+| 2026-10-25 | Updates: looked for at launch and every few hours, installed on quit on Windows and the AppImage, pointed to on macOS and the Debian package; the sidebar names the journal and its folder; a polish pass (a journal's first day, the garden in a narrow window, the ghost prompt's ellipsis, a quit that could hang) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: SEO and sharing, the landing page's app mock-up, the domain,
-then end-to-end tests and auto-update.
+Keep it current as items ship or move. The next few: link previews and images on the page, then the image audit, new art and more gallery
+covers, then end-to-end tests and search.
 
 ---
 
