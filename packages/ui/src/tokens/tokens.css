@@ -50,11 +50,6 @@
   --on-ink-2: #e9e0d2;
   --on-ink-muted: #b5a493;
 
-  /* macOS window controls, drawn in product mock-ups */
-  --traffic-close: #ee6a5f;
-  --traffic-minimize: #f5be4f;
-  --traffic-zoom: #62c655;
-
   /* Type: next/font (web) or @fontsource (desktop) provide the --font-face-* variables */
   --font-display: var(--font-face-display, "Instrument Serif"), Georgia, serif;
   --font-sans: var(--font-face-sans, "Instrument Sans"), system-ui, sans-serif;
