@@ -42,11 +42,10 @@ jobs:
           - os: ubuntu-latest
             targets: --linux AppImage deb --x64
     runs-on: ${{ matrix.os }}
+    # Builds run the repository's code, so they never hold a token that can write
     permissions:
-      contents: write
+      contents: read
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE: ${{ inputs.release }}
       # A pull request builds a preview, numbered after the run
       VERSION: ${{ inputs.version || format('0.0.0-pr.{0}', github.run_number) }}
     defaults:
@@ -77,13 +76,26 @@ jobs:
           mkdir ../installers
           mv Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb ../installers/
           ls -l ../installers
-      - if: inputs.release != ''
-        name: Attach to the release
-        working-directory: apps/desktop/installers
-        run: gh release upload "$RELEASE" * --clobber
-      - if: inputs.release == ''
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: installers-${{ matrix.os }}
           path: apps/desktop/installers
           retention-days: 7
+
+  attach:
+    needs: build
+    if: inputs.release != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE: ${{ inputs.release }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          merge-multiple: true
+          path: installers
+      - name: Attach to the release
+        run: gh release upload "$RELEASE" installers/* --repo "$GITHUB_REPOSITORY" --clobber
