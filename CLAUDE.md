@@ -562,7 +562,9 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 ### Next
 1. Search across all days (design in Paper first).
 2. Onboarding: choosing the folder on first run.
-3. Packaging and signing for all three platforms.
+3. Packaging and signing for all three platforms. Then check the evening reminder's notification on Windows from
+   the installer: it's untested there, and the unpacked build can't show it, since Windows only shows notifications
+   from an app with a Start Menu entry under its id (`app.daylily.desktop`), which the installer creates.
 
 ---
 
