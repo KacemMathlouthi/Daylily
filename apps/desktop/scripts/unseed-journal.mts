@@ -1,5 +1,6 @@
 import { readFile, rm, rmdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { flowerCache } from "../src/main/journal/flower-cache";
 import {
   journalFolder,
   manifestPath,
@@ -68,9 +69,19 @@ async function removeEmptyFolders(paths: string[]) {
 
 const results = await Promise.all(manifest.files.map(removeIfUnchanged));
 await removeEmptyFolders(manifest.files.map((file) => file.path));
+// Their flower colours go too, also for pages already deleted; a day someone changed keeps its colour
+const removedDays = manifest.files
+  .filter(
+    (file, index) => results[index] !== "changed" && file.path.endsWith(".md")
+  )
+  .map((file) => file.path.split("/").at(-1)?.replace(".md", "") ?? "");
+await flowerCache(journal).forget(removedDays);
 await rm(manifestPath(journal));
-// The seed may have made .daylily just for its manifest
-await rmdir(dirname(manifestPath(journal))).catch(() => undefined);
+// The seed may have made .daylily just for its manifest and colours
+await removeInOrder([
+  join(journal, ".daylily", "cache"),
+  dirname(manifestPath(journal)),
+]);
 
 const kept = manifest.files.filter((_, index) => results[index] === "changed");
 console.log(

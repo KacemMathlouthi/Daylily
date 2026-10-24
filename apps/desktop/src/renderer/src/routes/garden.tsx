@@ -12,8 +12,8 @@ import { YearList } from "../components/garden/year-list";
 import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
 import { gardenGrid, gardenStats, gardenYears } from "../lib/garden";
+import { useJournalDays } from "../lib/journal";
 import { useToday } from "../lib/use-today";
-import { MOCK_DAYS } from "../mock/journal";
 
 export const Route = createFileRoute("/garden")({
   component: GardenScreen,
@@ -25,7 +25,8 @@ const NUMBER = new Intl.NumberFormat("en");
 /** Paper's "06 Garden": every written day a flower, bare soil for days that rested. */
 function GardenScreen() {
   const today = useToday();
-  const years = useMemo(() => gardenYears(MOCK_DAYS.keys(), today), [today]);
+  const days = useJournalDays();
+  const years = useMemo(() => gardenYears(days.keys(), today), [days, today]);
   const [year, setYear] = useState(() => Number(today.slice(0, 4)));
   const { data: info } = useQuery({
     queryFn: () => window.daylily.app.info(),
@@ -38,10 +39,10 @@ function GardenScreen() {
       new Date(year, 0, 1),
       new Date(year, 11, 31),
       today,
-      MOCK_DAYS
+      days
     );
-    return { grid: built, stats: gardenStats(built, MOCK_DAYS) };
-  }, [year, today]);
+    return { grid: built, stats: gardenStats(built, days) };
+  }, [days, year, today]);
 
   const saveImage = useCallback(async () => {
     const png = await renderShareCard({
@@ -109,11 +110,7 @@ function GardenScreen() {
       </header>
 
       <div className="flex items-start gap-4">
-        <GardenBoard
-          currentMonth={today.slice(0, 7)}
-          days={MOCK_DAYS}
-          grid={grid}
-        />
+        <GardenBoard currentMonth={today.slice(0, 7)} days={days} grid={grid} />
         <YearList onSelect={setYear} selected={year} years={years} />
       </div>
 

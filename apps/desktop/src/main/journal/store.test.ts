@@ -43,6 +43,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  // Colours are written a moment later; write them before the folder goes
+  await journal.flushCache();
   await rm(root, { force: true, recursive: true });
 });
 
@@ -124,8 +126,13 @@ describe("readDay", () => {
       ok: true,
       value: {
         body: "Rain all morning.\n",
+        color: null,
         cover: null,
+        coverStamp: null,
         day,
+        excerpt: "Rain all morning.",
+        // Written at 20:00 in Tunis
+        hour: 20,
         state: "open",
         title: "Rain",
         words: 3,
@@ -182,6 +189,39 @@ describe("saveCover", () => {
   });
 });
 
+describe("flower colours", () => {
+  it("keeps a colour sampled from the cover until the cover changes", async () => {
+    const day = key("2026-10-21");
+    await journal.saveCover(day, new Uint8Array([1, 2, 3]), "jpg");
+    await journal.writeDay(day, { ...page("Words."), cover: "cover.jpg" });
+    const first = await journal.readDay(day);
+    const stamp = first.ok ? first.value?.coverStamp : null;
+    expect(stamp).toBeTruthy();
+    await journal.setFlowerColor(day, stamp ?? "", "petal");
+    const coloured = await journal.readDay(day);
+    expect(coloured.ok && coloured.value?.color).toBe("petal");
+
+    await journal.saveCover(day, new Uint8Array([4, 5, 6, 7]), "jpg");
+    const changed = await journal.readDay(day);
+    expect(changed.ok && changed.value?.color).toBeNull();
+  });
+});
+
+describe("gallery colours", () => {
+  it("keeps the colour a gallery cover brings, without sampling", async () => {
+    const day = key("2026-10-21");
+    await journal.saveCover(
+      day,
+      new Uint8Array([1, 2, 3]),
+      "jpg",
+      "cornflower"
+    );
+    await journal.writeDay(day, { ...page("Words."), cover: "cover.jpg" });
+    const read = await journal.readDay(day);
+    expect(read.ok && read.value?.color).toBe("cornflower");
+  });
+});
+
 describe("listDays", () => {
   it("is empty before the journal folder exists", async () => {
     const missing = createJournal({
@@ -203,9 +243,24 @@ describe("listDays", () => {
     await mkdir(join(root, "2026", "10", "19"), { recursive: true });
     await writeFile(join(root, "2026", "10", "19", "draft.md"), "Not a day");
 
+    const blank = { color: null, cover: null, coverStamp: null, title: "" };
     expect(await journal.listDays()).toEqual([
-      { cover: null, day: "2025-03-02", state: "open", title: "", words: 1 },
-      { cover: null, day: "2026-10-20", state: "open", title: "", words: 3 },
+      {
+        ...blank,
+        day: "2025-03-02",
+        excerpt: "Earlier.",
+        hour: 12,
+        state: "open",
+        words: 1,
+      },
+      {
+        ...blank,
+        day: "2026-10-20",
+        excerpt: "One two three.",
+        hour: 12,
+        state: "open",
+        words: 3,
+      },
     ]);
   });
 
@@ -222,6 +277,24 @@ describe("listDays", () => {
       { day: "2026-10-15", state: "unreadable" },
       expect.objectContaining({ day: "2026-10-21", state: "edited" }),
     ]);
+  });
+});
+
+describe("diskUsage", () => {
+  it("adds up every file in the journal", async () => {
+    expect(await journal.diskUsage()).toBe(0);
+    await journal.saveCover(key("2026-10-21"), new Uint8Array(1000), "jpg");
+    await writeFile(join(root, "notes.md"), "12345");
+    expect(await journal.diskUsage()).toBe(1005);
+  });
+
+  it("is nothing before the folder exists", async () => {
+    const missing = createJournal({
+      app: "daylily/0.1.0",
+      clock,
+      root: join(root, "not-yet"),
+    });
+    expect(await missing.diskUsage()).toBe(0);
   });
 });
 

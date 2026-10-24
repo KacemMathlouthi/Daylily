@@ -1,11 +1,20 @@
 import type { DayKey } from "@daylily/core/day";
 import type { DayFileError } from "@daylily/core/day-file";
+import type { FlowerColor } from "@daylily/core/flower";
 
 /** A day as the calendar and garden need it, without its page. */
 interface DaySummary {
+  /** The flower's colour, sampled from the cover; null until it has been. */
+  color: FlowerColor | null;
   /** A file in the day's folder, shown through `journalAssetUrl`. */
   cover: string | null;
+  /** Which version of the cover file this is, for caching what's sampled from it. */
+  coverStamp: string | null;
   day: DayKey;
+  /** The page's opening words, for cards that quote the day. */
+  excerpt: string;
+  /** The hour writing began where it was written, 0 to 23; null if unknown. */
+  hour: number | null;
   /** Open while it can still be written; edited when its seal no longer matches. */
   state: "open" | "sealed" | "edited";
   title: string;

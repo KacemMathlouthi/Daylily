@@ -116,6 +116,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@daylily/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@daylily/ui':
         specifier: workspace:*
         version: link:../../packages/ui

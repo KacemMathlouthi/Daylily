@@ -1,9 +1,6 @@
+import type { FlowerColor } from "@daylily/core/flower";
 import { PETAL } from "@daylily/ui/components/daylily-mark";
-import {
-  bloomScale,
-  type FlowerColor,
-  isFlower,
-} from "@daylily/ui/components/garden";
+import { bloomScale, isFlower } from "@daylily/ui/components/garden";
 import meadow from "../../assets/meadow.jpg";
 import { dateFormat } from "../../lib/format";
 import type { GardenGrid } from "../../lib/garden";

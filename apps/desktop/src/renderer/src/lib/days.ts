@@ -1,18 +1,14 @@
-import { countWords } from "@daylily/core/words";
 import { useMemo } from "react";
-import { MOCK_DAYS } from "../mock/journal";
-import { mockPage } from "../mock/pages";
-import { coverLabel } from "./covers";
+import { journalAssetUrl } from "../../../shared/journal";
 import { dateFormat } from "./format";
+import { useJournalListing, useStoredDay } from "./journal";
 import { type DayKey, fromKey } from "./month";
-import { pageCoverUrl, type TodayPage, useWrittenPages } from "./today-page";
 
-/** A day before today: sealed with its page, or rested with nothing written. */
+/** A day before today: sealed with its page, rested with nothing written, or still being read. */
 export type PastDay =
+  | { kind: "loading" }
   | {
       kind: "written";
-      /** Sample days stand for files in the journal; "memory" pages were written this session and saved to it. */
-      source: "journal" | "memory";
       title: string;
       cover: { url: string; label: string } | null;
       markdown: string;
@@ -20,48 +16,39 @@ export type PastDay =
     }
   | { kind: "rested" };
 
-/** The same test as the seal: a page with words, a title or a cover was written. */
-function wasWritten(page: TodayPage) {
-  return page.words > 0 || page.title.trim() !== "" || page.cover !== null;
-}
-
-/**
- * A past day from the sample journal, or from a page written while the app was
- * open and since sealed. The journal store replaces both later.
- */
+/** A past day from its file in the journal. */
 export function usePastDay(key: DayKey): PastDay {
-  const written = useWrittenPages().get(key);
-  return useMemo(() => {
-    if (written && wasWritten(written)) {
-      return {
-        cover: written.cover
-          ? {
-              label: coverLabel(written.cover),
-              url: pageCoverUrl(written) ?? "",
-            }
-          : null,
-        kind: "written",
-        markdown: written.markdown,
-        source: "memory",
-        title: written.title,
-        words: written.words,
-      };
+  const stored = useStoredDay(key);
+  return useMemo((): PastDay => {
+    if (stored === undefined) {
+      return { kind: "loading" };
     }
-    const day = MOCK_DAYS.get(key);
-    if (!day) {
+    if (stored === null) {
       return { kind: "rested" };
     }
-    const markdown = mockPage(key, day);
+    // Its proper state is designed in Paper first; until then it reads as an empty page
+    if (stored === "unreadable") {
+      return {
+        cover: null,
+        kind: "written",
+        markdown: "",
+        title: "",
+        words: 0,
+      };
+    }
     return {
-      cover: { label: day.title, url: day.cover },
+      cover: stored.cover
+        ? {
+            label: stored.title || "The day’s cover",
+            url: `${journalAssetUrl(key, stored.cover)}?v=${stored.coverStamp ?? ""}`,
+          }
+        : null,
       kind: "written",
-      markdown,
-      source: "journal",
-      title: day.title,
-      // Counted from the page itself, so the bar never shows a length the page doesn't have
-      words: countWords(markdown),
+      markdown: stored.body,
+      title: stored.title,
+      words: stored.words,
     };
-  }, [key, written]);
+  }, [key, stored]);
 }
 
 /**
@@ -69,25 +56,16 @@ export function usePastDay(key: DayKey): PastDay {
  * the last sealed day comes today's page.
  */
 export function useNeighbours(key: DayKey, today: DayKey) {
-  const pages = useWrittenPages();
+  const { days, ready } = useJournalListing();
   return useMemo(() => {
-    const keys = new Set(MOCK_DAYS.keys());
-    for (const [day, page] of pages) {
-      if (wasWritten(page)) {
-        keys.add(day);
-      }
+    if (!ready) {
+      return { next: undefined, previous: undefined };
     }
-    const sealed = [...keys].filter((day) => day < today).sort();
+    const sealed = [...days.keys()].filter((day) => day < today).sort();
     const previous = sealed.findLast((day) => day < key);
     const next = sealed.find((day) => day > key) ?? "today";
     return { next, previous };
-  }, [key, pages, today]);
-}
-
-/** Where a day's file lives, as §3.2 lays the journal out. */
-export function journalPath(day: DayKey) {
-  const [year, month, date] = day.split("-");
-  return `~/Journal/${year}/${month}/${date}/${day}.md`;
+  }, [days, key, ready, today]);
 }
 
 const WEEKDAY = dateFormat({ weekday: "long" });

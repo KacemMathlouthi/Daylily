@@ -46,6 +46,9 @@ const api: DaylilyApi = {
       ipcRenderer.invoke(CHANNELS.saveGardenImage, png, name),
   },
   journal: {
+    change: () => ipcRenderer.invoke(CHANNELS.journalChange),
+    flowerColor: (day, stamp, color) =>
+      ipcRenderer.invoke(CHANNELS.journalFlowerColor, day, stamp, color),
     info: () => ipcRenderer.invoke(CHANNELS.journalInfo),
     list: () => ipcRenderer.invoke(CHANNELS.journalList),
     onChange: (listener) => {
@@ -57,12 +60,27 @@ const api: DaylilyApi = {
         ipcRenderer.off(CHANNELS.journalChanged, forward);
       };
     },
+    onSwitch: (listener) => {
+      const forward = () => listener();
+      ipcRenderer.on(CHANNELS.journalSwitched, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.journalSwitched, forward);
+      };
+    },
     pickCover: (day) => ipcRenderer.invoke(CHANNELS.journalPickCover, day),
     read: (day) => ipcRenderer.invoke(CHANNELS.journalRead, day),
-    saveCover: (day, image, extension) =>
-      ipcRenderer.invoke(CHANNELS.journalSaveCover, day, image, extension),
+    saveCover: (day, image, extension, color) =>
+      ipcRenderer.invoke(
+        CHANNELS.journalSaveCover,
+        day,
+        image,
+        extension,
+        color
+      ),
     setConfig: (changes) =>
       ipcRenderer.invoke(CHANNELS.journalSetConfig, changes),
+    show: () => ipcRenderer.invoke(CHANNELS.journalShow),
+    stats: () => ipcRenderer.invoke(CHANNELS.journalStats),
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
   platform: process.platform,

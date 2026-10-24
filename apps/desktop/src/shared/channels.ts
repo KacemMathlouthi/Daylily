@@ -1,4 +1,5 @@
 import type { PageContent } from "@daylily/core/day-file";
+import type { FlowerColor } from "@daylily/core/flower";
 import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
@@ -22,13 +23,18 @@ export const CHANNELS = {
   appReady: "app:ready",
   deviceGet: "device:get",
   deviceSet: "device:set",
+  journalChange: "journal:change",
   journalChanged: "journal:changed",
+  journalFlowerColor: "journal:flower-color",
   journalInfo: "journal:info",
   journalList: "journal:list",
   journalPickCover: "journal:pick-cover",
   journalRead: "journal:read",
   journalSaveCover: "journal:save-cover",
   journalSetConfig: "journal:set-config",
+  journalShow: "journal:show",
+  journalStats: "journal:stats",
+  journalSwitched: "journal:switched",
   journalWrite: "journal:write",
   saveGardenImage: "garden:save-image",
 } as const;
@@ -76,6 +82,17 @@ export interface DaylilyApi {
    * one, and writes only today, or a day that ended and hasn't sealed yet.
    */
   journal: {
+    /** Keeps the flower colour sampled from a day's cover, stamped with the cover file it came from. */
+    flowerColor: (
+      day: string,
+      stamp: string,
+      color: FlowerColor
+    ) => Promise<void>;
+    /**
+     * Asks for another folder and moves the journal there: Daylily reads from the
+     * new place, and nothing in the old one moves or goes. False if cancelled.
+     */
+    change: () => Promise<boolean>;
     info: () => Promise<JournalInfo>;
     /** Every written day, oldest first. */
     list: () => Promise<ListedDay[]>;
@@ -88,13 +105,23 @@ export interface DaylilyApi {
     pickCover: (day: string) => Promise<Result<string, JournalError> | null>;
     /** A day's page and fields, or null when nothing was written. */
     read: (day: string) => Promise<Result<StoredDay | null, JournalError>>;
-    /** Copies a cover into the day's folder; the name it returns goes in the next save. */
+    /**
+     * Copies a cover into the day's folder; the name it returns goes in the next
+     * save. A gallery cover passes its set flower colour.
+     */
     saveCover: (
       day: string,
       image: Uint8Array,
-      extension: CoverExtension
+      extension: CoverExtension,
+      color?: FlowerColor
     ) => Promise<Result<string, JournalError>>;
+    /** Calls `listener` when the journal moves to another folder. Returns a way to stop. */
+    onSwitch: (listener: () => void) => () => void;
     setConfig: (changes: JournalConfigChanges) => Promise<JournalConfig>;
+    /** Opens the journal folder in the system's file manager. */
+    show: () => Promise<void>;
+    /** How much the journal takes on disk. */
+    stats: () => Promise<{ bytes: number }>;
     /** Saves a day's page. Null when an empty page left nothing to save. */
     write: (
       day: string,

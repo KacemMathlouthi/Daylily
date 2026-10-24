@@ -75,3 +75,13 @@ export const deviceChangesSchema = z.strictObject({
   sidebarOpen: z.boolean().optional(),
   theme: z.enum(["light", "dark", "system"]).optional(),
 });
+
+export const flowerColorSchema = z.enum([
+  "daylily",
+  "petal",
+  "saffron",
+  "cornflower",
+]);
+
+/** A cover file's stamp, as the main process gave it: its size and time, which can be fractional or before 1970. */
+export const coverStampSchema = z.string().regex(/^\d+--?\d+(?:\.\d+)?$/);

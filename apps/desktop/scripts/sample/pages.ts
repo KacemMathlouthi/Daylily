@@ -1,5 +1,5 @@
 import { countWords } from "@daylily/core/words";
-import type { DayKey } from "../lib/month";
+import type { DayKey } from "../../src/renderer/src/lib/month";
 import type { SampleDay } from "./sample-days";
 
 /** The words of the days Paper quotes, as their files would hold them. */

@@ -1,11 +1,17 @@
 import { cn } from "@daylily/ui/lib/cn";
 import { Link } from "@tanstack/react-router";
+import type { JournalDay } from "../../lib/journal";
 import type { DayKey } from "../../lib/month";
-import type { MockDay } from "../../mock/journal";
 import { HOVER_LIFT_SELF, HOVER_WARM, HOVER_ZOOM } from "../day/hover";
 
 /** A day from a year ago, offered back: its cover, title and first line. */
-export function OnThisDay({ dayKey, day }: { dayKey: DayKey; day: MockDay }) {
+export function OnThisDay({
+  dayKey,
+  day,
+}: {
+  dayKey: DayKey;
+  day: JournalDay;
+}) {
   return (
     <Link
       className={cn(
@@ -15,14 +21,16 @@ export function OnThisDay({ dayKey, day }: { dayKey: DayKey; day: MockDay }) {
       params={{ key: dayKey }}
       to="/day/$key"
     >
-      <div className="h-28 overflow-hidden rounded-lg">
-        <img
-          alt=""
-          className={cn("size-full object-cover", HOVER_ZOOM)}
-          height={404}
-          src={day.cover}
-          width={640}
-        />
+      <div className="h-28 overflow-hidden rounded-lg bg-paper-tint">
+        {day.cover ? (
+          <img
+            alt=""
+            className={cn("size-full object-cover", HOVER_ZOOM)}
+            height={404}
+            src={day.cover}
+            width={640}
+          />
+        ) : null}
       </div>
       <div className="flex flex-col gap-1 px-1.5">
         <span className="font-semibold text-ink-faint text-meta uppercase leading-3.5 tracking-eyebrow">

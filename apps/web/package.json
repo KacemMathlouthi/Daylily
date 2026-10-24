@@ -9,6 +9,7 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@daylily/core": "workspace:*",
     "@daylily/ui": "workspace:*",
     "lucide-react": "1.55.0",
     "motion": "14.3.1",

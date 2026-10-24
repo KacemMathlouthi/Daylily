@@ -2,8 +2,8 @@ import { cn } from "@daylily/ui/lib/cn";
 import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { dateFormat } from "../../lib/format";
+import type { JournalDay } from "../../lib/journal";
 import { type DayKey, fromKey } from "../../lib/month";
-import type { MockDay } from "../../mock/journal";
 import {
   HOVER_LIFT,
   HOVER_REST_DOT,
@@ -21,7 +21,7 @@ export function ThisWeek({
   entries,
 }: {
   days: DayKey[];
-  entries: ReadonlyMap<DayKey, MockDay>;
+  entries: ReadonlyMap<DayKey, JournalDay>;
 }) {
   return (
     <section className="flex flex-col gap-3">
@@ -52,10 +52,11 @@ export function ThisWeek({
                 className={cn(
                   "flex aspect-19/12 items-center justify-center overflow-hidden rounded-md",
                   HOVER_LIFT,
-                  !entry && ["bg-paper-tint", HOVER_REST_TILE]
+                  !entry?.cover && "bg-paper-tint",
+                  !entry && HOVER_REST_TILE
                 )}
               >
-                {entry ? (
+                {entry?.cover ? (
                   <img
                     alt=""
                     className={cn("size-full object-cover", HOVER_ZOOM)}
@@ -63,7 +64,8 @@ export function ThisWeek({
                     src={entry.cover}
                     width={640}
                   />
-                ) : (
+                ) : null}
+                {entry ? null : (
                   <span
                     className={cn(
                       "size-1.5 rounded-full bg-soil-soft",

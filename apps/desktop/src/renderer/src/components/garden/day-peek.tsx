@@ -6,8 +6,8 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { ReactElement } from "react";
 import { dateFormat } from "../../lib/format";
+import type { JournalDay } from "../../lib/journal";
 import { fromKey } from "../../lib/month";
-import type { MockDay } from "../../mock/journal";
 
 const LONG_DATE = dateFormat({
   day: "numeric",
@@ -26,7 +26,7 @@ export function DayPeek({
   cell,
 }: {
   dayKey: string;
-  day: MockDay;
+  day: JournalDay;
   cell: ReactElement;
 }) {
   return (
@@ -50,13 +50,15 @@ export function DayPeek({
         side="top"
         sideOffset={8}
       >
-        <img
-          alt=""
-          className="h-14 w-18.5 shrink-0 rounded-row object-cover"
-          height={404}
-          src={day.cover}
-          width={640}
-        />
+        {day.cover ? (
+          <img
+            alt=""
+            className="h-14 w-18.5 shrink-0 rounded-row object-cover"
+            height={404}
+            src={day.cover}
+            width={640}
+          />
+        ) : null}
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="font-medium text-on-ink-muted text-tag leading-3.5">
             {LONG_DATE.format(fromKey(dayKey))} · {NUMBER.format(day.words)}{" "}
