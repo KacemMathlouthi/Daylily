@@ -1,6 +1,6 @@
 {
   "name": "@daylily/desktop",
-  "version": "0.0.1",
+  "version": "0.0.0-development",
   "private": true,
   "description": "Daylily, a human-first journal",
   "homepage": "https://github.com/KacemMathlouthi/Daylily",
