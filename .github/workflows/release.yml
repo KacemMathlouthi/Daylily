@@ -71,50 +71,13 @@ jobs:
   installers:
     needs: version
     if: needs.version.outputs.tag != ''
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            targets: --mac dmg --arm64 --x64
-          - os: windows-latest
-            # The Windows runner can set the .exe's icon and version, which needs Wine elsewhere
-            targets: --win nsis --x64 -c.win.signAndEditExecutable=true
-          - os: ubuntu-latest
-            targets: --linux AppImage deb --x64
-    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
-    env:
-      TAG: ${{ needs.version.outputs.tag }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ needs.version.outputs.tag }}
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Build
-        working-directory: apps/desktop
-        run: |
-          # The version lives in the tag; the app and its installer take it from here
-          npm pkg set version="${TAG#v}"
-          pnpm exec electron-vite build
-          pnpm exec electron-builder ${{ matrix.targets }} --publish never
-      - name: Attach to the release
-        working-directory: apps/desktop/release
-        run: |
-          # Each runner makes only its own kind of installer
-          shopt -s nullglob
-          installers=(Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb)
-          gh release upload "$TAG" "${installers[@]}" --clobber
+    uses: ./.github/workflows/installers.yml
+    with:
+      ref: ${{ needs.version.outputs.tag }}
+      version: ${{ needs.version.outputs.tag }}
+      release: ${{ needs.version.outputs.tag }}
 
   publish:
     needs: [version, installers]
