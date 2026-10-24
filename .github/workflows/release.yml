@@ -40,6 +40,9 @@ jobs:
       - if: github.event_name == 'workflow_run'
         uses: actions/checkout@v5
         with:
+          # The commit CI passed on; if main has moved on since, semantic-release
+          # sees it's behind and leaves the release to that newer commit's run
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
       - if: github.event_name == 'workflow_run'
         uses: pnpm/action-setup@v6
@@ -91,6 +94,8 @@ jobs:
       - name: Checksums
         run: |
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir installers
+          # A rerun finds the last run's list among the assets; it isn't an installer
+          rm -f installers/SHA256SUMS
           (cd installers && sha256sum -- * > ../SHA256SUMS)
           gh release upload "$TAG" SHA256SUMS --repo "$GITHUB_REPOSITORY" --clobber
       - name: Publish
