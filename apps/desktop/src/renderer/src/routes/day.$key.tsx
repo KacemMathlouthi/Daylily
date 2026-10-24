@@ -87,7 +87,7 @@ function SealedDayScreen() {
       <div className="flex grow justify-center px-8 pt-3 pb-16">
         <article className="flex w-full max-w-170 flex-col">
           {day.kind === "written" ? (
-            <SealedPage day={key} key={key} page={day} />
+            <SealedPage day={key} key={`${key}:${day.revision}`} page={day} />
           ) : null}
           {day.kind === "rested" ? <RestedPage day={key} /> : null}
           {day.kind === "unreadable" ? <UnreadablePage day={key} /> : null}

@@ -118,6 +118,12 @@ export async function flushSaves() {
   await writing;
 }
 
+/** Whether a day has changes of its own not yet safely in its file. */
+export function hasUnsavedChanges(day: DayKey) {
+  const state = states.get().get(day);
+  return timers.has(day) || (state !== undefined && state.kind !== "saved");
+}
+
 /** Records a day as matching its file, such as just after reading it. */
 export function markSaved(day: DayKey) {
   setState(day, { kind: "saved" });

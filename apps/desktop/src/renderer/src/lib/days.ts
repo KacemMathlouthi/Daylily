@@ -17,6 +17,8 @@ export type PastDay =
       /** Changed in another app after it sealed: its seal no longer matches. */
       edited: boolean;
       markdown: string;
+      /** Changes each time the file is read again, as after another app edits it. */
+      revision: number;
       words: number;
     }
   | { kind: "rested" }
@@ -24,7 +26,7 @@ export type PastDay =
 
 /** A past day from its file in the journal. */
 export function usePastDay(key: DayKey): PastDay {
-  const stored = useStoredDay(key);
+  const { day: stored, readAt } = useStoredDay(key);
   return useMemo((): PastDay => {
     if (stored === undefined) {
       return { kind: "loading" };
@@ -45,10 +47,11 @@ export function usePastDay(key: DayKey): PastDay {
       edited: stored.state === "edited",
       kind: "written",
       markdown: stored.body,
+      revision: readAt,
       title: stored.title,
       words: stored.words,
     };
-  }, [key, stored]);
+  }, [key, readAt, stored]);
 }
 
 /**
