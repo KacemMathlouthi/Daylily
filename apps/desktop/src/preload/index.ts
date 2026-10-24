@@ -35,6 +35,13 @@ const api: DaylilyApi = {
         }
       });
     },
+    onOpenToday: (listener) => {
+      const forward = () => listener();
+      ipcRenderer.on(CHANNELS.appOpenToday, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.appOpenToday, forward);
+      };
+    },
     ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
   device: {
