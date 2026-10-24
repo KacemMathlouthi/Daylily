@@ -4,48 +4,43 @@ import { cn } from "@daylily/ui/lib/cn";
 import {
   Calendar,
   Ellipsis,
-  Folder,
+  House,
   Lock,
-  MessageCircle,
+  Moon,
+  PanelLeftClose,
   PenLine,
   Search,
+  Settings,
   Sprout,
 } from "lucide-react";
 import Image from "next/image";
 import { GhostLine } from "./ghost-line";
 
 const NAV = [
+  { icon: House, label: "Home" },
   { active: true, icon: PenLine, label: "Today" },
-  { icon: Sprout, label: "Garden" },
   { icon: Calendar, label: "Calendar" },
-  { badge: "AI", icon: MessageCircle, label: "Ask your journal" },
-] as const;
-
-const THIS_WEEK = [
-  { day: "Mon", dot: "bg-saffron", title: "On my way" },
-  { day: "Sun", dot: "bg-petal", title: "Slow Sunday" },
-  { day: "Sat", dot: "bg-daylily", title: "Out of town" },
-  { day: "Fri", dot: null, title: "Resting" },
-  { day: "Thu", dot: "bg-moss", title: "Fresh flowers" },
+  { icon: Sprout, label: "Garden" },
 ] as const;
 
 /** Hover feedback for the mock's controls; they look alive without being focusable dead ends. */
 const HOVERABLE =
   "cursor-pointer transition-colors duration-200 ease-soft hover:bg-ink/[0.05]";
 
+/** The app's sidebar as it ships: the journal, search, four screens, and Settings at the foot. */
 function Sidebar() {
   return (
     <aside className="hidden w-58 shrink-0 flex-col justify-between border-line border-r bg-paper-sunk px-2.5 py-3.5 lg:flex">
       <div className="flex flex-col gap-4.5">
         <div
           className={cn(
-            "flex items-center gap-2 rounded-row px-2 py-1",
+            "flex h-8 items-center gap-2.25 rounded-row px-2",
             HOVERABLE
           )}
         >
-          <DaylilyMark className="text-daylily" size={16} />
-          <span className="font-semibold text-ink text-ui">
-            Kacem’s journal
+          <DaylilyMark className="text-daylily" size={18} />
+          <span className="font-semibold text-ink text-ui-lg">
+            Your journal
           </span>
         </div>
         <div className="flex h-7.5 cursor-text items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 transition-colors duration-200 hover:border-ink-ghost">
@@ -71,65 +66,43 @@ function Sidebar() {
                 />
                 <span
                   className={cn(
-                    "grow font-medium text-ui",
+                    "font-medium text-ui",
                     active ? "text-ink" : "text-ink-soft"
                   )}
                 >
                   {label}
                 </span>
-                {active ? (
-                  <span className="size-1.5 rounded-full bg-daylily" />
-                ) : null}
-                {"badge" in item ? (
-                  <span className="rounded-sm bg-paper-tint px-1.5 py-px font-semibold text-ink-subtle text-tag-xs">
-                    {item.badge}
-                  </span>
-                ) : null}
               </div>
             );
           })}
         </nav>
-        <div className="flex flex-col gap-px">
-          <span className="px-2.5 pb-1.5 font-semibold text-ink-faint text-tag tracking-eyebrow">
-            This week
-          </span>
-          {THIS_WEEK.map((day) => (
-            <div
-              className={cn(
-                "flex h-7 items-center gap-2.25 rounded-row px-2.5",
-                HOVERABLE
-              )}
-              key={day.title}
-            >
-              <span className="flex w-4 shrink-0 justify-center">
-                <span
-                  className={cn(
-                    "rounded-full",
-                    day.dot ? `size-1.75 ${day.dot}` : "size-1.25 bg-ink-ghost"
-                  )}
-                />
-              </span>
-              <span
-                className={cn(
-                  "grow text-ui",
-                  day.dot ? "text-ink-soft" : "text-ink-faint"
-                )}
-              >
-                {day.title}
-              </span>
-              <span className="text-ink-faint text-meta">{day.day}</span>
-            </div>
-          ))}
-        </div>
       </div>
-      <div className="flex cursor-pointer items-center gap-2.25 rounded-tile border border-line bg-paper-page p-2.5 transition-colors duration-200 hover:border-ink-ghost">
-        <Folder className="text-moss" size={15} strokeWidth={1.9} />
-        <div className="flex flex-col gap-px">
-          <span className="font-medium text-ink text-xs">~/Journal</span>
-          <span className="text-ink-subtle text-tag">
-            Synced with git · 2m ago
-          </span>
+      <div className="flex items-center gap-0.5">
+        <div
+          className={cn(
+            "flex h-7.5 grow items-center gap-2.25 rounded-row px-2.5",
+            HOVERABLE
+          )}
+        >
+          <Settings className="text-ink-muted" size={15} strokeWidth={1.9} />
+          <span className="font-medium text-ink-soft text-ui">Settings</span>
         </div>
+        <span
+          className={cn(
+            "flex size-6.5 items-center justify-center rounded-row text-ink-muted",
+            HOVERABLE
+          )}
+        >
+          <Moon size={15} strokeWidth={1.9} />
+        </span>
+        <span
+          className={cn(
+            "flex size-6.5 items-center justify-center rounded-row text-ink-muted",
+            HOVERABLE
+          )}
+        >
+          <PanelLeftClose size={15} strokeWidth={1.9} />
+        </span>
       </div>
     </aside>
   );
@@ -207,7 +180,7 @@ export function TodayWindow({ className }: { className?: string }) {
   return (
     <AppWindow
       className={cn("w-full max-w-285 lg:h-180", className)}
-      title="Daylily · Today"
+      title="Your journal · Today"
     >
       <Sidebar />
       <TodayPage />
