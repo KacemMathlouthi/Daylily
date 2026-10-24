@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app packaged for macOS, Windows and Linux (unsigned), its first release 0.1.0 next: writes, saves, reads and seals a real journal folder, and reminds in the evening; search and onboarding are next. |
+| **Status** | Website live. Desktop app 0.1.0 released for macOS, Windows and Linux (unsigned): writes, saves, reads and seals a real journal folder, and reminds in the evening; what comes next is in `ROADMAP.md`. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
@@ -431,8 +431,8 @@ Work accordingly.
   types release nothing. The website's scopes, `web` and `site`, never release the app.
 
 ### Versions
-- Semantic versioning, `MAJOR.MINOR.PATCH`. The first release, `0.1.0`, is tagged by hand with written notes; the
-  release workflow waits for that first `v*` tag, and every release after it is made from the commits.
+- Semantic versioning, `MAJOR.MINOR.PATCH`. The first release, `0.1.0` (2026-10-24), was tagged by hand with written
+  notes; every release after it is made from the commits.
 - **Daylily stays below 1.0** until the owner decides it's ready; a breaking change is released as a minor version.
   Going to 1.0 is a deliberate change to `release.config.mjs`, never a side effect.
 
@@ -569,13 +569,13 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 | 2026-10-24 | A sealed day changed elsewhere says "Edited outside Daylily" (04d); a file that can't be read explains itself and shows the file (04e); a day without a cover shows its flower on its tile, pale when unreadable (05f) |
 | 2026-10-24 | The evening reminder, from the tray while the window is closed; ghost prompts, gallery covers and the reminder are kept in the journal's config |
 | 2026-10-24 | Releases: installers for macOS, Windows and Linux built in CI, versions and notes from the commits by semantic-release, unsigned for now; `main` protected by PRs and green CI |
+| 2026-10-24 | **Daylily 0.1.0 released** on GitHub: dmg (Apple silicon and Intel), Windows setup, AppImage and deb |
+| 2026-10-24 | `ROADMAP.md`: everything planned, in order of execution, with impact, effort and feasibility |
 
 ### Next
-1. Search across all days (design in Paper first).
-2. Onboarding: choosing the folder on first run.
-3. Signing for macOS (Developer ID, notarization) and Windows, and auto-update. Then check the evening reminder's notification on Windows from
-   the installer: it's untested there, and the unpacked build can't show it, since Windows only shows notifications
-   from an app with a Start Menu entry under its id (`app.daylily.desktop`), which the installer creates.
+The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
+Keep it current as items ship or move. The next few: test 0.1.0 on real machines, the changelog and roadmap
+pages and real download links, the domain, the README, then end-to-end tests and auto-update.
 
 ---
 
