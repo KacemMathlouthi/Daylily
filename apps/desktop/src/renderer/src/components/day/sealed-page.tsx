@@ -1,6 +1,7 @@
 import { PageContent } from "@daylily/ui/components/page-content";
 import { usePageEditor } from "@daylily/ui/editor/use-page-editor";
 import type { PastDay } from "../../lib/days";
+import { useFindOnPage } from "../../lib/search";
 import { DayCover } from "./day-cover";
 import { DayDate } from "./day-date";
 
@@ -10,12 +11,16 @@ import { DayDate } from "./day-date";
  */
 export function SealedPage({
   day,
+  find,
   page,
 }: {
   day: string;
+  /** What search was looking for, to open the page at it. */
+  find: string | undefined;
   page: Extract<PastDay, { kind: "written" }>;
 }) {
   const editor = usePageEditor({ content: page.markdown, editable: false });
+  useFindOnPage(editor, find);
 
   return (
     <>

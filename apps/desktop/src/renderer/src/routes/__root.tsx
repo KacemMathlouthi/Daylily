@@ -8,9 +8,11 @@ import {
 } from "@tanstack/react-router";
 import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
+import { SearchDialog } from "../components/search/search-dialog";
 import { TITLE_STRIP_HEIGHT, TitleStrip } from "../components/title-strip";
 import { useFocusMode } from "../lib/focus-mode";
 import { useFlowerColors } from "../lib/journal";
+import { openSearch } from "../lib/search";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -41,8 +43,9 @@ function useSidebarOpen() {
 }
 
 /**
- * ⌘N / Ctrl+N opens today's page from anywhere, as Home's button promises, and
- * ⌘, / Ctrl+, opens Settings, as the File menu says.
+ * ⌘N / Ctrl+N opens today's page from anywhere, as Home's button promises,
+ * ⌘K / Ctrl+K opens search, as the sidebar says, and ⌘, / Ctrl+, opens
+ * Settings, as the File menu says.
  */
 function useAppShortcuts() {
   const navigate = useNavigate();
@@ -54,6 +57,9 @@ function useAppShortcuts() {
       if (event.key === "n") {
         event.preventDefault();
         navigate({ to: "/today" });
+      } else if (event.key === "k") {
+        event.preventDefault();
+        openSearch();
       } else if (event.key === ",") {
         event.preventDefault();
         navigate({ search: { section: "journal" }, to: "/settings" });
@@ -99,6 +105,7 @@ function AppShell() {
           ) : null}
           <Outlet />
         </SidebarInset>
+        <SearchDialog />
       </SidebarProvider>
     </TooltipProvider>
   );

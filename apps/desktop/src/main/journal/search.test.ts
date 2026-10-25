@@ -66,9 +66,16 @@ describe("journalSearch", () => {
   });
 
   it("never stretches a short word to another one", async () => {
-    await write("2026-03-04", "Green tea by the window.");
+    await write("2026-03-04", "Green tea by the window, in my seat.");
     const search = journalSearch(journal);
     expect(days(await search.find("sea"))).not.toContain("2026-03-04");
+  });
+
+  it("leaves out common words when there's more to look for", async () => {
+    const search = journalSearch(journal);
+    expect(days(await search.find("the sea"))).toEqual(
+      days(await search.find("sea"))
+    );
   });
 
   it("needs every word of the search", async () => {

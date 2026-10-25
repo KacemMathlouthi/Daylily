@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import type { ReactElement } from "react";
 import { useJournalInfo } from "../lib/journal-info";
+import { openSearch } from "../lib/search";
 import { useTheme } from "../lib/theme";
 import type { FileRoutesByTo } from "../route-tree.gen";
 import { UpdateCard } from "./update-card";
@@ -186,6 +187,7 @@ export function AppSidebar() {
           <button
             aria-label="Search days"
             className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 hover:border-ink-ghost group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+            onClick={openSearch}
             type="button"
           >
             <Search

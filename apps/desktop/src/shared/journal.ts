@@ -34,6 +34,12 @@ export interface UnreadableDay {
 
 export type ListedDay = DaySummary | UnreadableDay;
 
+/**
+ * Enough for anyone to find a day; more is a list nobody reads. Search returns
+ * one more, so the list can say there were more.
+ */
+export const MAX_SEARCH_HITS = 50;
+
 /** A day that holds what was searched for, with a line of it to show. */
 export interface SearchHit {
   color: FlowerColor | null;

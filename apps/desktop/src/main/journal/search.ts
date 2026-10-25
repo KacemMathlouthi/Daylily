@@ -1,14 +1,20 @@
 import type { DayKey } from "@daylily/core/day";
 import { pageText } from "@daylily/core/excerpt";
-import { queryWords, searchSnippet } from "@daylily/core/search-text";
+import {
+  matchRanges,
+  queryWords,
+  searchSnippet,
+} from "@daylily/core/search-text";
 import { create, insert, remove, search } from "@orama/orama";
-import type { SearchHit } from "../../shared/journal";
+import { MAX_SEARCH_HITS, type SearchHit } from "../../shared/journal";
 import type { Journal } from "./store";
 
-/** Enough for anyone to find a day; more is a list nobody reads. */
-const MAX_HITS = 40;
+/** The index finds short words by their start too; it's asked for plenty, then held to the rule. */
+const CANDIDATES = 1000;
 /** A typo is forgiven only in longer words, so "sea" never finds "tea". */
 const TYPO_FROM_LENGTH = 5;
+/** Words this short must be found whole, which the index can't be told per word. */
+const WHOLE_BELOW_LENGTH = 4;
 
 type Entry = Omit<SearchHit, "snippet"> & { text: string };
 
@@ -63,7 +69,7 @@ export function journalSearch(journal: Pick<Journal, "listDays" | "readDay">) {
   }
 
   return {
-    /** Days whose title or page holds every word of `query`, best first. */
+    /** Days whose title or page holds every word of `query`, best first, up to one more than `MAX_SEARCH_HITS`. */
     async find(query: string): Promise<SearchHit[]> {
       const words = queryWords(query);
       if (words.length === 0) {
@@ -73,7 +79,7 @@ export function journalSearch(journal: Pick<Journal, "listDays" | "readDay">) {
       // Orama answers at once from memory; it only returns a promise with async plugins
       const result = await search(index, {
         boost: { title: 2 },
-        limit: MAX_HITS,
+        limit: CANDIDATES,
         properties: ["title", "text"],
         term: words.join(" "),
         // Every word must be there, not any of them
@@ -82,14 +88,24 @@ export function journalSearch(journal: Pick<Journal, "listDays" | "readDay">) {
           ? 1
           : 0,
       });
-      return result.hits.flatMap(({ id }) => {
+      const short = words.filter((word) => word.length < WHOLE_BELOW_LENGTH);
+      const hits: SearchHit[] = [];
+      for (const { id } of result.hits) {
         const entry = entries.get(id as DayKey);
-        if (!entry) {
-          return [];
+        const page = entry && `${entry.title}\n${entry.text}`;
+        if (
+          entry &&
+          page &&
+          short.every((word) => matchRanges(page, word).length > 0)
+        ) {
+          const { text, ...hit } = entry;
+          hits.push({ ...hit, snippet: searchSnippet(text, query) });
+          if (hits.length > MAX_SEARCH_HITS) {
+            break;
+          }
         }
-        const { text, ...hit } = entry;
-        return [{ ...hit, snippet: searchSnippet(text, query) }];
-      });
+      }
+      return hits;
     },
 
     /** Indexes the days that changed on disk, once the index exists. */
@@ -113,5 +129,3 @@ export function journalSearch(journal: Pick<Journal, "listDays" | "readDay">) {
     warm: () => ready().then(() => undefined),
   };
 }
-
-export type JournalSearch = ReturnType<typeof journalSearch>;
