@@ -33,12 +33,12 @@ export const RELEASES: Release[] = [
         title: "Paste or drop",
       },
       {
-        body: "Each one is copied, untouched, into the day’s folder as image-01.jpg, and the page links to it in plain markdown any editor can read.",
+        body: "Each one is copied, untouched, into the day’s folder under the next number, image-01.jpg, image-02.png and on, and the page links to it in plain markdown any editor can read.",
         color: "text-saffron",
         title: "Kept beside your words",
       },
       {
-        body: "An image whose file is gone, or one from the web, shows as a small card instead. Daylily never loads anything from the internet.",
+        body: "An image whose file is gone, or one from the web, shows as a small card instead. Daylily never loads images from the web.",
         color: "text-cornflower",
         title: "Quiet when it can’t show",
       },
