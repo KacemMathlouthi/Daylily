@@ -1,7 +1,7 @@
 import { parseDayKey } from "@daylily/core/day";
 import { type FlowerColor, flowerColor } from "@daylily/core/flower";
 import { type QueryClient, useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   journalAssetUrl,
   type ListedDay,
@@ -269,4 +269,26 @@ export function useFlowerColors(client: QueryClient) {
       cancelled = true;
     };
   }, [client, listing]);
+}
+
+/**
+ * The journal's first day: its earliest page, or today before anything is
+ * written. Days before it weren't rested, they came before the journal, so they
+ * show as plain ground and never count as missed. While the journal is first
+ * read it's the empty key, before every day, so nothing changes look as it loads.
+ */
+export function useJournalBegins(today: DayKey): DayKey {
+  const { days, ready } = useJournalListing();
+  return useMemo(() => {
+    if (!ready) {
+      return "";
+    }
+    let first = today;
+    for (const key of days.keys()) {
+      if (key < first) {
+        first = key;
+      }
+    }
+    return first;
+  }, [days, ready, today]);
 }

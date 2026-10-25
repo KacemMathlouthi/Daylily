@@ -93,7 +93,10 @@ export function registerJournalIpc({
       .catch((error) => console.error("Could not save flower colours", error))
       .finally(() => {
         cacheSaved = true;
-        app.quit();
+        // On the next turn: Electron ignores app.quit() called before this
+        // will-quit has finished, which happens when there was nothing to save,
+        // and the app would be left running with no window
+        setImmediate(() => app.quit());
       });
   });
 

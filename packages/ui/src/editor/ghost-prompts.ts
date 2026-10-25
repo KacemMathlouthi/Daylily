@@ -63,6 +63,13 @@ function nextPrompt(prompts: readonly string[], last: string | null) {
  * copied or saved, and any keystroke or cursor move sends it away. At most one per
  * pause: the next waits for more writing.
  */
+const LEADING_ELLIPSIS = /^…/;
+
+/** "…and how did that feel?" never breaks between the ellipsis and its first word. */
+function keepEllipsisOn(prompt: string) {
+  return prompt.replace(LEADING_ELLIPSIS, "…\u2060");
+}
+
 export const GhostPrompts = Extension.create<GhostPromptsOptions>({
   addCommands() {
     return {
@@ -107,7 +114,7 @@ export const GhostPrompts = Extension.create<GhostPromptsOptions>({
               () => {
                 const span = document.createElement("span");
                 span.className = className;
-                span.textContent = shown.text;
+                span.textContent = keepEllipsisOn(shown.text);
                 span.contentEditable = "false";
                 // A nudge for the eyes; screen readers keep reading the writer's words
                 span.setAttribute("aria-hidden", "true");

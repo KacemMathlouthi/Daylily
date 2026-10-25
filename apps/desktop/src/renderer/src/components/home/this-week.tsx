@@ -16,11 +16,24 @@ import { TileFlower } from "../day/tile-flower";
 
 const WEEKDAY = dateFormat({ weekday: "short" });
 
+/** A day from before the journal began: plain ground, like the days around a month. */
+function BeforeTheJournal({ label }: { label: string }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <div className="aspect-19/12 rounded-md bg-paper-sunk/45" />
+      <span className="text-ink-faint text-meta leading-3.5">{label}</span>
+    </div>
+  );
+}
+
 /** The six days before today and today's open page, as small covers. */
 export function ThisWeek({
+  begins,
   days,
   entries,
 }: {
+  /** The journal's first day; days before it are plain, not rested. */
+  begins: DayKey;
   days: DayKey[];
   entries: ReadonlyMap<DayKey, JournalDay>;
 }) {
@@ -42,6 +55,9 @@ export function ThisWeek({
           const entry = entries.get(key);
           const date = fromKey(key);
           const label = `${WEEKDAY.format(date)} ${date.getDate()}`;
+          if (key < begins) {
+            return <BeforeTheJournal key={key} label={label} />;
+          }
           return (
             <Link
               className="group flex min-w-0 flex-col gap-1.5"

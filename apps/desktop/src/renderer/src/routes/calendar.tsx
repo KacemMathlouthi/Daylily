@@ -6,7 +6,11 @@ import {
 } from "../components/calendar/calendar-header";
 import { DayCell } from "../components/calendar/day-cell";
 import { Page } from "../components/page";
-import { type JournalDay, useJournalDays } from "../lib/journal";
+import {
+  type JournalDay,
+  useJournalBegins,
+  useJournalDays,
+} from "../lib/journal";
 import { type DayKey, monthWeeks } from "../lib/month";
 import { useToday } from "../lib/use-today";
 
@@ -19,11 +23,13 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 function statsFor(
   weeks: ReturnType<typeof monthWeeks>,
   today: DayKey,
+  begins: DayKey,
   days: ReadonlyMap<DayKey, JournalDay>
 ) {
   const stats: MonthStats = { resting: 0, words: 0, written: 0 };
   for (const day of weeks.flat()) {
-    if (!day.inMonth || day.key > today) {
+    // Only the journal's own days count: none from before it began, or still to come
+    if (!day.inMonth || day.key > today || day.key < begins) {
       continue;
     }
     const entry = days.get(day.key);
@@ -41,6 +47,7 @@ function statsFor(
 function CalendarScreen() {
   const today = useToday();
   const days = useJournalDays();
+  const begins = useJournalBegins(today);
   const [shown, setShown] = useState(() => {
     const [year, month] = today.split("-").map(Number) as [number, number];
     return { month: month - 1, year };
@@ -51,8 +58,8 @@ function CalendarScreen() {
     [shown.year, shown.month]
   );
   const stats = useMemo(
-    () => statsFor(weeks, today, days),
-    [weeks, today, days]
+    () => statsFor(weeks, today, begins, days),
+    [weeks, today, begins, days]
   );
 
   // Date rolls the month over into the next or previous year
@@ -85,6 +92,7 @@ function CalendarScreen() {
         ))}
         {weeks.flat().map((day) => (
           <DayCell
+            begins={begins}
             day={day}
             entry={day.inMonth ? days.get(day.key) : undefined}
             key={day.key}

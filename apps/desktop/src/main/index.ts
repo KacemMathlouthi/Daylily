@@ -3,7 +3,7 @@ import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { CHANNELS } from "../shared/channels";
 import { registerDeviceIpc } from "./device-ipc";
-import { saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
+import { isQuitting, saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
 import { registerIpc, whenAppReady } from "./ipc";
 import { registerJournalIpc } from "./journal/ipc";
 import { registerJournalScheme, serveJournalAssets } from "./journal/protocol";
@@ -13,6 +13,7 @@ import { sealAsDaysEnd } from "./seal-scheduler";
 import { type DeviceSettingsStore, deviceSettings } from "./settings";
 import { loadPage, openSplash } from "./splash";
 import { backgroundTray } from "./tray";
+import { keepUpToDate } from "./updates";
 import { registerWindowIpc, reportMaximized } from "./window-ipc";
 
 const PAPER = "#f4eee3";
@@ -109,6 +110,10 @@ async function launch(settings: DeviceSettingsStore) {
 
 /** Brings the window back, from the tray or a second launch, or opens one if there's none. */
 function showWindow(settings: DeviceSettingsStore) {
+  // A second launch while quitting, as when an update starts its new version, opens nothing here
+  if (isQuitting()) {
+    return;
+  }
   if (!mainWindow || mainWindow.isDestroyed()) {
     // Unless one is on its way, behind the splash
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -186,7 +191,10 @@ app.whenReady().then(async () => {
   saveOnSleepAndQuit();
   await registerDeviceIpc(settings);
   await openJournal(settings);
+  const updates = await keepUpToDate({ clock: systemClock, settings });
   launch(settings);
+  // Looked for while the splash shows; it never holds the app up
+  updates.check();
   app.on("second-instance", () => showWindow(settings));
 
   // macOS keeps apps alive without windows; clicking the dock icon brings one back

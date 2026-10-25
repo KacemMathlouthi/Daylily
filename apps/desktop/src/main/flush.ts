@@ -37,6 +37,11 @@ export async function flushAllPages() {
 
 let quitting = false;
 
+/** Whether Daylily is on its way out, so nothing should open a window again. */
+export function isQuitting() {
+  return quitting;
+}
+
 /** Saves before the computer sleeps and remembers a quit, so it can resume after saving. */
 export function saveOnSleepAndQuit() {
   app.on("before-quit", () => {

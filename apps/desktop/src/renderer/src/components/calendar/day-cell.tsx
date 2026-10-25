@@ -22,9 +22,11 @@ type Look = "outside" | "written" | "resting" | "future";
 function lookOf(
   day: CalendarDay,
   today: DayKey,
+  begins: DayKey,
   entry: JournalDay | undefined
 ): Look {
-  if (!day.inMonth) {
+  // Days before the journal began look like the days around the month: never missed
+  if (!day.inMonth || day.key < begins) {
     return "outside";
   }
   // A day ahead can't hold writing yet; only today and the past show a cover
@@ -146,13 +148,16 @@ function TileLabel({
 export function DayCell({
   day,
   today,
+  begins,
   entry,
 }: {
   day: CalendarDay;
   today: DayKey;
+  /** The journal's first day; days before it are plain, not rested. */
+  begins: DayKey;
   entry: JournalDay | undefined;
 }) {
-  const look = lookOf(day, today, entry);
+  const look = lookOf(day, today, begins, entry);
   const isToday = day.key === today && day.inMonth;
   // The next month's first day names its month, so the row doesn't read "31, 1"
   const number =

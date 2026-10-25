@@ -48,13 +48,16 @@ export function gardenYears(
 
 /**
  * Lays days out in weeks from `start` to `end`: flowers for written days, bare soil
- * for the rest up to today, faint dots after it, and blanks to fill the edge weeks.
+ * for the rest up to today, faint dots after it and before the journal `begins`
+ * (those days weren't rested, there was no journal yet), and blanks to fill the
+ * edge weeks.
  */
 export function gardenGrid(
   start: Date,
   end: Date,
   today: DayKey,
-  entries: ReadonlyMap<DayKey, GardenEntry>
+  entries: ReadonlyMap<DayKey, GardenEntry>,
+  begins: DayKey = ""
 ): GardenGrid {
   const first = dayKey(start);
   const last = dayKey(end);
@@ -81,7 +84,7 @@ export function gardenGrid(
 
     if (key < first || key > last) {
       cells.push("blank");
-    } else if (key > today) {
+    } else if (key > today || key < begins) {
       cells.push("upcoming");
     } else if (entry) {
       cells.push({

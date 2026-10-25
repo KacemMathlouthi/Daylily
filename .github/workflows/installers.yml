@@ -71,10 +71,11 @@ jobs:
       - name: Gather the installers
         working-directory: apps/desktop/release
         run: |
-          # Each runner makes only its own kind
+          # Each runner makes only its own kind. The latest*.yml files and the
+          # blockmaps are what installed copies read to update themselves
           shopt -s nullglob
           mkdir ../installers
-          mv Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb ../installers/
+          mv Daylily-*.dmg Daylily-*-setup.exe Daylily-*.AppImage daylily_*.deb latest*.yml *.blockmap ../installers/
           ls -l ../installers
       - uses: actions/upload-artifact@v4
         with:

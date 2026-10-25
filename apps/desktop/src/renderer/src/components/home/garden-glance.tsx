@@ -8,6 +8,8 @@ export interface GlanceStats {
   averageWords: number;
   flowers: number;
   since: string;
+  /** Of the six days before today, how many the journal has had. */
+  weekDays: number;
   /** Days written out of the six before today. */
   weekWritten: number;
 }
@@ -25,7 +27,14 @@ export function GardenGlance({
       label: `flowers since ${stats.since}`,
       value: NUMBER.format(stats.flowers),
     },
-    { label: "days this week", value: `${stats.weekWritten} of 6` },
+    {
+      label: "days this week",
+      // A young journal counts only its own days, never ones from before it began
+      value:
+        stats.weekDays > 0
+          ? `${stats.weekWritten} of ${stats.weekDays}`
+          : String(stats.weekWritten),
+    },
     {
       label: "words on an average day",
       value: NUMBER.format(stats.averageWords),
