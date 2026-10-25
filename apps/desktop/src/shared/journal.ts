@@ -86,6 +86,9 @@ export const COVER_NAME = new RegExp(
   `^cover\\.(${COVER_EXTENSIONS.join("|")})$`
 );
 
+/** The longest name Daylily keeps for the person who writes. */
+export const MAX_NAME_LENGTH = 60;
+
 /** A reminder time, `HH:MM` on a 24-hour clock. */
 export const REMINDER_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -94,6 +97,8 @@ export interface JournalConfig {
   /** Whether a day sealed without a cover gets one from the gallery. */
   galleryCovers: boolean;
   ghostPrompts: boolean;
+  /** What Daylily calls the person who writes, or null for the computer's name for them. */
+  name: string | null;
   reminder: {
     enabled: boolean;
     /** Local time, `HH:MM`. */
@@ -111,8 +116,23 @@ export interface JournalInfo {
   separator: string;
 }
 
+/** A folder offered as the journal while choosing one, as onboarding does. */
+export interface FolderInfo {
+  /** Its preferences: its own if it's a journal already, a new journal's otherwise. */
+  config: JournalConfig;
+  /** The days already written there; none for a new journal. */
+  days: number;
+  /** The folder, with the home folder as `~`. */
+  displayPath: string;
+  path: string;
+  /** Whether Daylily can make and write files there. */
+  writable: boolean;
+}
+
 /** What this computer remembers about the app, rather than the journal. */
 export interface DeviceState {
+  /** Whether onboarding has been through on this computer. */
+  onboarded: boolean;
   sidebarOpen: boolean;
   /** A theme, or to follow the system's. */
   theme: "light" | "dark" | "system";

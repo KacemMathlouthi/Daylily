@@ -11,8 +11,8 @@ import type { DeviceSettingsStore } from "./settings";
  * saved when it changes them.
  */
 export async function registerDeviceIpc(settings: DeviceSettingsStore) {
-  const { sidebarOpen, theme } = await settings.read();
-  let current: DeviceState = { sidebarOpen, theme };
+  const { onboarded, sidebarOpen, theme } = await settings.read();
+  let current: DeviceState = { onboarded, sidebarOpen, theme };
 
   ipcMain.on(CHANNELS.deviceGet, (event) => {
     event.returnValue = isTrustedSender(event) ? current : null;
@@ -20,6 +20,10 @@ export async function registerDeviceIpc(settings: DeviceSettingsStore) {
 
   handle(CHANNELS.deviceSet, async (_event, changes) => {
     const saved = await settings.write(deviceChangesSchema.parse(changes));
-    current = { sidebarOpen: saved.sidebarOpen, theme: saved.theme };
+    current = {
+      onboarded: saved.onboarded,
+      sidebarOpen: saved.sidebarOpen,
+      theme: saved.theme,
+    };
   });
 }

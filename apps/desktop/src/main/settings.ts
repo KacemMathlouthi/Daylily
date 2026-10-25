@@ -15,13 +15,15 @@ const settingsSchema = z.looseObject({
   /** A new version whose sidebar card was put away with "Not now". */
   dismissedUpdate: z.string().nullable().catch(null),
   journalPath: z.string().refine(isAbsolute).nullable().catch(null),
+  // Everyone goes through onboarding once, people who wrote before it existed too
+  onboarded: z.boolean().catch(false),
   sidebarOpen: z.boolean().catch(true),
   theme: z.enum(["light", "dark", "system"]).catch("system"),
 }) satisfies z.ZodType<DeviceState & { journalPath: string | null }>;
 
 export type DeviceSettings = z.infer<typeof settingsSchema>;
 
-/** Where a journal lives until onboarding lets people choose. */
+/** Where a new journal is suggested, and where one lives until another is chosen. */
 export const DEFAULT_JOURNAL = join(homedir(), "Daylily");
 
 export type DeviceSettingsStore = ReturnType<typeof deviceSettings>;

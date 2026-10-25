@@ -8,6 +8,7 @@ import { JOURNAL_INFO_KEY, useJournalInfo } from "./journal-info";
 const DEFAULTS: JournalConfig = {
   galleryCovers: true,
   ghostPrompts: true,
+  name: null,
   reminder: { enabled: true, time: "21:00" },
 };
 
@@ -19,6 +20,7 @@ function withChanges(
   return {
     galleryCovers: changes.galleryCovers ?? config.galleryCovers,
     ghostPrompts: changes.ghostPrompts ?? config.ghostPrompts,
+    name: changes.name === undefined ? config.name : changes.name,
     reminder: {
       enabled: changes.reminder?.enabled ?? config.reminder.enabled,
       time: changes.reminder?.time ?? config.reminder.time,

@@ -8,7 +8,7 @@ const PETAL_MS = 400;
  * When each petal starts to open, in ms: the top petal first, then its neighbours,
  * then the bottom one, as in Paper's "Launch bloom" storyboard.
  */
-const OPENING = [
+export const PETAL_OPENING = [
   { angle: 0, delay: 0 },
   { angle: 60, delay: 120 },
   { angle: 300, delay: 120 },
@@ -19,7 +19,7 @@ const OPENING = [
 
 /** Full bloom, when the last petal settles; anything that follows starts here. */
 export const BLOOM_MS =
-  Math.max(...OPENING.map(({ delay }) => delay)) + PETAL_MS;
+  Math.max(...PETAL_OPENING.map(({ delay }) => delay)) + PETAL_MS;
 
 type DaylilyBloomProps = ComponentProps<"svg"> & {
   size?: number;
@@ -40,7 +40,7 @@ export function DaylilyBloom({ size = 88, ...props }: DaylilyBloomProps) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      {OPENING.map(({ angle, delay }) => (
+      {PETAL_OPENING.map(({ angle, delay }) => (
         // The rotation sits on a group so the petal's own transform is free to scale
         <g key={angle} transform={`rotate(${angle})`}>
           <path

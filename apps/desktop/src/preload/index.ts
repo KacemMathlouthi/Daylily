@@ -18,6 +18,8 @@ function initialDevice(): DeviceState {
     CHANNELS.deviceGet
   );
   return {
+    // Unknown, the app opens as usual rather than asking again
+    onboarded: typeof value?.onboarded === "boolean" ? value.onboarded : true,
     sidebarOpen:
       typeof value?.sidebarOpen === "boolean" ? value.sidebarOpen : true,
     theme: THEMES.has(value?.theme ?? "")
@@ -46,6 +48,13 @@ const api: DaylilyApi = {
         ipcRenderer.off(CHANNELS.appOpenToday, forward);
       };
     },
+    onOpenWelcome: (listener) => {
+      const forward = () => listener();
+      ipcRenderer.on(CHANNELS.appOpenWelcome, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.appOpenWelcome, forward);
+      };
+    },
     ready: () => ipcRenderer.send(CHANNELS.appReady),
   },
   device: {
@@ -62,6 +71,7 @@ const api: DaylilyApi = {
     change: () => ipcRenderer.invoke(CHANNELS.journalChange),
     flowerColor: (day, stamp, color) =>
       ipcRenderer.invoke(CHANNELS.journalFlowerColor, day, stamp, color),
+    folder: () => ipcRenderer.invoke(CHANNELS.journalFolder),
     info: () => ipcRenderer.invoke(CHANNELS.journalInfo),
     list: () => ipcRenderer.invoke(CHANNELS.journalList),
     onChange: (listener) => {
@@ -81,6 +91,7 @@ const api: DaylilyApi = {
       };
     },
     pickCover: (day) => ipcRenderer.invoke(CHANNELS.journalPickCover, day),
+    pickFolder: () => ipcRenderer.invoke(CHANNELS.journalPickFolder),
     read: (day) => ipcRenderer.invoke(CHANNELS.journalRead, day),
     saveCover: (day, image, extension, color) =>
       ipcRenderer.invoke(
@@ -95,6 +106,7 @@ const api: DaylilyApi = {
       ipcRenderer.invoke(CHANNELS.journalSetConfig, changes),
     show: (day?: string) => ipcRenderer.invoke(CHANNELS.journalShow, day),
     stats: () => ipcRenderer.invoke(CHANNELS.journalStats),
+    use: (path) => ipcRenderer.invoke(CHANNELS.journalUse, path),
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
   platform: process.platform,

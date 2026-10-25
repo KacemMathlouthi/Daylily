@@ -13,6 +13,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import type { WindowAction } from "../../../shared/channels";
 import { openSearch } from "../lib/search";
 import { useTheme } from "../lib/theme";
+import { openWelcome, useWelcome } from "../lib/welcome";
 
 /** Paper's "12b": 36px, the sidebar's paper, a hairline beneath. */
 export const TITLE_STRIP_HEIGHT = "2.25rem";
@@ -41,6 +42,10 @@ const SCREENS: Record<string, string> = {
 /** "Your journal · Home": where you are, as the window's title. */
 function useWindowTitle() {
   const path = useRouterState({ select: (state) => state.location.pathname });
+  const welcoming = useWelcome().open;
+  if (welcoming) {
+    return "Welcome to Daylily";
+  }
   const screen = path.startsWith("/day/") ? "A past day" : SCREENS[path];
   return screen ? `Your journal · ${screen}` : "Your journal";
 }
@@ -56,6 +61,7 @@ function useMaximized() {
 
 function useMenus(): [string, MenuGroups][] {
   const navigate = useNavigate();
+  const welcoming = useWelcome().open;
   const { toggleSidebar } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const act = (action: WindowAction) => () => {
@@ -110,7 +116,10 @@ function useMenus(): [string, MenuGroups][] {
           { label: "Paste", run: act("paste"), shortcut: "Ctrl V" },
           { label: "Select all", run: act("selectAll"), shortcut: "Ctrl A" },
         ],
-        [{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }],
+        // Search opens over the app, which waits beneath onboarding
+        ...(welcoming
+          ? []
+          : [[{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }]]),
       ],
     ],
     [
@@ -134,6 +143,10 @@ function useMenus(): [string, MenuGroups][] {
       "Help",
       [
         [
+          {
+            label: "Welcome to Daylily",
+            run: openWelcome,
+          },
           {
             label: "About Daylily",
             run: () =>
@@ -280,7 +293,9 @@ function WindowControls() {
  */
 export function TitleStrip() {
   const title = useWindowTitle();
-  const menus = useMenus();
+  const welcoming = useWelcome().open;
+  // During onboarding only Edit, for the name field: the rest acts on the app beneath it
+  const menus = useMenus().filter(([label]) => !welcoming || label === "Edit");
   return (
     <header
       className="fixed inset-x-0 top-0 z-30 flex select-none items-stretch justify-between border-line border-b bg-sidebar [-webkit-app-region:drag]"

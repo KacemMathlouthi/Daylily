@@ -2,11 +2,13 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { configChangesSchema } from "../../shared/schemas";
 import { readConfig, writeConfig } from "./config";
 
 const DEFAULTS = {
   galleryCovers: true,
   ghostPrompts: true,
+  name: null,
   reminder: { enabled: true, time: "21:00" },
 };
 
@@ -41,6 +43,7 @@ describe("readConfig", () => {
     expect(await readConfig(root)).toEqual({
       ...DEFAULTS,
       ghostPrompts: false,
+      name: null,
     });
   });
 });
@@ -60,6 +63,7 @@ describe("writeConfig", () => {
     await writeConfig(root, { ghostPrompts: false });
     expect(JSON.parse(await readFile(path(), "utf8"))).toMatchObject({
       ghostPrompts: false,
+      name: null,
       sync: { provider: "git" },
     });
   });
@@ -73,7 +77,15 @@ describe("writeConfig", () => {
     expect(await readConfig(root)).toEqual({
       galleryCovers: false,
       ghostPrompts: false,
+      name: null,
       reminder: { enabled: false, time: "21:00" },
     });
+  });
+
+  it("keeps a chosen name, trimmed, and an empty one goes back to the computer's", async () => {
+    await writeConfig(root, configChangesSchema.parse({ name: "  Kacem " }));
+    expect((await readConfig(root)).name).toBe("Kacem");
+    await writeConfig(root, configChangesSchema.parse({ name: "" }));
+    expect((await readConfig(root)).name).toBeNull();
   });
 });

@@ -9,6 +9,7 @@ import {
   COVER_EXTENSIONS,
   COVER_NAME,
   MAX_IMAGE_BYTES,
+  MAX_NAME_LENGTH,
   MAX_QUERY_LENGTH,
   REMINDER_TIME,
 } from "./journal";
@@ -70,6 +71,14 @@ export const coverExtensionSchema = z.enum(COVER_EXTENSIONS);
 export const configChangesSchema = z.strictObject({
   galleryCovers: z.boolean().optional(),
   ghostPrompts: z.boolean().optional(),
+  // An empty name is kept as none, so the computer's name for them is used
+  name: z
+    .string()
+    .trim()
+    .max(MAX_NAME_LENGTH)
+    .transform((name) => name || null)
+    .nullable()
+    .optional(),
   reminder: z
     .strictObject({
       enabled: z.boolean().optional(),
@@ -79,9 +88,13 @@ export const configChangesSchema = z.strictObject({
 }) satisfies z.ZodType<JournalConfigChanges>;
 
 export const deviceChangesSchema = z.strictObject({
+  onboarded: z.boolean().optional(),
   sidebarOpen: z.boolean().optional(),
   theme: z.enum(["light", "dark", "system"]).optional(),
 });
+
+/** A journal folder the page passes back; the main process checks it offered it. */
+export const folderPathSchema = z.string().min(1).max(4096);
 
 export const flowerColorSchema = z.enum([
   "daylily",

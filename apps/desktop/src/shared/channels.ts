@@ -4,6 +4,7 @@ import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
   DeviceState,
+  FolderInfo,
   ImageError,
   JournalConfig,
   JournalError,
@@ -23,6 +24,7 @@ export const CHANNELS = {
   appFlushed: "app:flushed",
   appInfo: "app:info",
   appOpenToday: "app:open-today",
+  appOpenWelcome: "app:open-welcome",
   appReady: "app:ready",
   deviceGet: "device:get",
   deviceSet: "device:set",
@@ -30,9 +32,11 @@ export const CHANNELS = {
   journalChange: "journal:change",
   journalChanged: "journal:changed",
   journalFlowerColor: "journal:flower-color",
+  journalFolder: "journal:folder",
   journalInfo: "journal:info",
   journalList: "journal:list",
   journalPickCover: "journal:pick-cover",
+  journalPickFolder: "journal:pick-folder",
   journalRead: "journal:read",
   journalSaveCover: "journal:save-cover",
   journalSearch: "journal:search",
@@ -40,6 +44,7 @@ export const CHANNELS = {
   journalShow: "journal:show",
   journalStats: "journal:stats",
   journalSwitched: "journal:switched",
+  journalUse: "journal:use",
   journalWrite: "journal:write",
   saveGardenImage: "garden:save-image",
   updatesChanged: "updates:changed",
@@ -121,6 +126,8 @@ export interface DaylilyApi {
     onFlush: (save: () => Promise<void>) => void;
     /** Calls `listener` when the app is asked to open today's page, as from the reminder. Returns a way to stop. */
     onOpenToday: (listener: () => void) => () => void;
+    /** Calls `listener` when Help › Welcome to Daylily is chosen from the native menu. Returns a way to stop. */
+    onOpenWelcome: (listener: () => void) => () => void;
     /** Tells the main process the app has painted, so the splash can hand over. */
     ready: () => void;
   };
@@ -161,6 +168,15 @@ export interface DaylilyApi {
      * new place, and nothing in the old one moves or goes. False if cancelled.
      */
     change: () => Promise<boolean>;
+    /** The folder the journal is in now, as a choice: its days, whether it can be written, its preferences. */
+    folder: () => Promise<FolderInfo>;
+    /** Asks for a folder, without moving to it: null if cancelled. */
+    pickFolder: () => Promise<FolderInfo | null>;
+    /**
+     * Moves the journal to a folder offered by `folder` or `pickFolder`, as
+     * `change` does; any other path is refused. Staying put does nothing.
+     */
+    use: (path: string) => Promise<void>;
     info: () => Promise<JournalInfo>;
     /** Every written day, oldest first. */
     list: () => Promise<ListedDay[]>;

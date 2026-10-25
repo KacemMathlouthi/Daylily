@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { CHANNELS } from "../shared/channels";
+import { setMacMenu } from "./app-menu";
 import { registerDeviceIpc } from "./device-ipc";
 import { isQuitting, saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
 import { registerIpc, whenAppReady } from "./ipc";
@@ -35,6 +36,8 @@ let mainWindow: BrowserWindow | null = null;
 let keepRunning = false;
 /** Today's page was asked for while no window was there; the next one opens on it. */
 let openTodayWhenReady = false;
+/** Help › Welcome to Daylily was chosen while no window was there; the next one opens on it. */
+let openWelcomeWhenReady = false;
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -100,6 +103,10 @@ async function launch(settings: DeviceSettingsStore) {
     if (openTodayWhenReady) {
       openTodayWhenReady = false;
       window.webContents.send(CHANNELS.appOpenToday);
+    }
+    if (openWelcomeWhenReady) {
+      openWelcomeWhenReady = false;
+      window.webContents.send(CHANNELS.appOpenWelcome);
     }
   });
   fallback = setTimeout(() => {
@@ -196,6 +203,17 @@ app.whenReady().then(async () => {
   // Looked for while the splash shows; it never holds the app up
   updates.check();
   app.on("second-instance", () => showWindow(settings));
+  if (process.platform === "darwin") {
+    setMacMenu(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        showWindow(settings);
+        mainWindow.webContents.send(CHANNELS.appOpenWelcome);
+        return;
+      }
+      openWelcomeWhenReady = true;
+      showWindow(settings);
+    });
+  }
 
   // macOS keeps apps alive without windows; clicking the dock icon brings one back
   app.on("activate", () => showWindow(settings));

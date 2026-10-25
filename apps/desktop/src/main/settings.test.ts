@@ -30,6 +30,7 @@ describe("deviceSettings", () => {
     expect(await settings.read()).toEqual({
       dismissedUpdate: null,
       journalPath: null,
+      onboarded: false,
       sidebarOpen: false,
       theme: "dark",
     });
@@ -43,11 +44,23 @@ describe("deviceSettings", () => {
     expect(await deviceSettings(folder).journalPath()).toBe(DEFAULT_JOURNAL);
   });
 
+  it("asks for onboarding once on a computer that used Daylily before it", async () => {
+    await writeFile(
+      join(folder, "settings.json"),
+      JSON.stringify({ journalPath: null, sidebarOpen: false, theme: "dark" })
+    );
+    const settings = deviceSettings(folder);
+    expect((await settings.read()).onboarded).toBe(false);
+    await settings.write({ onboarded: true });
+    expect((await settings.read()).onboarded).toBe(true);
+  });
+
   it("starts over from a file that isn't JSON", async () => {
     await writeFile(join(folder, "settings.json"), "nope");
     expect(await deviceSettings(folder).read()).toEqual({
       dismissedUpdate: null,
       journalPath: null,
+      onboarded: false,
       sidebarOpen: true,
       theme: "system",
     });
