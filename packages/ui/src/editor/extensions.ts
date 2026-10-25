@@ -1,6 +1,7 @@
 import { type AnyExtension, Extension } from "@tiptap/core";
 import { Code } from "@tiptap/extension-code";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
+import { Paragraph } from "@tiptap/extension-paragraph";
 import { TableKit } from "@tiptap/extension-table";
 import { Placeholder } from "@tiptap/extensions";
 import { Markdown } from "@tiptap/markdown";
@@ -51,6 +52,25 @@ export interface PageExtensionsOptions {
  */
 const InlineCode = Code.extend({ excludes: "" });
 
+/**
+ * A paragraph holding only an image stays a paragraph. Tiptap's own lifts the
+ * image out, as if images were blocks; the page's are inline, as markdown has
+ * them, and an image outside a paragraph breaks the page.
+ */
+const PageParagraph = Paragraph.extend({
+  parseMarkdown(token, helpers) {
+    const tokens = token.tokens ?? [];
+    if (tokens.length === 1 && tokens[0]?.type === "image") {
+      return helpers.createNode(
+        "paragraph",
+        undefined,
+        helpers.parseInline(tokens)
+      );
+    }
+    return this.parent?.(token, helpers) ?? [];
+  },
+});
+
 /** Links that are safe to hand to the system browser. */
 const SAFE_LINK = /^(https?:\/\/|mailto:)/i;
 
@@ -77,9 +97,12 @@ export function pageExtensions({
         isAllowedUri: (url) => SAFE_LINK.test(url),
         openOnClick: true,
       },
+      // Replaced below, so a lone image keeps its paragraph
+      paragraph: false,
       // Not markdown, so it wouldn't survive the file
       underline: false,
     }),
+    PageParagraph,
     InlineCode,
     CodeBlock,
     TableKit.configure({ table: { resizable: false } }),

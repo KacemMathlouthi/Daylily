@@ -21,8 +21,14 @@ function open(markdown: string, images?: PageImageOptions) {
   return editor;
 }
 
+/**
+ * The page as saved after opening it, once its document is checked against the
+ * schema: an invalid one breaks the editor at the first change.
+ */
 function reopened(markdown: string) {
-  return open(markdown).getMarkdown();
+  const page = open(markdown);
+  page.state.doc.check();
+  return page.getMarkdown();
 }
 
 /** Pastes as the system would, with files and whatever text came with them. */
@@ -60,6 +66,14 @@ function journal() {
 const settled = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("a page's images", () => {
+  it("opens a page that ends with an image, and can still be written", () => {
+    const page = open("The long way home.\n\n![](image-01.jpg)");
+    page.state.doc.check();
+    page.commands.focus("end");
+    page.commands.insertContent("Then tea.");
+    expect(page.getMarkdown()).toContain("![](image-01.jpg)");
+  });
+
   it("keeps an image on its own line", () => {
     const page = "The long way home.\n\n![](image-01.jpg)\n\nThen tea.";
     expect(reopened(page)).toBe(page);
@@ -101,6 +115,23 @@ describe("a page's images", () => {
 
   it("keeps an address with spaces", () => {
     expect(reopened("![](<my photo.jpg>)")).toBe("![](<my photo.jpg>)");
+  });
+});
+
+describe("an image as HTML", () => {
+  it("never carries a src the browser would load, and reads back the same", () => {
+    const page = open("![](https://example.com/sky.jpg)");
+    const html = page.getHTML();
+    expect(html).not.toContain(" src=");
+    expect(html).toContain('data-src="https://example.com/sky.jpg"');
+    page.commands.setContent(html);
+    expect(page.getMarkdown()).toBe("![](https://example.com/sky.jpg)");
+  });
+
+  it("still takes an image pasted from elsewhere with a src", () => {
+    const page = open("");
+    page.commands.setContent('<p><img src="image-01.jpg" alt=""></p>');
+    expect(page.getMarkdown()).toBe("![](image-01.jpg)");
   });
 });
 

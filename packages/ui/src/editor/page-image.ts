@@ -273,6 +273,23 @@ function dropPlugin(add: (file: File) => Promise<string | null>) {
  * adds sits in a paragraph of its own and fills the column.
  */
 export const PageImage = Image.extend<PageImageOptions & { inline: boolean }>({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      /*
+       * As HTML, the address is kept in data-src. The editor draws a page from its
+       * HTML before the image views are ready, and a real src would load at once:
+       * from the web, which Daylily never does, or a file beside the app.
+       */
+      src: {
+        default: null,
+        parseHTML: (element) =>
+          element.getAttribute("data-src") ?? element.getAttribute("src"),
+        renderHTML: (attributes) => ({ "data-src": attributes.src }),
+      },
+    };
+  },
+
   addNodeView() {
     return ReactNodeViewRenderer(PageImageView);
   },
@@ -287,6 +304,11 @@ export const PageImage = Image.extend<PageImageOptions & { inline: boolean }>({
 
   addProseMirrorPlugins() {
     return this.options.add ? [dropPlugin(this.options.add)] : [];
+  },
+
+  // Images copied within a page come back from data-src too
+  parseHTML() {
+    return [{ tag: "img[data-src]" }, ...(this.parent?.() ?? [])];
   },
 
   renderMarkdown: (node) =>
