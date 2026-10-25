@@ -4,17 +4,11 @@ import {
   matchRanges,
   queryWords,
   searchSnippet,
+  TYPO_FROM_LENGTH,
 } from "@daylily/core/search-text";
 import { create, insert, remove, search } from "@orama/orama";
 import { MAX_SEARCH_HITS, type SearchHit } from "../../shared/journal";
 import type { Journal } from "./store";
-
-/** The index finds short words by their start too; it's asked for plenty, then held to the rule. */
-const CANDIDATES = 1000;
-/** A typo is forgiven only in longer words, so "sea" never finds "tea". */
-const TYPO_FROM_LENGTH = 5;
-/** Words this short must be found whole, which the index can't be told per word. */
-const WHOLE_BELOW_LENGTH = 4;
 
 type Entry = Omit<SearchHit, "snippet"> & { text: string };
 
@@ -79,24 +73,26 @@ export function journalSearch(journal: Pick<Journal, "listDays" | "readDay">) {
       // Orama answers at once from memory; it only returns a promise with async plugins
       const result = await search(index, {
         boost: { title: 2 },
-        limit: CANDIDATES,
+        // Every candidate, ranked: the index can't be told the rules per word, so
+        // it's asked broadly and its hits are held to them below
+        limit: Math.max(1, entries.size),
         properties: ["title", "text"],
         term: words.join(" "),
         // Every word must be there, not any of them
         threshold: 0,
-        tolerance: words.every((word) => word.length >= TYPO_FROM_LENGTH)
+        tolerance: words.some((word) => word.length >= TYPO_FROM_LENGTH)
           ? 1
           : 0,
       });
-      const short = words.filter((word) => word.length < WHOLE_BELOW_LENGTH);
       const hits: SearchHit[] = [];
       for (const { id } of result.hits) {
         const entry = entries.get(id as DayKey);
         const page = entry && `${entry.title}\n${entry.text}`;
+        // The words as the page marks them: short words whole, a typo only in long ones
         if (
           entry &&
           page &&
-          short.every((word) => matchRanges(page, word).length > 0)
+          words.every((word) => matchRanges(page, word).length > 0)
         ) {
           const { text, ...hit } = entry;
           hits.push({ ...hit, snippet: searchSnippet(text, query) });

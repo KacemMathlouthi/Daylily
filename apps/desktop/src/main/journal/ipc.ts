@@ -69,10 +69,12 @@ export function registerJournalIpc({
   let search = journalSearch(journal);
 
   /** Builds the index in the quiet after opening, so the first search answers at once. */
+  let warming: ReturnType<typeof setTimeout> | undefined;
   const warmSoon = () => {
-    const current = search;
-    setTimeout(() => {
-      current
+    // A journal left before its index was built never builds it
+    clearTimeout(warming);
+    warming = setTimeout(() => {
+      search
         .warm()
         .catch((error) => console.error("Could not build search", error));
     }, WARM_SEARCH_AFTER_MS);

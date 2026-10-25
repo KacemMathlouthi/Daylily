@@ -173,8 +173,11 @@ export interface DaylilyApi {
       color?: FlowerColor
     ) => Promise<Result<string, JournalError>>;
     /**
-     * Days whose title or page holds every word of `query`, best first, each with
-     * a line of the page around the first match. Searched on this computer only.
+     * Days whose title or page holds every word of `query`: by a word's start,
+     * short words whole, accents ignored, one typo forgiven in long words. Best
+     * first, up to `MAX_SEARCH_HITS` and one more to tell there were more. Each
+     * comes with a line of its page around the first match, or the page's start
+     * when only the title matched. Searched on this computer only.
      */
     search: (query: string) => Promise<SearchHit[]>;
     /** Calls `listener` when the journal moves to another folder. Returns a way to stop. */

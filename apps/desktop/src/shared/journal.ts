@@ -40,6 +40,9 @@ export type ListedDay = DaySummary | UnreadableDay;
  */
 export const MAX_SEARCH_HITS = 50;
 
+/** The longest search: the field stops there, and the main process refuses more. */
+export const MAX_QUERY_LENGTH = 200;
+
 /** A day that holds what was searched for, with a line of it to show. */
 export interface SearchHit {
   color: FlowerColor | null;

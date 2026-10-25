@@ -5,7 +5,12 @@ import {
   type JournalConfigChanges,
   WINDOW_ACTIONS,
 } from "./channels";
-import { COVER_EXTENSIONS, COVER_NAME, REMINDER_TIME } from "./journal";
+import {
+  COVER_EXTENSIONS,
+  COVER_NAME,
+  MAX_QUERY_LENGTH,
+  REMINDER_TIME,
+} from "./journal";
 
 /** Validates what the main process sends back, so the contract can't drift silently. */
 export const appInfoSchema = z.object({
@@ -92,5 +97,5 @@ export const coverStampSchema = z.string().regex(/^\d+--?\d+(?:\.\d+)?$/);
 
 export const windowActionSchema = z.enum(WINDOW_ACTIONS);
 
-/** What someone typed to search; nobody types more, and the index never sees more. */
-export const searchQuerySchema = z.string().max(200);
+/** What someone typed to search, as long as the field allows. */
+export const searchQuerySchema = z.string().max(MAX_QUERY_LENGTH);

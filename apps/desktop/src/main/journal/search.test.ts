@@ -67,8 +67,15 @@ describe("journalSearch", () => {
 
   it("never stretches a short word to another one", async () => {
     await write("2026-03-04", "Green tea by the window, in my seat.");
-    const search = journalSearch(journal);
-    expect(days(await search.find("sea"))).not.toContain("2026-03-04");
+    const found = days(await journalSearch(journal).find("sea"));
+    expect(found).toContain("2025-07-12");
+    expect(found).not.toContain("2026-03-04");
+  });
+
+  it("forgives a typo in a long word even beside a short one", async () => {
+    expect(days(await journalSearch(journal).find("sea brekfast"))).toEqual([
+      "2025-07-12",
+    ]);
   });
 
   it("leaves out common words when there's more to look for", async () => {
@@ -124,8 +131,8 @@ describe("journalSearch", () => {
       join(root, "2026", "05", "01", "2026-05-01.md"),
       "---\ntitle: [broken\n---\nThe sea again\n"
     );
-    expect(days(await journalSearch(journal).find("sea"))).not.toContain(
-      "2026-05-01"
-    );
+    const found = days(await journalSearch(journal).find("sea"));
+    expect(found).toContain("2025-07-12");
+    expect(found).not.toContain("2026-05-01");
   });
 });
