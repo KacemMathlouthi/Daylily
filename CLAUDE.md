@@ -8,11 +8,11 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live. Desktop app 0.1.0 released for macOS, Windows and Linux (unsigned): writes, saves, reads and seals a real journal folder, and reminds in the evening; what comes next is in `ROADMAP.md`. |
+| **Status** | Website live at [daylily.ink](https://daylily.ink). Desktop app released for macOS, Windows and Linux (unsigned), a version from every merge that changes it: writes, saves, reads, searches and seals a real journal folder, welcomes, and reminds in the evening; what comes next is in `ROADMAP.md`. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-25 |
+| **Last updated** | 2026-10-26 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -549,13 +549,14 @@ drift, sync Paper back to what was agreed.
 
 | Page | Contents |
 |---|---|
-| v1 | First landing page draft (superseded) |
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
 Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases and are **not in v1**.
+Each page is laid out in labelled columns, one per screen or site page; boards no longer current sit in a
+final Archive column rather than being deleted.
 
 ### Repository assets
 
@@ -616,6 +617,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-25 | Search: every page from ⌘K, an Orama index in memory built from the files, results as you type with the chosen day previewed, opened at the words with a fading glow; designed in Paper first (13a to 13c) |
 | 2026-10-25 | Images on the page: pasted or dropped, copied untouched into the day's folder as `image-NN`, plain markdown; images written in other editors no longer dropped on save; the editor's markdown tested (`packages/ui`). The website: a centred statement on the landing, "For your eyes only." on the Manifesto with a new painting; video, files, link previews and diagrams moved past v1. Designed in Paper first |
 | 2026-10-25 | Onboarding: welcome, make it yours (your name and your folder), a little help, then hello, as a list of steps that grows (AI later); once on every computer and from Help › Welcome to Daylily; designed in Paper first (10d to 10h). A page ending with an image opened again (0.5.1) |
+| 2026-10-26 | Daylily's own domain, **daylily.ink**: the website, the README and the app's links moved there, the old addresses redirect to it; the Paper file tidied into labelled columns, outdated boards archived; the landing seals at 4am, not midnight |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
@@ -644,14 +646,14 @@ opt-in AI from any provider, and a garden.
 **Honest take:** the hook is the principles, not the features. *Your files, today only, AI that asks but never
 writes.* The garden is the expected visual layer, not a moat. We'd be second to at8pm on sealing.
 
-**Name checks (Oct 2026):** no journaling or software collisions; npm `daylily` is free; `daylily.so` looks free,
-`daylily.app` and `getdaylily.com` look parked, `daylilyjournal.com` is taken; the bare GitHub org is taken.
+**Name checks (Oct 2026):** no journaling or software collisions; npm `daylily` is free; `daylily.com`, `.app`,
+`.so`, `.io` and `daylilyjournal.com` are taken; the bare GitHub org is taken. **`daylily.ink` was bought on
+2026-10-26** (Vercel, renews at about $29 a year): ink is the seal's promise, "honest and unedited, like ink".
 
 ---
 
 ## 12. Open questions
 
-- **Domain and trademark:** buy `daylily.so`; check whether `daylily.app` can be bought; run a USPTO/EUIPO trademark
-  search.
+- **Trademark:** run a USPTO/EUIPO trademark search for "Daylily".
 - **Cover gallery:** how many covers ship with the app, and how they're licensed.
 - **Codexes:** when, if ever, and whether they're the paid feature.

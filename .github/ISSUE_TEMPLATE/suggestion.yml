@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Daylily grows slowly, by the [manifesto](https://daylily.kacem.lol/manifesto): one page a day, your own words, files you own, and AI that asks but never writes.
+        Daylily grows slowly, by the [manifesto](https://daylily.ink/manifesto): one page a day, your own words, files you own, and AI that asks but never writes.
   - type: textarea
     id: idea
     attributes:

@@ -33,7 +33,8 @@ export function Hero() {
         <Reveal delay={0.34}>
           <p className="max-w-150 text-body text-ink-soft leading-7.5 md:text-lead">
             Daylily asks how your day was, then gets out of the way. Write it in
-            your own words. At midnight the page seals, and a flower grows.
+            your own words. When the day is done, the page seals, and a flower
+            grows.
           </p>
         </Reveal>
 

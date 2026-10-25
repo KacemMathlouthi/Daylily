@@ -83,7 +83,7 @@ function SealedCard() {
     <Card
       body="Today is the only page you can write. Yesterday stays honest, like ink."
       dark
-      title="Sealed at midnight"
+      title="Sealed at 4am"
     >
       <SealedStack />
     </Card>
