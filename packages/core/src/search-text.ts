@@ -31,22 +31,64 @@ function folded(text: string) {
   return { from, value };
 }
 
-/** The words of a search, folded; punctuation around them is not part of them. */
+/** Words in nearly every page, which would mark everything and find nothing in particular. */
+const COMMON_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "at",
+  "but",
+  "by",
+  "for",
+  "from",
+  "i",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "so",
+  "the",
+  "to",
+  "was",
+  "we",
+  "with",
+]);
+
+/**
+ * The words of a search, folded; punctuation around them is not part of them.
+ * Common words like "the" are left out when there's anything else to look for.
+ */
 export function queryWords(query: string) {
-  return query
+  const words = query
     .split(SPACES)
     .map((word) => [...word].map(foldChar).join(""))
     .map((word) => word.replace(EDGE_PUNCTUATION, ""))
     .filter((word) => word !== "");
+  const telling = words.filter((word) => !COMMON_WORDS.has(word));
+  return telling.length > 0 ? telling : words;
 }
 
 const isWordChar = (char: string | undefined) =>
   char !== undefined && WORD_CHAR.test(char);
 
+/** Shorter words match only whole, or with a plural "s": "sea" finds "seas", never "seat". */
+const PREFIX_FROM_LENGTH = 4;
+
+/** Whether `found`, a whole word of the text, is what `word` of the search asks for. */
+function answers(found: string, word: string) {
+  return word.length >= PREFIX_FROM_LENGTH
+    ? found.startsWith(word)
+    : found === word || found === `${word}s`;
+}
+
 /**
  * Where the words of `query` appear in `text`, each match a whole word that
- * starts with one of them ("walk" marks "walked"), ignoring case and accents.
- * In order, never overlapping.
+ * starts with one of them ("walk" marks "walked"; a word of three letters or
+ * fewer only itself), ignoring case and accents. In order, never overlapping.
  */
 export function matchRanges(text: string, query: string): TextRange[] {
   const words = queryWords(query);
@@ -57,19 +99,18 @@ export function matchRanges(text: string, query: string): TextRange[] {
   const ranges: TextRange[] = [];
   let at = 0;
   while (at < value.length) {
-    const startsWord = !isWordChar(value[at - 1]) && isWordChar(value[at]);
-    const word = startsWord
-      ? words.find((candidate) => value.startsWith(candidate, at))
-      : undefined;
-    if (!word) {
+    if (isWordChar(value[at - 1]) || !isWordChar(value[at])) {
       at += 1;
       continue;
     }
-    let end = at + word.length;
+    let end = at;
     while (isWordChar(value[end])) {
       end += 1;
     }
-    ranges.push([from[at] ?? 0, from[end] ?? text.length]);
+    const found = value.slice(at, end);
+    if (words.some((word) => answers(found, word))) {
+      ranges.push([from[at] ?? 0, from[end] ?? text.length]);
+    }
     at = end;
   }
   return ranges;
@@ -81,8 +122,8 @@ export interface Snippet {
   text: string;
 }
 
-/** Characters shown before the first match, so it reads in context. */
-const LEAD = 40;
+/** Characters shown before the first match: enough to read it in context, few enough that a narrow list still shows it. */
+const LEAD = 24;
 
 /**
  * A line of `text` around the first match of `query`, about `max` characters,
@@ -94,7 +135,8 @@ export function searchSnippet(text: string, query: string, max = 140): Snippet {
   const ranges = matchRanges(line, query);
   const first = ranges[0]?.[0] ?? 0;
 
-  let start = Math.max(0, first - LEAD);
+  // Never later than needed: a page shorter than the snippet is quoted whole
+  let start = Math.max(0, Math.min(first - LEAD, line.length - max));
   if (start > 0) {
     // Begin on a word, never in the middle of one
     const space = line.indexOf(" ", start);

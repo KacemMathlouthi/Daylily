@@ -10,6 +10,11 @@ describe("queryWords", () => {
     expect(queryWords("  Café, “Sea”!  ")).toEqual(["cafe", "sea"]);
   });
 
+  it("leaves out common words when there's something else to look for", () => {
+    expect(queryWords("the sea")).toEqual(["sea"]);
+    expect(queryWords("the")).toEqual(["the"]);
+  });
+
   it("is empty for a query of spaces and marks", () => {
     expect(queryWords(" … ?! ")).toEqual([]);
   });
@@ -24,11 +29,18 @@ describe("matchRanges", () => {
   });
 
   it("never matches inside a word", () => {
-    expect(marked("Overseas, the seaside", "sea")).toEqual(["seaside"]);
+    expect(marked("Overseas, the seaside", "seas")).toEqual(["seaside"]);
+  });
+
+  it("matches a short word only whole, or with a plural s", () => {
+    expect(marked("A seat by the sea, two seas, a season", "sea")).toEqual([
+      "sea",
+      "seas",
+    ]);
   });
 
   it("ignores case and accents in either direction", () => {
-    expect(marked("Un café à Tunis", "CAFE a")).toEqual(["café", "à"]);
+    expect(marked("Un café à Tunis", "CAFE TÚNIS")).toEqual(["café", "Tunis"]);
     expect(marked("a cafe in town", "café")).toEqual(["cafe"]);
   });
 
@@ -49,11 +61,17 @@ describe("searchSnippet", () => {
   it("quotes the words around the first match, cut at words", () => {
     const snippet = searchSnippet(page, "sea", 60);
     expect(snippet.text).toBe(
-      "…took forever. We walked down to the sea before breakfast and…"
+      "…We walked down to the sea before breakfast and the tide was…"
     );
     expect(
       snippet.marks.map(([start, end]) => snippet.text.slice(start, end))
     ).toEqual(["sea"]);
+  });
+
+  it("quotes a short page whole, wherever the match is", () => {
+    expect(
+      searchSnippet("We walked down to the sea at last.", "last").text
+    ).toBe("We walked down to the sea at last.");
   });
 
   it("marks every match inside the quote", () => {
