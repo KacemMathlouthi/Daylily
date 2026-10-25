@@ -308,7 +308,11 @@ export const PageImage = Image.extend<PageImageOptions & { inline: boolean }>({
 
   // Images copied within a page come back from data-src too
   parseHTML() {
-    return [{ tag: "img[data-src]" }, ...(this.parent?.() ?? [])];
+    // Never a data: URI, as Tiptap's own rule for src: the page keeps files, not their bytes
+    return [
+      { tag: 'img[data-src]:not([data-src^="data:"])' },
+      ...(this.parent?.() ?? []),
+    ];
   },
 
   renderMarkdown: (node) =>
