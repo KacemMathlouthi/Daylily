@@ -140,12 +140,12 @@ function TodayPage() {
       <div className="flex grow flex-col items-center px-5 pt-4.5 pb-10 md:px-10">
         <article className="flex w-full max-w-155 flex-col">
           <Image
-            alt="Orange daylilies along a wooden fence at dusk"
+            alt="Orange daylilies along a wooden fence at sunset"
             className="h-28 w-full rounded-lg object-cover object-[center_60%] md:h-37.5"
-            height={405}
+            height={1024}
             priority
             src="/images/covers/long-way-home.jpg"
-            width={1672}
+            width={1536}
           />
           <div className="flex flex-col gap-3.5 pt-7">
             <p className="font-medium text-ink-subtle text-xs tracking-label">
