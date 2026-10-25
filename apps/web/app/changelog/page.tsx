@@ -75,10 +75,21 @@ function Masthead() {
   );
 }
 
-/** The left column: when, and which version. It stays in view while the release scrolls past. */
+/**
+ * The left column: when, and which version. It stays in view while the release
+ * scrolls past, and stops a release's spacing short of the next one's date.
+ */
 function DateColumn({ release }: { release: Release }) {
   return (
-    <div className="flex flex-col gap-1.5 pt-0.5 lg:sticky lg:top-28 lg:w-65 lg:shrink-0 lg:self-start">
+    <div className="lg:w-65 lg:shrink-0 lg:pb-24">
+      <DateLines release={release} />
+    </div>
+  );
+}
+
+function DateLines({ release }: { release: Release }) {
+  return (
+    <div className="flex flex-col gap-1.5 pt-0.5 lg:sticky lg:top-28">
       <p className="font-display text-ink text-title-sm leading-8.5 tracking-snug">
         {day(release.date, { day: "numeric", month: "long" })}
       </p>
