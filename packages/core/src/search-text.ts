@@ -2,14 +2,19 @@
 export type TextRange = readonly [start: number, end: number];
 
 const MARKS = /\p{M}/gu;
-const WORD_CHAR = /[\p{L}\p{N}]/u;
-const SPACES = /\s+/;
+const WORD_CHAR = /^[\p{L}\p{N}]$/u;
+const NOT_WORD = /[^\p{L}\p{N}]+/u;
 const SPACES_ALL = /\s+/g;
-const EDGE_PUNCTUATION = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu;
+// Greek writes a final sigma as ς, which upper case gives back as Σ
+const FINAL_SIGMA = /ς/g;
 
 /** A character as search compares it: lower case, without accents. */
 function foldChar(char: string) {
-  return char.normalize("NFD").replace(MARKS, "").toLowerCase();
+  return char
+    .normalize("NFD")
+    .replace(MARKS, "")
+    .toLowerCase()
+    .replace(FINAL_SIGMA, "σ");
 }
 
 /**
@@ -59,36 +64,83 @@ const COMMON_WORDS = new Set([
 ]);
 
 /**
- * The words of a search, folded; punctuation around them is not part of them.
- * Common words like "the" are left out when there's anything else to look for.
+ * The words of a search, folded, split wherever the text would be ("didn't" is
+ * "didn" and "t", as on the page). Common words like "the" are left out when
+ * there's anything else to look for.
  */
 export function queryWords(query: string) {
-  const words = query
-    .split(SPACES)
-    .map((word) => [...word].map(foldChar).join(""))
-    .map((word) => word.replace(EDGE_PUNCTUATION, ""))
+  const words = [...query]
+    .map(foldChar)
+    .join("")
+    .split(NOT_WORD)
     .filter((word) => word !== "");
   const telling = words.filter((word) => !COMMON_WORDS.has(word));
   return telling.length > 0 ? telling : words;
 }
 
-const isWordChar = (char: string | undefined) =>
-  char !== undefined && WORD_CHAR.test(char);
-
 /** Shorter words match only whole, or with a plural "s": "sea" finds "seas", never "seat". */
-const PREFIX_FROM_LENGTH = 4;
+export const PREFIX_FROM_LENGTH = 4;
+/** Words this long forgive one typo, as the index does: "brekfast" finds "breakfast". */
+export const TYPO_FROM_LENGTH = 5;
+
+/** Whether `a` becomes `b` with at most one letter added, dropped or changed. */
+function withinOneEdit(a: string, b: string) {
+  if (Math.abs(a.length - b.length) > 1) {
+    return false;
+  }
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) {
+    i += 1;
+  }
+  if (a.length === b.length) {
+    return a.slice(i + 1) === b.slice(i + 1);
+  }
+  const [shorter, longer] = a.length < b.length ? [a, b] : [b, a];
+  return shorter.slice(i) === longer.slice(i + 1);
+}
 
 /** Whether `found`, a whole word of the text, is what `word` of the search asks for. */
 function answers(found: string, word: string) {
-  return word.length >= PREFIX_FROM_LENGTH
-    ? found.startsWith(word)
-    : found === word || found === `${word}s`;
+  if (word.length < PREFIX_FROM_LENGTH) {
+    return found === word || found === `${word}s`;
+  }
+  if (found.startsWith(word)) {
+    return true;
+  }
+  // The word's start with one typo: a prefix of about its length, one edit away
+  return (
+    word.length >= TYPO_FROM_LENGTH &&
+    [-1, 0, 1].some((change) =>
+      withinOneEdit(found.slice(0, word.length + change), word)
+    )
+  );
+}
+
+/** The whole words of a folded text, by code point so letters beyond the BMP count, with their UTF-16 spans. */
+function* foldedWords(value: string) {
+  let start = -1;
+  let at = 0;
+  for (const char of value) {
+    if (WORD_CHAR.test(char)) {
+      if (start === -1) {
+        start = at;
+      }
+    } else if (start !== -1) {
+      yield [start, at] as const;
+      start = -1;
+    }
+    at += char.length;
+  }
+  if (start !== -1) {
+    yield [start, at] as const;
+  }
 }
 
 /**
  * Where the words of `query` appear in `text`, each match a whole word that
  * starts with one of them ("walk" marks "walked"; a word of three letters or
- * fewer only itself), ignoring case and accents. In order, never overlapping.
+ * fewer only itself; a long word with one typo too), ignoring case and
+ * accents. In order, never overlapping.
  */
 export function matchRanges(text: string, query: string): TextRange[] {
   const words = queryWords(query);
@@ -97,21 +149,11 @@ export function matchRanges(text: string, query: string): TextRange[] {
   }
   const { from, value } = folded(text);
   const ranges: TextRange[] = [];
-  let at = 0;
-  while (at < value.length) {
-    if (isWordChar(value[at - 1]) || !isWordChar(value[at])) {
-      at += 1;
-      continue;
-    }
-    let end = at;
-    while (isWordChar(value[end])) {
-      end += 1;
-    }
-    const found = value.slice(at, end);
+  for (const [start, end] of foldedWords(value)) {
+    const found = value.slice(start, end);
     if (words.some((word) => answers(found, word))) {
-      ranges.push([from[at] ?? 0, from[end] ?? text.length]);
+      ranges.push([from[start] ?? 0, from[end] ?? text.length]);
     }
-    at = end;
   }
   return ranges;
 }
@@ -127,16 +169,16 @@ const LEAD = 24;
 
 /**
  * A line of `text` around the first match of `query`, about `max` characters,
- * cut at words, with "…" where it was cut. Without a match (a typo forgiven by
- * the index), it's the start of the text.
+ * cut at words, with "…" where it was cut. Without a match (the words were
+ * only in the title), it's the start of the text.
  */
 export function searchSnippet(text: string, query: string, max = 140): Snippet {
   const line = text.replace(SPACES_ALL, " ").trim();
   const ranges = matchRanges(line, query);
   const first = ranges[0]?.[0] ?? 0;
 
-  // Never later than needed: a page shorter than the snippet is quoted whole
-  let start = Math.max(0, Math.min(first - LEAD, line.length - max));
+  // A page that fits is quoted whole; a longer one starts just before the match
+  let start = line.length <= max ? 0 : Math.max(0, first - LEAD);
   if (start > 0) {
     // Begin on a word, never in the middle of one
     const space = line.indexOf(" ", start);

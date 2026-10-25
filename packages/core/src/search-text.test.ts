@@ -15,6 +15,10 @@ describe("queryWords", () => {
     expect(queryWords("the")).toEqual(["the"]);
   });
 
+  it("splits on punctuation inside a search, like the page does", () => {
+    expect(queryWords("well-known")).toEqual(["well", "known"]);
+  });
+
   it("is empty for a query of spaces and marks", () => {
     expect(queryWords(" … ?! ")).toEqual([]);
   });
@@ -45,8 +49,28 @@ describe("matchRanges", () => {
   });
 
   it("keeps ranges on the original text when folding changes lengths", () => {
-    const text = "İstanbul in the rain";
-    expect(marked(text, "rain")).toEqual(["rain"]);
+    // A decomposed accent folds away, so everything after it shifts by one
+    const text = "cafe\u0301 au lait";
+    expect(matchRanges(text, "lait")).toEqual([[9, 13]]);
+    expect(marked(text, "cafe")).toEqual(["cafe\u0301"]);
+  });
+
+  it("matches words beyond the basic plane, and a final sigma either way", () => {
+    expect(marked("one 𝐰𝐨𝐫𝐝 here", "here")).toEqual(["here"]);
+    expect(marked("ΟΔΟΣ", "οδος")).toEqual(["ΟΔΟΣ"]);
+    expect(marked("οδός", "ΟΔΟΣ")).toEqual(["οδός"]);
+  });
+
+  it("forgives one typo in a longer word, as the index does", () => {
+    expect(marked("before breakfast, after breakfasts", "brekfast")).toEqual([
+      "breakfast",
+      "breakfasts",
+    ]);
+    expect(marked("a cat and a car", "cast")).toEqual([]);
+  });
+
+  it("splits a search where the page would, so a word with an apostrophe matches", () => {
+    expect(marked("I didn’t mind", "didn't")).toEqual(["didn", "t"]);
   });
 
   it("finds nothing for an empty query", () => {
@@ -74,6 +98,12 @@ describe("searchSnippet", () => {
     ).toBe("We walked down to the sea at last.");
   });
 
+  it("keeps the match near the start of the quote, even near the end of a long page", () => {
+    const long = `${"Nothing to see here at all. ".repeat(8)}Breakfast, work, a walk.`;
+    const snippet = searchSnippet(long, "breakfast");
+    expect(snippet.marks[0]?.[0]).toBeLessThan(30);
+  });
+
   it("marks every match inside the quote", () => {
     const snippet = searchSnippet("the sea, the sea, the sea", "sea");
     expect(snippet.marks).toHaveLength(3);
@@ -85,8 +115,8 @@ describe("searchSnippet", () => {
     );
   });
 
-  it("is the start of the page when nothing matches literally", () => {
-    const snippet = searchSnippet(page, "brekfast", 30);
+  it("is the start of the page when the words were only in the title", () => {
+    const snippet = searchSnippet(page, "mornings", 30);
     expect(snippet.text).toBe("Up before everyone. The house…");
     expect(snippet.marks).toEqual([]);
   });
