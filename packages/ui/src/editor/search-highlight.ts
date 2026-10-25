@@ -7,9 +7,14 @@ import { Decoration, DecorationSet } from "@tiptap/pm/view";
 /** How the words show: marked while choosing a result, or a glow that fades once the day opens. */
 export type SearchHighlightStyle = "mark" | "glow";
 
-interface HighlightState {
+interface Highlight {
   query: string;
   style: SearchHighlightStyle;
+}
+
+interface HighlightState extends Highlight {
+  /** Worked out once per page and highlight, not on every keystroke or click. */
+  marks: DecorationSet;
 }
 
 declare module "@tiptap/core" {
@@ -29,7 +34,7 @@ const highlightKey = new PluginKey<HighlightState>("searchHighlight");
 /** Stands in for anything in a line that isn't text, an image say, so offsets stay positions. */
 const NOT_TEXT = "￼";
 
-function decorations(doc: Node, { query, style }: HighlightState) {
+function decorations(doc: Node, { query, style }: Highlight) {
   if (query.trim() === "") {
     return DecorationSet.empty;
   }
@@ -79,19 +84,24 @@ export const SearchHighlight = Extension.create({
       new Plugin<HighlightState>({
         key: highlightKey,
         props: {
-          decorations(state) {
-            const highlight = highlightKey.getState(state);
-            return highlight ? decorations(state.doc, highlight) : null;
-          },
+          decorations: (state) => highlightKey.getState(state)?.marks ?? null,
         },
         state: {
           apply(tr, current) {
-            return (
-              (tr.getMeta(highlightKey) as HighlightState | undefined) ??
-              current
-            );
+            const asked = tr.getMeta(highlightKey) as Highlight | undefined;
+            if (asked) {
+              return { ...asked, marks: decorations(tr.doc, asked) };
+            }
+            // Writing while words are marked: only then is the page looked through again
+            return tr.docChanged && current.query !== ""
+              ? { ...current, marks: decorations(tr.doc, current) }
+              : current;
           },
-          init: () => ({ query: "", style: "mark" }),
+          init: () => ({
+            marks: DecorationSet.empty,
+            query: "",
+            style: "mark",
+          }),
         },
       }),
     ];
