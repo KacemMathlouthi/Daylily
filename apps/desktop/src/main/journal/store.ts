@@ -13,12 +13,13 @@ import type { FlowerColor } from "@daylily/core/flower";
 import { fail, ok, type Result } from "@daylily/core/result";
 import { hasEnded, sealDayFile, sealState, sealTime } from "@daylily/core/seal";
 import { countMarkdownWords } from "@daylily/core/words";
-import type {
-  CoverExtension,
-  JournalError,
-  ListedDay,
-  StoredDay,
-  UnreadableDay,
+import {
+  type CoverExtension,
+  type JournalError,
+  type ListedDay,
+  PAGE_IMAGE_NAME,
+  type StoredDay,
+  type UnreadableDay,
 } from "../../shared/journal";
 import { createFileAtomic, writeFileAtomic } from "./atomic-write";
 import { fileStamp, flowerCache } from "./flower-cache";
@@ -50,6 +51,18 @@ export interface SealCover {
   extension: CoverExtension;
 }
 
+/** The names in a folder, or none when it isn't there yet. */
+async function listFolder(path: string) {
+  try {
+    return await readdir(path);
+  } catch (error) {
+    if (errorCode(error) === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+}
+
 async function folderNames(path: string, pattern: RegExp) {
   try {
     const entries = await readdir(path, { withFileTypes: true });
@@ -62,6 +75,19 @@ async function folderNames(path: string, pattern: RegExp) {
     }
     throw error;
   }
+}
+
+/** The last number `PAGE_IMAGE_NAME` allows: past it, a name couldn't be served. */
+const MAX_IMAGE_NUMBER = 999;
+
+/** One past the highest image number in a day's folder, or 1 in a new one. */
+async function nextImageNumber(folder: string) {
+  let highest = 0;
+  for (const entry of await listFolder(folder)) {
+    const number = Number(PAGE_IMAGE_NAME.exec(entry)?.[1] ?? 0);
+    highest = Math.max(highest, number);
+  }
+  return highest + 1;
 }
 
 /**
@@ -146,8 +172,8 @@ export function createJournal({
     return day === now || (day < now && existing !== null);
   }
 
-  /** Why a day's cover can't change now, or null when it can. */
-  function coverLocked(
+  /** Why a day's cover or images can't change now, or null when they can. */
+  function mediaLocked(
     day: DayKey,
     existing: string | null
   ): JournalError | null {
@@ -218,6 +244,41 @@ export function createJournal({
   }
 
   return {
+    /**
+     * Copies an image into a day's folder as the next `image-NN.<ext>`, untouched,
+     * returning the name the page links to. Names already taken, by Daylily or
+     * anyone, are skipped, never written over. Only a day that can still be
+     * written takes one.
+     */
+    addImage(
+      day: DayKey,
+      bytes: Uint8Array,
+      extension: CoverExtension
+    ): Promise<Result<string, JournalError>> {
+      const path = dayFile(day);
+      return queued(path, () =>
+        guarded(async () => {
+          const locked = mediaLocked(day, await readIfThere(path));
+          if (locked) {
+            return fail(locked);
+          }
+          const folder = inJournal(...dayPath(day).slice(0, 3));
+          for (
+            let number = await nextImageNumber(folder);
+            number <= MAX_IMAGE_NUMBER;
+            number += 1
+          ) {
+            const name = `image-${String(number).padStart(2, "0")}.${extension}`;
+            // biome-ignore lint/performance/noAwaitInLoops: the next name is tried only once this one is taken
+            if (await createFileAtomic(dayAsset(day, name), bytes)) {
+              return ok(name);
+            }
+          }
+          // Every name to image-999 is taken: said as the disk refusing one more
+          return fail({ code: "EEXIST", kind: "io" });
+        })
+      );
+    },
     /** Where a file in a day's folder lives, for showing its cover. */
     dayAsset,
 
@@ -314,7 +375,7 @@ export function createJournal({
       const path = dayFile(day);
       return queued(path, () =>
         guarded(async () => {
-          const locked = coverLocked(day, await readIfThere(path));
+          const locked = mediaLocked(day, await readIfThere(path));
           if (locked) {
             return fail(locked);
           }

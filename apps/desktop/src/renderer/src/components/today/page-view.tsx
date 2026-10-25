@@ -11,10 +11,12 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
   useCallback,
+  useMemo,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { coverLabel } from "../../lib/covers";
+import { writtenImages } from "../../lib/page-images";
 import { useFindOnPage } from "../../lib/search";
 import { pageCoverUrl, type TodayPage } from "../../lib/today-page";
 import { DayCover } from "../day/day-cover";
@@ -35,6 +37,7 @@ export function PageView({
   onWrite,
   onTitle,
   onChooseCover,
+  onProblem,
   find,
   onFound,
   promptSlot,
@@ -46,6 +49,8 @@ export function PageView({
   onWrite: (change: PageChange) => void;
   onTitle: (title: string) => void;
   onChooseCover: () => void;
+  /** Says once, in the status bar, why an image couldn't be added. */
+  onProblem: (message: string) => void;
   /** What search was looking for: the page opens at it, the cursor still at the end. */
   find: string | undefined;
   /** Called once the found words have glowed, to let them go. */
@@ -55,11 +60,16 @@ export function PageView({
 }) {
   const [paste, setPaste] = useState<MarkdownPaste | null>(null);
   const donePasting = useCallback(() => setPaste(null), []);
+  const images = useMemo(
+    () => writtenImages(page.day, onProblem),
+    [page.day, onProblem]
+  );
   const editor = usePageEditor({
     autofocus: true,
     content: page.markdown,
     editable: !sealed,
     ghostPrompts: { enabled: ghostPrompts, prompts: NUDGES },
+    images,
     onChange: onWrite,
     onMarkdownPaste: setPaste,
     placeholder: "How was your day?",

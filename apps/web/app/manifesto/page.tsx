@@ -82,7 +82,7 @@ function Lede() {
 
 function Beliefs() {
   return (
-    <section className="border-line border-t px-5 pt-24 pb-30 md:px-30">
+    <section className="px-5 pt-24 pb-30 md:px-30 md:pt-30">
       <div className="mx-auto flex max-w-300 flex-col gap-14">
         <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div className="flex flex-col gap-3.5">
@@ -116,6 +116,42 @@ function Beliefs() {
           ))}
         </ol>
       </div>
+    </section>
+  );
+}
+
+/**
+ * At full width the words sit in the painting's dark third. Narrower, that side
+ * is too small, so the words come first and the painting follows as a card, as in
+ * "Why Daylily".
+ */
+function SeenByYou() {
+  return (
+    <section className="px-4 md:px-16">
+      <Reveal className="wide:relative mx-auto flex wide:aspect-[1312/738] max-w-328 flex-col gap-7 wide:overflow-clip wide:rounded-card-lg">
+        <div className="wide:absolute relative wide:inset-0 aspect-square wide:aspect-auto overflow-clip rounded-3xl wide:rounded-none sm:aspect-[3/2] md:rounded-card-lg">
+          <Image
+            alt="An eye half in shadow, a daylily where the iris would be"
+            className="object-cover object-[64%_50%] wide:object-center"
+            fill
+            sizes="(max-width: 1312px) 100vw, 1312px"
+            src="/images/art/eye.jpg"
+          />
+        </div>
+        <div className="relative -order-1 wide:order-none flex max-w-117.5 flex-col gap-4 wide:gap-5 px-2 wide:pt-21 wide:pr-0 wide:pl-20">
+          <p className="font-medium text-daylily-deep text-ui wide:text-saffron">
+            Your privacy
+          </p>
+          <h2 className="font-display text-5xl text-ink wide:text-display-lg wide:text-on-ink leading-heading-loose tracking-heading">
+            For your eyes only.
+          </h2>
+          <p className="font-writing text-ink-2 text-lead wide:text-on-ink-2 wide:text-xl leading-7.75 wide:leading-8.25">
+            Your days live on your computer, as plain files in a folder you
+            choose. No account, no server reading along, and no AI unless you
+            turn it on, feature by feature.
+          </p>
+        </div>
+      </Reveal>
     </section>
   );
 }
@@ -190,6 +226,7 @@ export default function ManifestoPage() {
         <HeaderSpacer />
         <Masthead />
         <Lede />
+        <SeenByYou />
         <Beliefs />
         <Never />
         <WhyDaylily />

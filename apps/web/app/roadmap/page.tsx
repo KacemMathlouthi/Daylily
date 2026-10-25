@@ -22,7 +22,7 @@ interface Item {
 
 /**
  * The sheet, cell by cell, two to a row on wide screens. Everything here is
- * past v1 (ROADMAP.md, "Later"); what's in v1 lands in the changelog instead.
+ * past v1 (the maintainer's local ROADMAP.md, "Later"); what's in v1 lands in the changelog instead.
  */
 type Cell =
   | { kind: "section"; name: string; title: ReactNode }
@@ -45,6 +45,16 @@ const CELLS: Cell[] = [
     body: "Pin the song that was playing, from Spotify, Apple Music or YouTube. It plays right on the page.",
     kind: "item",
     title: "A song for the day",
+  },
+  {
+    body: "Videos and files beside your words, kept in the day’s folder. A pasted link becomes a small card with its title and picture.",
+    kind: "item",
+    title: "Video, files and links",
+  },
+  {
+    body: "Diagrams, math, callouts and footnotes, drawn on the page and kept as plain text any editor can read.",
+    kind: "item",
+    title: "Diagrams and more",
   },
   {
     body: "Your accent colour, your writing font and size, the width of the page. Turn off anything you don’t need.",

@@ -144,6 +144,8 @@ v1 is the **human core**: write today, seal it, see your days grow. No AI, no sy
 | Local full-text search | Encryption at rest (rely on OS disk encryption) |
 | Evening reminder | Multiple journals |
 | Onboarding, settings, light and dark themes | Codexes, mobile, embedded terminal |
+| | Video, voice notes, files and link previews on the page |
+| | Diagrams (Mermaid), math and other markdown extras |
 
 ### 3.2 Files on disk
 
@@ -222,7 +224,7 @@ keychain and **never** into the journal folder.
 | **Launch** | A small frameless splash window (300 × 390) the instant the app starts: the six-petal bloom over the dusk meadow, "Opening your journal…", a progress bar that follows real loading, and a quote. The main window loads hidden behind it; the splash stays at least ~1.4s for the bloom, then fades as the app appears on Home. Paper: 01c. |
 | **Onboarding** | Three steps: *welcome*, *your folder* (choose or create the journal folder, defaulting to `~/Daylily`), *a little help* (reminder time, defaulting to 21:00; the AI options in the design are deferred). |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
-| **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. |
+| **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. Images pasted or dropped onto the page (Paper: 14a, 14b). |
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
 | **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three stats and the meadow (Paper: 06c). |
@@ -235,6 +237,13 @@ keychain and **never** into the journal folder.
   (temp file, fsync, rename). **Losing a user's words is the worst bug this app can have.**
 - **Nudges:** after ~6s of no typing on a non-empty page, a curated question fades in at the cursor in a faint
   colour. Any keystroke dismisses it. Never insertable, never repeated twice in a row, at most one per pause.
+- **Images on the page:** paste one, or drop one between paragraphs (a daylily line shows where). The file is
+  copied untouched into the day's folder as the next free `image-NN.<ext>` (never written over), and the page links
+  it as plain markdown, `![](image-01.jpg)`. What it is comes from its bytes: JPEG, PNG, GIF, WebP and AVIF are
+  taken; HEIC and anything else, or over 30 MB, is refused with a line in the status bar. It fills the column, or
+  stays its own size when smaller. Text copied with a picture of it (as Office apps do) pastes as text. Removing an
+  image from the page leaves its file. Images are inline in the markdown, so one written inside a line in another
+  editor keeps its place; one whose file is gone, or any web address, shows as a quiet card and is never loaded.
 - **Cover:** pick from the bundled gallery (copied into the day folder) or an image from disk. If none is chosen
   by seal, a random gallery cover is assigned. Days before seal show a soft "add a cover" state.
 - **Flowers:** size comes from `words` in buckets; petal colour is one of the four flower colours. A gallery cover
@@ -536,8 +545,8 @@ drift, sync Paper back to what was agreed.
 | Page | Contents |
 |---|---|
 | v1 | First landing page draft (superseded) |
-| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match |
+| v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
@@ -555,6 +564,9 @@ Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases an
 hand-printed art (`brand-art*.png`), the landing art and the sheets it was cut from, the covers and spot
 illustrations, the icon masters, and the GitHub social preview. When the app or the site needs one of them, a
 web-sized copy goes into the folders above. It was in the repository until 2026-10-25, so older commits still hold it.
+
+**`ROADMAP.md` and `.vscode/` are local too** (since 2026-10-25): the working plan and editor settings stay on
+the maintainer's machine. The public plan is the website's `/roadmap`.
 
 `*.mcpb` bundles and `.playwright-mcp/` are ignored.
 
@@ -597,11 +609,12 @@ web-sized copy goes into the folders above. It was in the repository until 2026-
 | 2026-10-25 | An image audit, then a repainted gallery: the twelve covers painted again at 1536 × 1024 with their subject in the middle band, eight new ones (sea, mountains, forest, garden, the moon, stars, a telescope, a rocket launch), the same pictures on the landing page and in the sample journal, and a real screenshot in the README |
 | 2026-10-25 | The website on phones: a full-screen menu for the header's links, the calendar one week at a time, download cards that fit; the large paintings upscaled 2× (Topaz) with a cleaner cutout behind the footer's wordmark; designed in Paper first |
 | 2026-10-25 | Search: every page from ⌘K, an Orama index in memory built from the files, results as you type with the chosen day previewed, opened at the words with a fading glow; designed in Paper first (13a to 13c) |
+| 2026-10-25 | Images on the page: pasted or dropped, copied untouched into the day's folder as `image-NN`, plain markdown; images written in other editors no longer dropped on save; the editor's markdown tested (`packages/ui`). The website: a centred statement on the landing, "For your eyes only." on the Manifesto with a new painting; video, files, link previews and diagrams moved past v1. Designed in Paper first |
 
 ### Next
-The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: images on the page, onboarding, then a talk about
-thoughts and notes.
+The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
+maintainer's machine (not in git; the website's `/roadmap` is the public version).
+Keep it current as items ship or move. The next few: onboarding, then a talk about thoughts and notes.
 
 ---
 

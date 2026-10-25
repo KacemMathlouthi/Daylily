@@ -1,6 +1,8 @@
 import { PageContent } from "@daylily/ui/components/page-content";
 import { usePageEditor } from "@daylily/ui/editor/use-page-editor";
+import { useMemo } from "react";
 import type { PastDay } from "../../lib/days";
+import { shownImages } from "../../lib/page-images";
 import { useFindOnPage } from "../../lib/search";
 import { Marked } from "../search/marked";
 import { DayCover } from "./day-cover";
@@ -23,7 +25,12 @@ export function SealedPage({
   onFound: () => void;
   page: Extract<PastDay, { kind: "written" }>;
 }) {
-  const editor = usePageEditor({ content: page.markdown, editable: false });
+  const images = useMemo(() => shownImages(day), [day]);
+  const editor = usePageEditor({
+    content: page.markdown,
+    editable: false,
+    images,
+  });
   useFindOnPage(editor, find, { onDone: onFound });
 
   return (

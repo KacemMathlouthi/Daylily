@@ -39,3 +39,7 @@ coverage
 # brand sources and working art: kept on the maintainer's machine, not in the repo.
 # Anything the app or the site uses is copied next to it (apps/*/public, apps/desktop/resources, .github/readme)
 brand/
+
+# the maintainer's working plan and editor settings; the public roadmap is the website's /roadmap
+ROADMAP.md
+.vscode/

@@ -4,6 +4,7 @@ import type { Result } from "@daylily/core/result";
 import type {
   CoverExtension,
   DeviceState,
+  ImageError,
   JournalConfig,
   JournalError,
   JournalInfo,
@@ -25,6 +26,7 @@ export const CHANNELS = {
   appReady: "app:ready",
   deviceGet: "device:get",
   deviceSet: "device:set",
+  journalAddImage: "journal:add-image",
   journalChange: "journal:change",
   journalChanged: "journal:changed",
   journalFlowerColor: "journal:flower-color",
@@ -139,6 +141,15 @@ export interface DaylilyApi {
    * one, and writes only today, or a day that ended and hasn't sealed yet.
    */
   journal: {
+    /**
+     * Copies a pasted or dropped image into today's folder, untouched, as the
+     * next `image-NN.<ext>`; the name it returns goes in the page. What the file
+     * is comes from its bytes, not its name.
+     */
+    addImage: (
+      day: string,
+      image: Uint8Array
+    ) => Promise<Result<string, ImageError>>;
     /** Keeps the flower colour sampled from a day's cover, stamped with the cover file it came from. */
     flowerColor: (
       day: string,

@@ -1,16 +1,22 @@
 import { mkdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { extname, resolve, sep } from "node:path";
+import { fail, type Result } from "@daylily/core/result";
 import { app, BrowserWindow, dialog, shell } from "electron";
 import { CHANNELS } from "../../shared/channels";
-import { COVER_EXTENSIONS, type CoverExtension } from "../../shared/journal";
+import {
+  COVER_EXTENSIONS,
+  type CoverExtension,
+  type ImageError,
+  MAX_IMAGE_BYTES,
+} from "../../shared/journal";
 import {
   configChangesSchema,
   coverExtensionSchema,
-  coverImageSchema,
   coverStampSchema,
   daySchema,
   flowerColorSchema,
+  imageBytesSchema,
   pageSchema,
   searchQuerySchema,
 } from "../../shared/schemas";
@@ -18,15 +24,13 @@ import { flushAllPages } from "../flush";
 import { handle } from "../ipc";
 import type { DeviceSettingsStore } from "../settings";
 import { readConfig, writeConfig } from "./config";
+import { imageKind } from "./image-kind";
 import { journalSearch } from "./search";
 import type { Journal } from "./store";
 import { watchJournal } from "./watch";
 
 /** Long enough for the app to have opened; the search index is built after it. */
 const WARM_SEARCH_AFTER_MS = 3000;
-
-/** Larger than any photo a phone takes; it keeps a stray video or scan out of memory. */
-const MAX_COVER_BYTES = 30 * 1024 * 1024;
 
 /** `/home/kacem/Daylily` as `~/Daylily`, the way people say where their files are. */
 function tildeHome(path: string) {
@@ -188,10 +192,26 @@ export function registerJournalIpc({
   handle(CHANNELS.journalSaveCover, (_event, day, image, extension, color) =>
     journal.saveCover(
       daySchema.parse(day),
-      coverImageSchema.parse(image),
+      imageBytesSchema.parse(image),
       coverExtensionSchema.parse(extension),
       flowerColorSchema.optional().parse(color)
     )
+  );
+
+  handle<Result<string, ImageError>>(
+    CHANNELS.journalAddImage,
+    (_event, day, image) => {
+      // An empty file is no image either, rather than a broken request
+      if (image instanceof Uint8Array && image.byteLength === 0) {
+        return fail({ heic: false, kind: "not-an-image" });
+      }
+      const bytes = imageBytesSchema.parse(image);
+      const found = imageKind(bytes);
+      if (found.kind !== "image") {
+        return fail({ heic: found.kind === "heic", kind: "not-an-image" });
+      }
+      return journal.addImage(daySchema.parse(day), bytes, found.extension);
+    }
   );
 
   handle(CHANNELS.journalPickCover, async (event, rawDay) => {
@@ -210,7 +230,7 @@ export function registerJournalIpc({
     if (canceled || !path || !extension) {
       return null;
     }
-    if ((await stat(path)).size > MAX_COVER_BYTES) {
+    if ((await stat(path)).size > MAX_IMAGE_BYTES) {
       return { error: { code: "EFBIG", kind: "io" }, ok: false } as const;
     }
     return journal.saveCover(day, await readFile(path), extension);

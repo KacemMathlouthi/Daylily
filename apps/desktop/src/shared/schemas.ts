@@ -8,6 +8,7 @@ import {
 import {
   COVER_EXTENSIONS,
   COVER_NAME,
+  MAX_IMAGE_BYTES,
   MAX_QUERY_LENGTH,
   REMINDER_TIME,
 } from "./journal";
@@ -59,13 +60,10 @@ export const pageSchema = z.object({
   title: z.string().max(1000),
 });
 
-/** Larger than any photo a phone takes. */
-const MAX_COVER_BYTES = 30 * 1024 * 1024;
-
-export const coverImageSchema = z
+export const imageBytesSchema = z
   .instanceof(Uint8Array)
   .refine((bytes) => bytes.byteLength > 0, "Empty image")
-  .refine((bytes) => bytes.byteLength <= MAX_COVER_BYTES, "Image too large");
+  .refine((bytes) => bytes.byteLength <= MAX_IMAGE_BYTES, "Image too large");
 
 export const coverExtensionSchema = z.enum(COVER_EXTENSIONS);
 

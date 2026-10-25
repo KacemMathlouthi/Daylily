@@ -1,5 +1,10 @@
 @import "@daylily/ui/globals.css";
 
+/* The width at which the Paper landing's 1312px panels reach their full size. */
+@theme {
+  --breakpoint-wide: 90rem;
+}
+
 /*
  * The website's painted backgrounds. Each is art direction taken from the Paper
  * landing; they live here, named, instead of inside components.

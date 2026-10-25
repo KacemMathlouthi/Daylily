@@ -25,6 +25,35 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    art: "/images/covers/bike.jpg",
+    changes: [
+      {
+        body: "Paste a picture, or drag one onto today’s page. A line shows where it will land, between your paragraphs.",
+        color: "text-daylily",
+        title: "Paste or drop",
+      },
+      {
+        body: "Each one is copied, untouched, into the day’s folder under the next number, image-01.jpg, image-02.png and on, and the page links to it in plain markdown any editor can read.",
+        color: "text-saffron",
+        title: "Kept beside your words",
+      },
+      {
+        body: "An image whose file is gone, or one from the web, shows as a small card instead. Daylily never loads images from the web.",
+        color: "text-cornflower",
+        title: "Quiet when it can’t show",
+      },
+      {
+        body: "An image added to today’s page in another editor stays put when Daylily saves.",
+        color: "text-petal",
+        title: "Images from elsewhere, kept",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "Today’s page can hold pictures now. They live in the day’s folder beside the page, so the day stays yours and readable anywhere.",
+    title: "Pictures on the page.",
+    version: "0.5.0",
+  },
+  {
     changes: [
       {
         body: "⌘K, or Ctrl K, from anywhere: every page you’ve written, searched by its title and its words, on your computer and nowhere else.",

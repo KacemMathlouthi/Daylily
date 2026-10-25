@@ -12,7 +12,7 @@ slowly and carefully. This page explains how to make a change that fits.
   Ideas and questions are welcome in [Discussions](https://github.com/KacemMathlouthi/Daylily/discussions).
 - **Visual changes are designed first.** Layout, colour, a new screen or state: describe or sketch it in an issue.
   The designs live in Paper, and code follows them closely.
-- **See what's planned** in the [roadmap](ROADMAP.md) before starting something new.
+- **See what's planned** in the [roadmap](https://daylily-silk.vercel.app/roadmap) before starting something new.
 
 ## Setting up
 
