@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 /**
  * Where the website lives: canonical links, sharing cards, the sitemap and the
- * feed all build on it. A temporary address until Daylily's own domain is
- * bought; daylily-silk.vercel.app keeps serving, so links already out still work.
+ * feed all build on it. The addresses it had before (daylily-silk.vercel.app,
+ * daylily.kacem.lol) redirect here, so links already out still work.
  */
-export const SITE_URL = "https://daylily.kacem.lol";
+export const SITE_URL = "https://daylily.ink";
 
 export const SITE_NAME = "Daylily";
 
