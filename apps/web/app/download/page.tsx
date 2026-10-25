@@ -228,8 +228,8 @@ function ReleaseNotes() {
             The human core, first.
           </h2>
           <p className="text-base text-ink-muted leading-6.5">
-            Everything you need to write every day. Search, sync and AI arrive
-            later, and AI stays optional.
+            Everything you need to write every day. Sync and AI arrive later,
+            and AI stays optional.
           </p>
         </Reveal>
         <ul className="flex grow flex-col">

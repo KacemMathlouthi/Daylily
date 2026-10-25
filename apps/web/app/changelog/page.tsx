@@ -217,9 +217,8 @@ function BeingWritten() {
           />
         </p>
         <p className="max-w-130 text-body-sm text-ink-muted leading-6">
-          Updates that install themselves, search across every day, and a
-          welcome for your first run are growing now. They’ll land here when
-          they bloom.
+          Signed installers, and the first ways to bring in an AI that asks but
+          never writes, are growing now. They’ll land here when they bloom.
         </p>
         <div className="flex flex-wrap gap-6">
           <Link
