@@ -24,7 +24,8 @@ export interface UsePageEditorOptions {
   };
   /**
    * Where the page's images load from and, on a page being written, how a pasted
-   * or dropped one is copied in. Read once, when the editor is made.
+   * or dropped one is copied in. The latest callbacks are always used; whether
+   * the page takes images at all (`add` given or not) is fixed when it's made.
    */
   images?: PageImageOptions;
   onChange?: (change: PageChange) => void;

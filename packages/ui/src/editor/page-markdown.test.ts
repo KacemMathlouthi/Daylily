@@ -88,6 +88,11 @@ describe("a page's images", () => {
     );
   });
 
+  it("keeps a title with quotes and backslashes", () => {
+    const page = '![](image-01.jpg "a \\"quoted\\" C:\\\\ path")';
+    expect(reopened(page)).toBe(page);
+  });
+
   it("keeps an image from the web as written", () => {
     expect(reopened("![](https://example.com/a.jpg)")).toBe(
       "![](https://example.com/a.jpg)"
@@ -139,7 +144,7 @@ describe("pasting images", () => {
     );
   });
 
-  it("pastes the words when a picture of them comes along, as Office apps send", () => {
+  it("leaves the words to paste when a picture of them comes along, as Office apps send", () => {
     const { images, added } = journal();
     const page = open("Today.", images);
     expect(paste(page, [photo("image.png")], "Some copied words")).toBeFalsy();

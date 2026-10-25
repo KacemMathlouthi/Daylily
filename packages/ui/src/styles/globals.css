@@ -224,8 +224,10 @@
     @apply relative;
   }
 
-  .page-content .drop-line-before::before,
-  .page-content .drop-line-after::after {
+  .page-content .drop-line-before:not(pre, .tableWrapper)::before,
+  .page-content .drop-line-after:not(pre, .tableWrapper)::after,
+  .page-content
+    :is(pre, .tableWrapper):is(.drop-line-before, .drop-line-after)::after {
     content: "";
     background:
       radial-gradient(
@@ -238,12 +240,24 @@
   }
 
   /* Centred in the 14px gap between blocks */
-  .page-content .drop-line-before::before {
+  .page-content .drop-line-before:not(pre, .tableWrapper)::before {
     @apply -top-2.75;
   }
 
-  .page-content .drop-line-after::after {
+  .page-content .drop-line-after:not(pre, .tableWrapper)::after {
     @apply -bottom-2.75;
+  }
+
+  /*
+   * Code and tables scroll sideways, which clips anything drawn outside them, and
+   * code keeps ::before for its language: the line sits just inside their edge.
+   */
+  .page-content :is(pre, .tableWrapper).drop-line-before::after {
+    @apply top-0;
+  }
+
+  .page-content :is(pre, .tableWrapper).drop-line-after::after {
+    @apply bottom-0;
   }
 
   .page-content :not(pre) > code {

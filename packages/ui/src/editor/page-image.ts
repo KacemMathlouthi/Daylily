@@ -19,7 +19,7 @@ export interface PageImageOptions {
   add?: (file: File) => Promise<string | null>;
   /**
    * Where an image on the page loads from, or null when it can't be shown.
-   * Daylily never loads anything from the web, so web addresses come back null.
+   * Daylily never loads images from the web, so web addresses come back null.
    */
   resolve: (src: string) => string | null;
 }
@@ -27,7 +27,7 @@ export interface PageImageOptions {
 /** A markdown image address that needs `<…>` to survive: spaces, brackets, parentheses. */
 const NEEDS_ANGLES = /[\s()<>]/;
 const ALT_SPECIAL = /[\\[\]]/g;
-const TITLE_QUOTE = /"/g;
+const TITLE_SPECIAL = /[\\"]/g;
 
 /** An image as markdown, escaped so any address or description reads back the same. */
 export function imageMarkdown({
@@ -42,7 +42,7 @@ export function imageMarkdown({
   const address = src ?? "";
   const target = NEEDS_ANGLES.test(address) ? `<${address}>` : address;
   const text = (alt ?? "").replace(ALT_SPECIAL, "\\$&");
-  const titled = title ? ` "${title.replace(TITLE_QUOTE, '\\"')}"` : "";
+  const titled = title ? ` "${title.replace(TITLE_SPECIAL, "\\$&")}"` : "";
   return `![${text}](${target}${titled})`;
 }
 
@@ -72,8 +72,10 @@ function carriesFiles(data: DataTransfer | null) {
 function boundaryAt(view: EditorView, x: number, y: number) {
   const { doc } = view.state;
   const hit = view.posAtCoords({ left: x, top: y });
-  if (!hit || doc.childCount === 0) {
-    return { after: true, pos: Math.max(0, doc.content.size - 1) };
+  const last = doc.lastChild;
+  if (!(hit && last)) {
+    // Past the page's end: after its last block
+    return { after: true, pos: doc.content.size - (last?.nodeSize ?? 0) };
   }
   const $pos = doc.resolve(Math.min(hit.pos, doc.content.size));
   const index = Math.min($pos.index(0), doc.childCount - 1);
@@ -224,6 +226,9 @@ function dropPlugin(add: (file: File) => Promise<string | null>) {
         return true;
       },
       handlePaste(view, event) {
+        if (!view.editable) {
+          return false;
+        }
         const data = event.clipboardData;
         const files = Array.from(data?.files ?? []);
         // Office apps put a picture of the copied text beside the text: the words win

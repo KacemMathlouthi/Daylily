@@ -3,8 +3,8 @@ import { Globe, ImageOff, type LucideIcon } from "lucide-react";
 import { type ReactNode, useCallback, useState } from "react";
 import { cn } from "../lib/cn";
 
-/** An address with a scheme (`https:`, `file:`…), rather than a file beside the page. */
-const HAS_SCHEME = /^[a-z][a-z\d+.-]*:/i;
+/** An address on the web, rather than a file. */
+const WEB = /^https?:/i;
 
 /** Paper 14b: a quiet card in the image's place, the markdown untouched. */
 function Unshown({
@@ -46,20 +46,30 @@ export function PageImageView({
   const fail = useCallback(() => setBroken(true), []);
 
   let content: ReactNode;
-  if (HAS_SCHEME.test(src) && url === null) {
+  const name = src || "This image";
+  if (WEB.test(src) && url === null) {
     content = (
       <Unshown
         icon={Globe}
-        note="Daylily never loads anything from the internet."
+        note="Daylily never loads images from the web."
         title="An image from the web"
       />
     );
-  } else if (url === null || broken) {
+  } else if (url === null) {
+    // Written by hand elsewhere: a path on disk, or a file Daylily didn't add
     content = (
       <Unshown
         icon={ImageOff}
-        note="Its place on the page is kept, in case it comes back."
-        title={`${src || "This image"} isn’t in this day’s folder`}
+        note="Daylily shows the images it keeps in the day’s folder."
+        title={`${name} can’t be shown`}
+      />
+    );
+  } else if (broken) {
+    content = (
+      <Unshown
+        icon={ImageOff}
+        note="It’s gone from the day’s folder, or can’t be read. Its place on the page is kept."
+        title={`${name} can’t be shown`}
       />
     );
   } else {

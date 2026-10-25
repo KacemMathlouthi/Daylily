@@ -213,10 +213,6 @@ function LinkField({
 }
 
 /**
- * The small ink bar over a selection (Paper: "03d"): marks, headings, lists,
- * checklists, code and links. Markdown shortcuts do the same from the keyboard.
- */
-/**
  * Shown over selected words, as Tiptap's own does, and never over a selected
  * image: there's nothing in it to format.
  */
@@ -241,6 +237,10 @@ function hasWordsSelected({
   );
 }
 
+/**
+ * The small ink bar over a selection (Paper: "03d"): marks, headings, lists,
+ * checklists, code and links. Markdown shortcuts do the same from the keyboard.
+ */
 export function FormatToolbar({ editor }: { editor: Editor }) {
   const [linking, setLinking] = useState(false);
   const active = useEditorState({
