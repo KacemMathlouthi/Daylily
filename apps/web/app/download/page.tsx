@@ -160,7 +160,7 @@ function PlatformCard({
 }) {
   const checksums = findAsset(release, FILES.checksums);
   return (
-    <div className="flex w-full flex-col gap-6 rounded-3xl border border-line bg-paper-page p-8 shadow-tile">
+    <div className="flex w-full min-w-0 flex-col gap-6 rounded-3xl border border-line bg-paper-page p-6 shadow-tile md:p-8">
       <div className="flex items-center gap-4">
         <Image
           alt=""
@@ -188,13 +188,14 @@ function PlatformCard({
                 <span className="font-medium text-body-sm text-ink">
                   {file.kind}
                 </span>
-                <span className="truncate font-mono text-ink-subtle text-xs">
+                <span className="wrap-anywhere font-mono text-ink-subtle text-xs">
                   {asset
                     ? `${asset.name} · ${megabytes(asset.size)}`
                     : "On GitHub Releases"}
                 </span>
               </div>
               <ButtonLink
+                className="shrink-0"
                 href={asset?.url ?? RELEASES_URL}
                 size="pill-sm"
                 variant="paper"
@@ -222,13 +223,13 @@ function ReleaseNotes() {
     <section className="border-line border-t px-5 pt-24 pb-30 md:px-30">
       <div className="mx-auto flex max-w-300 flex-col gap-12 lg:flex-row lg:gap-30">
         <Reveal className="flex flex-col gap-3.5 lg:w-105 lg:shrink-0">
-          <p className="font-medium text-daylily text-ui">What’s in 0.1</p>
+          <p className="font-medium text-daylily text-ui">What’s in it</p>
           <h2 className="font-display text-display-sm text-ink leading-heading-loose tracking-heading md:text-display">
             The human core, first.
           </h2>
           <p className="text-base text-ink-muted leading-6.5">
-            Version 0.1 is everything you need to write every day. Search, sync
-            and AI arrive later, and AI stays optional.
+            Everything you need to write every day. Search, sync and AI arrive
+            later, and AI stays optional.
           </p>
         </Reveal>
         <ul className="flex grow flex-col">
@@ -289,11 +290,15 @@ export default async function DownloadPage() {
         <HeaderSpacer />
         <DownloadHero release={release} />
         <div
-          className="mx-auto grid max-w-328 scroll-mt-28 gap-5 px-4 pb-30 md:grid-cols-3 md:px-0"
+          className="mx-auto grid max-w-328 scroll-mt-28 gap-5 px-4 pb-30 md:px-8 lg:grid-cols-3 xl:px-0"
           id="platforms"
         >
           {PLATFORMS.map((platform, index) => (
-            <Reveal className="flex" delay={index * 0.08} key={platform.name}>
+            <Reveal
+              className="flex min-w-0"
+              delay={index * 0.08}
+              key={platform.name}
+            >
               <PlatformCard platform={platform} release={release} />
             </Reveal>
           ))}
