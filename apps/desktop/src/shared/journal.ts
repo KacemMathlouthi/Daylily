@@ -86,6 +86,9 @@ export const COVER_NAME = new RegExp(
   `^cover\\.(${COVER_EXTENSIONS.join("|")})$`
 );
 
+/** The longest name Daylily keeps for the person who writes. */
+export const MAX_NAME_LENGTH = 60;
+
 /** A reminder time, `HH:MM` on a 24-hour clock. */
 export const REMINDER_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -94,6 +97,8 @@ export interface JournalConfig {
   /** Whether a day sealed without a cover gets one from the gallery. */
   galleryCovers: boolean;
   ghostPrompts: boolean;
+  /** What Daylily calls the person who writes, or null for the computer's name for them. */
+  name: string | null;
   reminder: {
     enabled: boolean;
     /** Local time, `HH:MM`. */

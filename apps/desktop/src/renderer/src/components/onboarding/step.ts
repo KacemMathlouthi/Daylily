@@ -18,6 +18,8 @@ export interface FolderChoice {
 export interface OnboardingChoices {
   folder: FolderChoice;
   ghostPrompts: boolean;
+  /** What Daylily calls them, as typed; empty goes back to the computer's name. */
+  name: string;
   reminder: JournalConfig["reminder"];
 }
 
@@ -62,7 +64,7 @@ export function chosenFolder(folder: FolderChoice): FolderInfo {
 
 /**
  * Choices for another folder: the help that follows starts from that journal's
- * own preferences, since they live in its folder.
+ * own preferences, since they live in its folder, and so does a name it keeps.
  */
 export function withFolder(folder: FolderChoice): Partial<OnboardingChoices> {
   const { config } = chosenFolder(folder);
@@ -70,5 +72,6 @@ export function withFolder(folder: FolderChoice): Partial<OnboardingChoices> {
     folder,
     ghostPrompts: config.ghostPrompts,
     reminder: config.reminder,
+    ...(config.name ? { name: config.name } : {}),
   };
 }

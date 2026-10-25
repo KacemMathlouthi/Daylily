@@ -2,7 +2,11 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
 import type { JournalConfigChanges } from "../../shared/channels";
-import { type JournalConfig, REMINDER_TIME } from "../../shared/journal";
+import {
+  type JournalConfig,
+  MAX_NAME_LENGTH,
+  REMINDER_TIME,
+} from "../../shared/journal";
 import { writeFileAtomic } from "./atomic-write";
 
 /**
@@ -13,6 +17,7 @@ const configSchema = z.looseObject({
   /** Whether a day sealed without a cover gets one from the gallery. */
   galleryCovers: z.boolean().catch(true),
   ghostPrompts: z.boolean().catch(true),
+  name: z.string().trim().min(1).max(MAX_NAME_LENGTH).nullable().catch(null),
   reminder: z
     .object({
       enabled: z.boolean().catch(true),

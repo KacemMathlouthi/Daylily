@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { useMemo } from "react";
@@ -16,6 +15,7 @@ import {
   useJournalDays,
 } from "../lib/journal";
 import { type DayKey, dayKey, fromKey } from "../lib/month";
+import { usePersonName } from "../lib/person";
 import { useTodayPage } from "../lib/today-page";
 import { useNow } from "../lib/use-now";
 import { useToday } from "../lib/use-today";
@@ -85,10 +85,7 @@ function HomeScreen() {
   const now = useNow();
   const today = useToday();
   const todayPage = useTodayPage(today);
-  const { data: info } = useQuery({
-    queryFn: () => window.daylily.app.info(),
-    queryKey: ["app", "info"],
-  });
+  const name = usePersonName();
   const days = useJournalDays();
   const begins = useJournalBegins(today);
   const { grid, stats, week } = useGlance(today, begins, days);
@@ -120,7 +117,7 @@ function HomeScreen() {
           {DATE.format(fromKey(today))} · {TIME.format(now).toLowerCase()}
         </p>
         <h1 className="font-display text-display text-ink leading-15 tracking-heading">
-          {greetingFor(now, info?.userName)}
+          {greetingFor(now, name)}
         </h1>
       </header>
 

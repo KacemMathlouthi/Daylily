@@ -1,5 +1,4 @@
 import { Button } from "@daylily/ui/primitives/button";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Share } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -12,6 +11,7 @@ import { Page } from "../components/page";
 import { dateFormat } from "../lib/format";
 import { gardenGrid, gardenStats, gardenYears } from "../lib/garden";
 import { useJournalBegins, useJournalDays } from "../lib/journal";
+import { usePersonName } from "../lib/person";
 import { useToday } from "../lib/use-today";
 
 export const Route = createFileRoute("/garden")({
@@ -28,10 +28,7 @@ function GardenScreen() {
   const begins = useJournalBegins(today);
   const years = useMemo(() => gardenYears(days.keys(), today), [days, today]);
   const [year, setYear] = useState(() => Number(today.slice(0, 4)));
-  const { data: info } = useQuery({
-    queryFn: () => window.daylily.app.info(),
-    queryKey: ["app", "info"],
-  });
+  const name = usePersonName();
   const isThisYear = year === Number(today.slice(0, 4));
 
   const { grid, stats } = useMemo(() => {
@@ -52,12 +49,12 @@ function GardenScreen() {
       fullestMonth: stats.fullestMonth,
       grid,
       isThisYear,
-      title: info?.userName ? `${info.userName}’s garden` : "My garden",
+      title: name ? `${name}’s garden` : "My garden",
       words: stats.words,
       year,
     });
     await window.daylily.garden.saveImage(png, `Daylily garden ${year}`);
-  }, [grid, info?.userName, isThisYear, stats, today, year]);
+  }, [grid, isThisYear, name, stats, today, year]);
 
   const tiles = [
     {

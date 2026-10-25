@@ -9,6 +9,7 @@ import {
   COVER_EXTENSIONS,
   COVER_NAME,
   MAX_IMAGE_BYTES,
+  MAX_NAME_LENGTH,
   MAX_QUERY_LENGTH,
   REMINDER_TIME,
 } from "./journal";
@@ -70,6 +71,14 @@ export const coverExtensionSchema = z.enum(COVER_EXTENSIONS);
 export const configChangesSchema = z.strictObject({
   galleryCovers: z.boolean().optional(),
   ghostPrompts: z.boolean().optional(),
+  // An empty name goes back to the computer's
+  name: z
+    .string()
+    .trim()
+    .max(MAX_NAME_LENGTH)
+    .transform((name) => name || null)
+    .nullable()
+    .optional(),
   reminder: z
     .strictObject({
       enabled: z.boolean().optional(),

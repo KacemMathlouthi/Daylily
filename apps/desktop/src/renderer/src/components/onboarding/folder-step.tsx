@@ -1,8 +1,15 @@
 import { cn } from "@daylily/ui/lib/cn";
+import { Input } from "@daylily/ui/primitives/input";
 import { Folder, FolderPlus } from "lucide-react";
-import { type MouseEvent, type ReactNode, useCallback } from "react";
+import {
+  type ChangeEvent,
+  type MouseEvent,
+  type ReactNode,
+  useCallback,
+  useId,
+} from "react";
 import rocket from "../../../../../resources/covers/rocket.jpg";
-import type { FolderInfo } from "../../../../shared/journal";
+import { type FolderInfo, MAX_NAME_LENGTH } from "../../../../shared/journal";
 import {
   chosenFolder,
   type FolderChoice,
@@ -100,8 +107,42 @@ function FolderCard({
   );
 }
 
-/** Paper 10e and its states (10g): a new journal, the one already kept, or a folder opened. */
-function YourFolder({ choices, change }: StepProps) {
+/** What Daylily should call them (Paper 10e), their computer's name to begin with. */
+function NameField({ choices, change }: StepProps) {
+  const id = useId();
+  const type = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) =>
+      change({ name: event.target.value }),
+    [change]
+  );
+  return (
+    <div className="flex flex-col gap-2">
+      <label
+        className="font-medium text-ink-soft text-ui leading-4"
+        htmlFor={id}
+      >
+        What should Daylily call you?
+      </label>
+      <Input
+        autoComplete="given-name"
+        className="h-11 rounded-xl border-line-strong bg-paper-page px-3.5 text-body-sm text-ink md:text-body-sm"
+        id={id}
+        maxLength={MAX_NAME_LENGTH}
+        onChange={type}
+        placeholder="Your name"
+        spellCheck={false}
+        value={choices.name}
+      />
+      <p className="text-caption text-ink-subtle leading-4">
+        It greets you on Home and signs your garden. Your computer’s name to
+        begin with.
+      </p>
+    </div>
+  );
+}
+
+/** Paper 10e and its states (10g): a name, then a new journal, the one already kept, or a folder opened. */
+function MakeItYours({ choices, change }: StepProps) {
   const { folder } = choices;
   const { suggested, opened } = folder;
   const choose = useCallback(
@@ -138,14 +179,18 @@ function YourFolder({ choices, change }: StepProps) {
     <>
       <div className="flex flex-col gap-2.5">
         <h1 className="font-display text-display-md text-ink leading-13 tracking-heading-sm">
-          Where should your journal live?
+          Make it yours.
         </h1>
         <p className="text-body-sm text-ink-muted leading-6">
-          Every day is saved as a plain markdown file in a folder you own. Sync
-          it however you like, or not at all.
+          Your name, and the folder where every day is kept as a plain markdown
+          file you own. Sync it however you like, or not at all.
         </p>
       </div>
+      <NameField change={change} choices={choices} />
       <div className="flex flex-col gap-2.5">
+        <p className="font-medium text-ink-soft text-ui leading-4">
+          Where should your journal live?
+        </p>
         <FolderCard
           chosen={folder.use === "suggested"}
           detail={where(suggested, "")}
@@ -199,10 +244,15 @@ export const folderStep: OnboardingStep = {
     line: "“Hemerocallis” is Greek for beauty for a day.",
     note: "Each daylily blooms for one day. So does each page.",
   },
-  Form: YourFolder,
+  Form: MakeItYours,
   id: "folder",
   next: "Continue",
   ready: (choices) => chosenFolder(choices.folder).writable,
-  save: (choices) =>
-    window.daylily.journal.use(chosenFolder(choices.folder).path),
+  // The name is kept with the journal, so it's saved once the journal has moved
+  save: async (choices) => {
+    await window.daylily.journal.use(chosenFolder(choices.folder).path);
+    await window.daylily.journal.setConfig({
+      name: choices.name.trim() || null,
+    });
+  },
 };
