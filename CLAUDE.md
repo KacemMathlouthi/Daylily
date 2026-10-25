@@ -222,7 +222,7 @@ keychain and **never** into the journal folder.
 |---|---|
 | **Window** | macOS keeps its traffic lights. On Windows and Linux the window has no frame: Daylily draws a slim 36px title strip with the mark, File / Edit / View / Help menus, the window's title and its own controls (Paper: 12b). |
 | **Launch** | A small frameless splash window (300 × 390) the instant the app starts: the six-petal bloom over the dusk meadow, "Opening your journal…", a progress bar that follows real loading, and a quote. The main window loads hidden behind it; the splash stays at least ~1.4s for the bloom, then fades as the app appears on Home. Paper: 01c. |
-| **Onboarding** | Three steps: *welcome*, *your folder* (choose or create the journal folder, defaulting to `~/Daylily`), *a little help* (reminder time, defaulting to 21:00; the AI options in the design are deferred). |
+| **Onboarding** | Three steps (Paper 10d to 10g): *welcome* (the three rules), *your folder* (keep the journal in use, create one at `~/Daylily`, or open a folder you already have), *a little help* (ghost prompts and the evening reminder with its time). Shown once on every computer, people who wrote before it existed too, and again from Help › Welcome to Daylily (Escape leaves it then). Choices are saved together at the end, then today's page opens. |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
 | **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. Images pasted or dropped onto the page (Paper: 14a, 14b). |
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
@@ -270,6 +270,12 @@ keychain and **never** into the journal folder.
   with "Restart now" (every page is saved first). macOS (until it's signed) and the Debian package can't replace
   themselves, so they say a new version is out and link to its download. A quiet card above Settings says so;
   "Not now" puts it away until the next version. Settings › About shows the state and a "Check now".
+- **Onboarding is a list of steps** (`components/onboarding/steps.ts`): each has its painting and card, its form,
+  whether it can go on, and how it saves. They share one set of choices, saved in step order at the end (the folder
+  is moved to before the help is saved into it), so leaving halfway changes nothing. A new step, such as AI, adds
+  its fields to `OnboardingChoices` and its entry to the list. The page may move the journal only to a folder the
+  main process offered it (the one in use, or one picked in the dialog); opening one never moves, copies or deletes
+  a file. A folder Daylily can't write in holds the step until another is chosen.
 - **Sidebar's journal:** the top of the sidebar names the journal and its folder (`~/Daylily`) and opens Settings ›
   Journal; there's one journal, so nothing to pick.
 - **A journal's first day:** days before the earliest page (or today, in an empty journal) weren't rested, they came
@@ -546,7 +552,7 @@ drift, sync Paper back to what was agreed.
 |---|---|
 | v1 | First landing page draft (superseded) |
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–g Onboarding for v1 (welcome over the eye, your folder over the rocket, a little help, the folder's states) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
@@ -610,11 +616,12 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-25 | The website on phones: a full-screen menu for the header's links, the calendar one week at a time, download cards that fit; the large paintings upscaled 2× (Topaz) with a cleaner cutout behind the footer's wordmark; designed in Paper first |
 | 2026-10-25 | Search: every page from ⌘K, an Orama index in memory built from the files, results as you type with the chosen day previewed, opened at the words with a fading glow; designed in Paper first (13a to 13c) |
 | 2026-10-25 | Images on the page: pasted or dropped, copied untouched into the day's folder as `image-NN`, plain markdown; images written in other editors no longer dropped on save; the editor's markdown tested (`packages/ui`). The website: a centred statement on the landing, "For your eyes only." on the Manifesto with a new painting; video, files, link previews and diagrams moved past v1. Designed in Paper first |
+| 2026-10-25 | Onboarding: welcome, your folder, a little help, as a list of steps that grows (AI later); once on every computer and from Help › Welcome to Daylily; designed in Paper first (10d to 10g). A page ending with an image opened again (0.5.1) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
 maintainer's machine (not in git; the website's `/roadmap` is the public version).
-Keep it current as items ship or move. The next few: onboarding, then a talk about thoughts and notes.
+Keep it current as items ship or move. The next few: a talk about thoughts and notes, then end-to-end tests.
 
 ---
 
