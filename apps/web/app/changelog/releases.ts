@@ -25,6 +25,19 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    changes: [
+      {
+        body: "The meadow behind “Save as image” is painted at twice the size, so the card stays crisp wherever you share it.",
+        color: "text-saffron",
+        title: "A sharper share card",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "A small one: the garden’s share card gets a sharper meadow.",
+    title: "A clearer meadow.",
+    version: "0.3.1",
+  },
+  {
     art: "/images/covers/stars.jpg",
     changes: [
       {
