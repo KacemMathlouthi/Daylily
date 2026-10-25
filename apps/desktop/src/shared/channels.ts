@@ -78,7 +78,8 @@ export type UpdateState =
       download: UpdateDownload;
       version: string;
     }
-  | { status: "error" };
+  /** `offline` when the computer had no connection, the one cause worth naming. */
+  | { offline: boolean; status: "error" };
 
 /** Fields to change; any left out, or undefined, stay as they are. */
 type Changes<T> = { [K in keyof T]?: T[K] | undefined };

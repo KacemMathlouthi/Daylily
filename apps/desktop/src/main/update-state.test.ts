@@ -67,7 +67,9 @@ describe("nextUpdateState", () => {
     };
     expect(nextUpdateState(ready, { type: "checking" }, SELF)).toBe(ready);
     expect(nextUpdateState(ready, { at: "x", type: "none" }, SELF)).toBe(ready);
-    expect(nextUpdateState(ready, { type: "failed" }, SELF)).toBe(ready);
+    expect(
+      nextUpdateState(ready, { offline: false, type: "failed" }, SELF)
+    ).toBe(ready);
     expect(
       nextUpdateState(ready, { type: "found", version: "0.2.0" }, SELF)
     ).toBe(ready);
@@ -81,14 +83,16 @@ describe("nextUpdateState", () => {
       version: "0.2.0",
     };
     expect(nextUpdateState(out, { type: "checking" }, MAC)).toBe(out);
-    expect(nextUpdateState(out, { type: "failed" }, MAC)).toBe(out);
+    expect(nextUpdateState(out, { offline: false, type: "failed" }, MAC)).toBe(
+      out
+    );
   });
 
   it("shows a failed look as an error otherwise", () => {
     const checking: UpdateState = { status: "checking" };
-    expect(nextUpdateState(checking, { type: "failed" }, SELF)).toEqual({
-      status: "error",
-    });
+    expect(
+      nextUpdateState(checking, { offline: true, type: "failed" }, SELF)
+    ).toEqual({ offline: true, status: "error" });
   });
 
   it("remembers that a version's card was put away, until a newer one comes", () => {

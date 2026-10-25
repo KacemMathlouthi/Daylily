@@ -119,7 +119,11 @@ function UpdateRow({
     case "error":
       return (
         <SettingsRow
-          description="Maybe you’re offline. Daylily will try again later."
+          description={
+            state.offline
+              ? "You seem to be offline. Daylily will try again later."
+              : "Daylily will try again later."
+          }
           title="Couldn’t look for updates"
         >
           <QuietButton onClick={checkForUpdate}>Try again</QuietButton>

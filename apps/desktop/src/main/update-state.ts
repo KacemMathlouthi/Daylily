@@ -7,7 +7,7 @@ export type UpdateEvent =
   | { type: "found"; version: string }
   | { type: "progress"; percent: number }
   | { type: "downloaded"; version: string }
-  | { type: "failed" }
+  | { type: "failed"; offline: boolean }
   | { type: "dismissed" };
 
 export interface UpdateContext {
@@ -69,7 +69,9 @@ export function nextUpdateState(
       };
     case "failed":
       // A version already found still stands, whatever a later look says: offline is not gone
-      return isWaiting(state) ? state : { status: "error" };
+      return isWaiting(state)
+        ? state
+        : { offline: event.offline, status: "error" };
     case "dismissed":
       return state.status === "ready" || state.status === "available"
         ? { ...state, dismissed: true }

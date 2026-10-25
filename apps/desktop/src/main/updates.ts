@@ -1,5 +1,5 @@
 import type { Clock } from "@daylily/core/clock";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, net } from "electron";
 import electronUpdater from "electron-updater";
 import {
   CHANNELS,
@@ -111,7 +111,7 @@ export async function keepUpToDate({
   );
   autoUpdater.on("error", (error) => {
     console.error("Could not update Daylily", error);
-    apply({ type: "failed" });
+    apply({ offline: !net.isOnline(), type: "failed" });
   });
 
   setInterval(check, RECHECK_MS).unref();
