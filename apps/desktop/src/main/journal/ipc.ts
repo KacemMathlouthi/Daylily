@@ -201,6 +201,10 @@ export function registerJournalIpc({
   handle<Result<string, ImageError>>(
     CHANNELS.journalAddImage,
     (_event, day, image) => {
+      // An empty file is no image either, rather than a broken request
+      if (image instanceof Uint8Array && image.byteLength === 0) {
+        return fail({ heic: false, kind: "not-an-image" });
+      }
       const bytes = imageBytesSchema.parse(image);
       const found = imageKind(bytes);
       if (found.kind !== "image") {

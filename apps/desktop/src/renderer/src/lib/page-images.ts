@@ -25,8 +25,9 @@ function imageProblem(error: ImageError) {
         ? "That photo is a HEIC file. Daylily can add JPEG, PNG, GIF, WebP and AVIF."
         : "That file isn’t an image Daylily can add: JPEG, PNG, GIF, WebP or AVIF.";
     case "sealed":
-    case "not-writable":
       return "This day is already sealed, so it stays as it was.";
+    case "not-writable":
+      return "This day has ended, so it can’t take an image now.";
     default:
       return "Couldn’t add that image to your journal.";
   }

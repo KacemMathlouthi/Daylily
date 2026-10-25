@@ -28,19 +28,39 @@ describe("imageKind", () => {
       extension: "webp",
       kind: "image",
     });
+    expect(imageKind(bytes("GIF87a"))).toEqual({
+      extension: "gif",
+      kind: "image",
+    });
     expect(imageKind(bytes([0, 0, 0, 28], "ftypavif"))).toEqual({
       extension: "avif",
       kind: "image",
     });
+    expect(imageKind(bytes([0, 0, 0, 16], "ftypavis"))).toEqual({
+      extension: "avif",
+      kind: "image",
+    });
+  });
+
+  it("knows an AVIF that names a general brand first", () => {
+    expect(
+      imageKind(bytes([0, 0, 0, 28], "ftypmif1", [0, 0, 0, 0], "mif1avifmiaf"))
+    ).toEqual({ extension: "avif", kind: "image" });
   });
 
   it("tells an iPhone photo apart, so it can be named", () => {
     expect(imageKind(bytes([0, 0, 0, 24], "ftypheic"))).toEqual({
       kind: "heic",
     });
-    expect(imageKind(bytes([0, 0, 0, 24], "ftypmif1"))).toEqual({
-      kind: "heic",
-    });
+    for (const brand of ["heix", "hevc", "mif1", "msf1"]) {
+      expect(imageKind(bytes([0, 0, 0, 16], `ftyp${brand}`))).toEqual({
+        kind: "heic",
+      });
+    }
+    // Brands past the box's end aren't read
+    expect(
+      imageKind(bytes([0, 0, 0, 16], "ftypheic", [0, 0, 0, 0], "avif"))
+    ).toEqual({ kind: "heic" });
   });
 
   it("refuses anything else, whatever it's called", () => {

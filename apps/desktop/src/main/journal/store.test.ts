@@ -334,6 +334,7 @@ describe("addImage", () => {
       error: { day: "2026-10-19", kind: "not-writable" },
       ok: false,
     });
+    expect(await readdir(root)).toEqual([]);
     const day = key("2026-10-21");
     await journal.writeDay(day, page("Words."));
     now = NEXT_MORNING;
@@ -343,6 +344,9 @@ describe("addImage", () => {
       error: { kind: "sealed" },
       ok: false,
     });
+    expect(await readdir(join(root, "2026", "10", "21"))).toEqual([
+      "2026-10-21.md",
+    ]);
   });
 });
 

@@ -118,9 +118,14 @@ export interface DeviceState {
   theme: "light" | "dark" | "system";
 }
 
+const IMAGE_TYPES = `\\.(?:${COVER_EXTENSIONS.join("|")})$`;
+
+/** An image Daylily added to the page, `image-01.jpg` to `image-999.png`, its number captured. */
+export const PAGE_IMAGE_NAME = new RegExp(`^image-(\\d{2,3})${IMAGE_TYPES}`);
+
 /** The only files the page may load from a day's folder: its cover and its images. */
 export const DAY_ASSET_NAME = new RegExp(
-  `^(?:cover|image-\\d{2,3})\\.(?:${COVER_EXTENSIONS.join("|")})$`
+  `^cover${IMAGE_TYPES}|${PAGE_IMAGE_NAME.source}`
 );
 
 /** The scheme the page loads a day's images through; nothing else in the journal is served. */

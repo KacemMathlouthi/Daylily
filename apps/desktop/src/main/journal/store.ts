@@ -13,12 +13,13 @@ import type { FlowerColor } from "@daylily/core/flower";
 import { fail, ok, type Result } from "@daylily/core/result";
 import { hasEnded, sealDayFile, sealState, sealTime } from "@daylily/core/seal";
 import { countMarkdownWords } from "@daylily/core/words";
-import type {
-  CoverExtension,
-  JournalError,
-  ListedDay,
-  StoredDay,
-  UnreadableDay,
+import {
+  type CoverExtension,
+  type JournalError,
+  type ListedDay,
+  PAGE_IMAGE_NAME,
+  type StoredDay,
+  type UnreadableDay,
 } from "../../shared/journal";
 import { createFileAtomic, writeFileAtomic } from "./atomic-write";
 import { fileStamp, flowerCache } from "./flower-cache";
@@ -76,15 +77,14 @@ async function folderNames(path: string, pattern: RegExp) {
   }
 }
 
-/** `image-01` to `image-999`: the names the page's images take, as served to it. */
-const IMAGE_NUMBER = /^image-(\d{2,3})\./;
+/** The last number `PAGE_IMAGE_NAME` allows: past it, a name couldn't be served. */
 const MAX_IMAGE_NUMBER = 999;
 
 /** One past the highest image number in a day's folder, or 1 in a new one. */
 async function nextImageNumber(folder: string) {
   let highest = 0;
   for (const entry of await listFolder(folder)) {
-    const number = Number(IMAGE_NUMBER.exec(entry)?.[1] ?? 0);
+    const number = Number(PAGE_IMAGE_NAME.exec(entry)?.[1] ?? 0);
     highest = Math.max(highest, number);
   }
   return highest + 1;
@@ -274,6 +274,7 @@ export function createJournal({
               return ok(name);
             }
           }
+          // Every name to image-999 is taken: said as the disk refusing one more
           return fail({ code: "EEXIST", kind: "io" });
         })
       );
