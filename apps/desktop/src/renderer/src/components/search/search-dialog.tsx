@@ -1,4 +1,3 @@
-import { matchRanges, type TextRange } from "@daylily/core/search-text";
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { FLOWER_CLASS } from "@daylily/ui/components/garden";
 import { PageContent } from "@daylily/ui/components/page-content";
@@ -21,7 +20,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import {
   type KeyboardEvent,
-  type ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -29,6 +27,7 @@ import {
 } from "react";
 import {
   journalAssetUrl,
+  MAX_QUERY_LENGTH,
   MAX_SEARCH_HITS,
   type SearchHit,
 } from "../../../../shared/journal";
@@ -36,6 +35,7 @@ import { usePastDay } from "../../lib/days";
 import { dateFormat } from "../../lib/format";
 import { fromKey, todayKey } from "../../lib/month";
 import { revealFirstMatch, useSearchDialog } from "../../lib/search";
+import { Marked } from "./marked";
 
 const HIT_DATE = dateFormat({
   day: "numeric",
@@ -50,29 +50,6 @@ const PREVIEW_DATE = dateFormat({
   year: "numeric",
 });
 const isMac = window.daylily.platform === "darwin";
-
-/** `text` with the ranges in `marks` marked in saffron, as the snippet's matches. */
-function Marked({
-  text,
-  marks,
-}: {
-  text: string;
-  marks: readonly TextRange[];
-}) {
-  const parts: ReactNode[] = [];
-  let at = 0;
-  for (const [start, end] of marks) {
-    parts.push(text.slice(at, start));
-    parts.push(
-      <mark className="search-match" key={start}>
-        {text.slice(start, end)}
-      </mark>
-    );
-    at = end;
-  }
-  parts.push(text.slice(at));
-  return <>{parts}</>;
-}
 
 function HitCover({ hit }: { hit: SearchHit }) {
   return hit.cover ? (
@@ -110,9 +87,9 @@ function Hit({
           {when}
         </span>
         <span className="truncate font-display text-ink text-lede leading-5.5">
-          <Marked marks={matchRanges(title, query)} text={title} />
+          <Marked query={query} text={title} />
         </span>
-        <span className="truncate text-ink-muted text-ui">
+        <span className="line-clamp-2 text-ink-muted text-ui leading-4.5">
           <Marked marks={hit.snippet.marks} text={hit.snippet.text} />
         </span>
       </div>
@@ -263,9 +240,7 @@ export function SearchDialog() {
   const changeOpen = useCallback(
     (next: boolean) => {
       setOpen(next);
-      if (next) {
-        openedDay.current = false;
-      } else {
+      if (!next) {
         setQuery("");
       }
     },
@@ -275,9 +250,18 @@ export function SearchDialog() {
   // Opening a day hands focus to its page, not back to what opened search
   const openedDay = useRef(false);
   const finalFocus = useCallback(() => !openedDay.current, []);
+  useEffect(() => {
+    if (open) {
+      openedDay.current = false;
+    }
+  }, [open]);
 
   const openDay = useCallback(
     (day: string) => {
+      // Results for an earlier query are still on screen for a moment; wait for the new ones
+      if (isPlaceholderData) {
+        return;
+      }
       openedDay.current = true;
       changeOpen(false);
       const find = query.trim();
@@ -287,7 +271,7 @@ export function SearchDialog() {
         navigate({ params: { key: day }, search: { find }, to: "/day/$key" });
       }
     },
-    [changeOpen, navigate, query, today]
+    [changeOpen, isPlaceholderData, navigate, query, today]
   );
 
   const togglePreview = useCallback((event: KeyboardEvent) => {
@@ -325,6 +309,7 @@ export function SearchDialog() {
             />
             <CommandBareInput
               className="bg-transparent text-ink text-lg caret-daylily placeholder:text-ink-ghost"
+              maxLength={MAX_QUERY_LENGTH}
               onValueChange={setQuery}
               placeholder="Search your days"
               value={query}

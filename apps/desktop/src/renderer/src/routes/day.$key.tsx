@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { DayArrows } from "../components/day/day-arrows";
 import { DayHeader } from "../components/day/day-header";
@@ -41,6 +41,12 @@ export const Route = createFileRoute("/day/$key")({
 function SealedDayScreen() {
   const { key } = Route.useParams();
   const { find } = Route.useSearch();
+  const navigate = useNavigate();
+  const forgetFind = useCallback(
+    () =>
+      navigate({ params: { key }, replace: true, search: {}, to: "/day/$key" }),
+    [key, navigate]
+  );
   const today = useToday();
   const day = usePastDay(key);
   const { previous, next } = useNeighbours(key, today);
@@ -94,6 +100,7 @@ function SealedDayScreen() {
               day={key}
               find={find}
               key={`${key}:${day.revision}`}
+              onFound={forgetFind}
               page={day}
             />
           ) : null}

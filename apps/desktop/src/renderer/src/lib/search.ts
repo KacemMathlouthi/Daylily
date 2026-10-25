@@ -1,5 +1,5 @@
 import type { usePageEditor } from "@daylily/ui/editor/use-page-editor";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createStore } from "./store";
 
 type Editor = ReturnType<typeof usePageEditor>;
@@ -55,34 +55,40 @@ export function revealFirstMatch(root: HTMLElement, smooth = true) {
 
 /**
  * Opens a page at what was searched for (Paper "13c"): scrolled to the first
- * match, which glows and fades. The glow is then cleared, so writing on today's
- * page never replays it.
+ * match, in its title or its page, which glows and fades. Then `onDone`, which
+ * takes `find` away, so the page reopened later (another app changed the file,
+ * the day sealed) doesn't glow again.
  */
 export function useFindOnPage(
   editor: Editor,
   find: string | undefined,
-  { writing = false } = {}
+  { writing = false, onDone }: { writing?: boolean; onDone: () => void }
 ) {
+  // Read when the page opens, not followed: the seal at 4am must not replay it
+  const writingRef = useRef(writing);
+  writingRef.current = writing;
+  const doneRef = useRef(onDone);
+  doneRef.current = onDone;
+
   useEffect(() => {
     if (!find) {
-      editor.commands.setSearchHighlight("");
       return;
     }
     editor.commands.setSearchHighlight(find, "glow");
-    if (writing) {
+    if (writingRef.current) {
       // The cursor goes back to the end, ready to write; the page scrolls to the match instead
       editor.commands.focus("end", { scrollIntoView: false });
     }
-    const frame = requestAnimationFrame(() =>
-      revealFirstMatch(editor.view.dom)
-    );
-    const timer = setTimeout(
-      () => editor.commands.setSearchHighlight(""),
-      GLOW_MS
-    );
+    // The title is outside the editor, so the whole page is searched for the first mark
+    const page = editor.view.dom.closest("article") ?? editor.view.dom;
+    const frame = requestAnimationFrame(() => revealFirstMatch(page));
+    const timer = setTimeout(() => {
+      editor.commands.setSearchHighlight("");
+      doneRef.current();
+    }, GLOW_MS);
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(timer);
     };
-  }, [editor, find, writing]);
+  }, [editor, find]);
 }
