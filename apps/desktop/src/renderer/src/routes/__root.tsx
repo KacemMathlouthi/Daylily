@@ -50,11 +50,12 @@ function useSidebarOpen() {
  * ⌘K / Ctrl+K opens search, as the sidebar says, and ⌘, / Ctrl+, opens
  * Settings, as the File menu says.
  */
-function useAppShortcuts() {
+function useAppShortcuts(paused: boolean) {
   const navigate = useNavigate();
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey)) {
+      // Onboarding holds the app beneath it until it's done
+      if (paused || !(event.metaKey || event.ctrlKey)) {
         return;
       }
       if (event.key === "n") {
@@ -80,7 +81,7 @@ function useAppShortcuts() {
       stopOpening();
       stopWelcoming();
     };
-  }, [navigate]);
+  }, [navigate, paused]);
 }
 
 function AppShell() {
@@ -88,7 +89,7 @@ function AppShell() {
   useFlowerColors(Route.useRouteContext().queryClient);
   const [focused] = useFocusMode();
   const welcoming = useWelcome().open;
-  useAppShortcuts();
+  useAppShortcuts(welcoming);
 
   return (
     <TooltipProvider>

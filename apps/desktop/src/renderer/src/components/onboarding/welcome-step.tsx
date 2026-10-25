@@ -75,13 +75,13 @@ export const welcomeStep: OnboardingStep = {
   next: "Begin",
   shortcut: {
     label: "I already have a Daylily folder",
-    // Straight to the folder step, with the folder already asked for
+    // Straight to the folder step with the folder chosen; cancelled, it stays here
     run: async ({ choices, change, goTo }) => {
       const opened = await window.daylily.journal.pickFolder();
       if (opened) {
         change(withFolder({ ...choices.folder, opened, use: "opened" }));
+        goTo("folder");
       }
-      goTo("folder");
     },
   },
 };

@@ -6,6 +6,7 @@ export function useComputerName() {
   const { data } = useQuery({
     queryFn: () => window.daylily.app.info(),
     queryKey: ["app", "info"],
+    staleTime: Number.POSITIVE_INFINITY,
   });
   return data?.userName ?? null;
 }

@@ -36,6 +36,8 @@ let mainWindow: BrowserWindow | null = null;
 let keepRunning = false;
 /** Today's page was asked for while no window was there; the next one opens on it. */
 let openTodayWhenReady = false;
+/** Help › Welcome to Daylily was chosen while no window was there; the next one opens on it. */
+let openWelcomeWhenReady = false;
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -101,6 +103,10 @@ async function launch(settings: DeviceSettingsStore) {
     if (openTodayWhenReady) {
       openTodayWhenReady = false;
       window.webContents.send(CHANNELS.appOpenToday);
+    }
+    if (openWelcomeWhenReady) {
+      openWelcomeWhenReady = false;
+      window.webContents.send(CHANNELS.appOpenWelcome);
     }
   });
   fallback = setTimeout(() => {
@@ -199,8 +205,13 @@ app.whenReady().then(async () => {
   app.on("second-instance", () => showWindow(settings));
   if (process.platform === "darwin") {
     setMacMenu(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        showWindow(settings);
+        mainWindow.webContents.send(CHANNELS.appOpenWelcome);
+        return;
+      }
+      openWelcomeWhenReady = true;
       showWindow(settings);
-      mainWindow?.webContents.send(CHANNELS.appOpenWelcome);
     });
   }
 

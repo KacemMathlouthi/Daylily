@@ -616,7 +616,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-25 | The website on phones: a full-screen menu for the header's links, the calendar one week at a time, download cards that fit; the large paintings upscaled 2× (Topaz) with a cleaner cutout behind the footer's wordmark; designed in Paper first |
 | 2026-10-25 | Search: every page from ⌘K, an Orama index in memory built from the files, results as you type with the chosen day previewed, opened at the words with a fading glow; designed in Paper first (13a to 13c) |
 | 2026-10-25 | Images on the page: pasted or dropped, copied untouched into the day's folder as `image-NN`, plain markdown; images written in other editors no longer dropped on save; the editor's markdown tested (`packages/ui`). The website: a centred statement on the landing, "For your eyes only." on the Manifesto with a new painting; video, files, link previews and diagrams moved past v1. Designed in Paper first |
-| 2026-10-25 | Onboarding: welcome, your folder, a little help, as a list of steps that grows (AI later); once on every computer and from Help › Welcome to Daylily; designed in Paper first (10d to 10g). A page ending with an image opened again (0.5.1) |
+| 2026-10-25 | Onboarding: welcome, make it yours (your name and your folder), a little help, then hello, as a list of steps that grows (AI later); once on every computer and from Help › Welcome to Daylily; designed in Paper first (10d to 10h). A page ending with an image opened again (0.5.1) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the

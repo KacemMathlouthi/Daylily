@@ -91,7 +91,7 @@ function ALittleHelp({ choices, change }: StepProps) {
                 value={reminder.time}
               />
               <Switch
-                aria-label="Ask me how my day was"
+                aria-label="Ask me “How was your day?”"
                 checked={reminder.enabled}
                 onCheckedChange={setReminder}
               />

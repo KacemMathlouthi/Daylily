@@ -4,11 +4,12 @@ import type { CSSProperties } from "react";
 import mark from "../assets/mark-textured.png";
 
 /**
- * The 60° wedge from the centre holding the petal at `angle` (0 points up,
- * clockwise), as a clip-path reaching well past the image's edge.
+ * The wedge from the centre holding the petal at `angle` (0 points up,
+ * clockwise), as a clip-path reaching well past the image's edge. A little
+ * over 60°, so neighbours overlap and no seam shows between them.
  */
 function wedge(angle: number) {
-  const points = [angle - 30, angle + 30].map((edge) => {
+  const points = [angle - 30.5, angle + 30.5].map((edge) => {
     const radians = ((edge - 90) * Math.PI) / 180;
     const x = 50 + 150 * Math.cos(radians);
     const y = 50 + 150 * Math.sin(radians);

@@ -289,7 +289,9 @@ function WindowControls() {
  */
 export function TitleStrip() {
   const title = useWindowTitle();
-  const menus = useMenus();
+  const welcoming = useWelcome().open;
+  // During onboarding only Edit, for the name field: the rest acts on the app beneath it
+  const menus = useMenus().filter(([label]) => !welcoming || label === "Edit");
   return (
     <header
       className="fixed inset-x-0 top-0 z-30 flex select-none items-stretch justify-between border-line border-b bg-sidebar [-webkit-app-region:drag]"

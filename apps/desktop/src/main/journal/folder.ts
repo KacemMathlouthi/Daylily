@@ -27,7 +27,9 @@ async function canWrite(path: string): Promise<boolean> {
     return parent !== path && canWrite(parent);
   }
   try {
-    await access(path, constants.W_OK);
+    // Making files in a folder takes searching it as well as writing to it
+    // biome-ignore lint/suspicious/noBitwiseOperators: Node's access takes its modes as flags
+    await access(path, constants.W_OK | constants.X_OK);
     return true;
   } catch {
     return false;

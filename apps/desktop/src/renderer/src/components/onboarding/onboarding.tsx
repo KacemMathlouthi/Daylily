@@ -10,6 +10,11 @@ import type { ChangeChoices, OnboardingChoices, OnboardingStep } from "./step";
 import { chosenFolder } from "./step";
 import { ONBOARDING_STEPS } from "./steps";
 
+/** On macOS, where the hidden title bar was. */
+function WindowDrag() {
+  return window.daylily.platform === "darwin" ? <MacDragStrip /> : null;
+}
+
 /** How long onboarding takes to fade away over today's page. */
 const LEAVE_MS = 500;
 
@@ -51,6 +56,8 @@ function useStartingChoices() {
 function Art({ step }: { step: OnboardingStep }) {
   return (
     <div className="relative hidden basis-5/12 overflow-clip bg-ink md:block">
+      {/* The window drags by the painting, never over the form as it scrolls */}
+      <WindowDrag />
       {ONBOARDING_STEPS.map(({ art, id }) => (
         <img
           alt={id === step.id ? art.alt : ""}
@@ -122,11 +129,14 @@ function QuietAction({ action }: QuietActionProps) {
   );
 }
 
-/** Opened again from Help, onboarding can be left as it was with Escape. */
-function useEscapeWhenDone() {
+/**
+ * Opened again from Help, onboarding can be left as it was with Escape, though
+ * not while its choices are being saved.
+ */
+function useEscapeWhenDone(busy: boolean) {
   const { done } = useWelcome();
   useEffect(() => {
-    if (!done) {
+    if (!done || busy) {
       return;
     }
     const leave = (event: KeyboardEvent) => {
@@ -137,7 +147,7 @@ function useEscapeWhenDone() {
     };
     window.addEventListener("keydown", leave);
     return () => window.removeEventListener("keydown", leave);
-  }, [done]);
+  }, [busy, done]);
 }
 
 /**
@@ -173,7 +183,7 @@ export function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const client = useQueryClient();
-  useEscapeWhenDone();
+  useEscapeWhenDone(saving || phase !== "steps");
   useGoodbye(phase, setPhase);
 
   const step = ONBOARDING_STEPS[index] ?? ONBOARDING_STEPS[0];
@@ -227,7 +237,9 @@ export function Onboarding() {
 
   const shortcut = useCallback(() => {
     if (choices && step?.shortcut) {
-      step.shortcut.run({ change, choices, goTo });
+      step.shortcut
+        .run({ change, choices, goTo })
+        .catch((error) => console.error("Could not take that shortcut", error));
     }
   }, [change, choices, goTo, step]);
 
@@ -254,7 +266,7 @@ export function Onboarding() {
       )}
       style={{ transitionDuration: `${LEAVE_MS}ms` }}
     >
-      {window.daylily.platform === "darwin" ? <MacDragStrip /> : null}
+      {phase === "steps" ? null : <WindowDrag />}
       {phase === "steps" ? (
         <>
           <Art step={step} />
@@ -262,6 +274,8 @@ export function Onboarding() {
             <div
               // Centred with auto margins, so a step taller than the window scrolls from its top
               className="rise-in-in-turn my-auto flex w-full max-w-140 flex-col gap-7.5"
+              // Nothing changes while the choices are saved, so what's saved is what shows
+              inert={saving}
               key={step.id}
             >
               <Progress at={index} of={ONBOARDING_STEPS.length} />
