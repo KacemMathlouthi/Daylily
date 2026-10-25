@@ -37,7 +37,7 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 12 | **End-to-end tests on the packaged app** | Playwright driving the real app: survive a force-quit mid-sentence, seal across 4am, sleep, a closed app and a time-zone change. Losing words is the worst bug Daylily can have. | High | L | Ready |
 | 13 | ~~**Auto-update, checked on the splash**~~ | electron-updater on the GitHub releases: checks for a new version while the splash shows, then every six hours; Windows and the AppImage install on quit or with "Restart now"; macOS and the Debian package point to the download until macOS is signed. Paper 09f, 09g. First felt from 0.2.0: 0.1.0 can't update itself. | High | M | ✓ Done, Oct 25 |
 | 14 | ~~**Polish pass**~~ | Walked every screen: a first run, an empty and a full journal, a very long page and title, dark mode, the smallest window (900 × 600), the keyboard (every control reachable, focus visible) and screen-reader names (every control and image named). Fixed: days before a journal began counted as rested (05g), garden numbers breaking in a narrow window, the ghost prompt's ellipsis wrapping alone, a quit that could hang with nothing to save. Not re-walked: the error states (04d, 04e), shipped and checked days ago. Still open: some faint text is below AA contrast, by design. | Medium | M | ✓ Done, Oct 25 |
-| 15 | **Search** | Full-text search across every day, offline, built from the files (§3.5). See the note on engines below. | High | L | Research: what search should feel like, then design |
+| 15 | ~~**Search**~~ | Every page from ⌘K: an Orama index in memory, built from the files and kept current by the watcher; results as you type with the chosen day previewed, opened at the words (Paper 13a to 13c, CLAUDE.md §3.5). | High | L | ✓ Done, Oct 25 |
 | 16 | **Onboarding** | Designed in Paper (10a to 10c): welcome, choose the journal folder, reminder time. §3.6: "write today's page within a minute". | High | M | Ready |
 | 17 | ~~**Sidebar's journal item**~~ | No more dropdown arrow: it names the journal and its folder, and opens Settings › Journal (Paper 09f). | Low | S | ✓ Done, Oct 25 |
 | 18 | ~~**Image quality audit**~~ | All 82 images measured against the size they're shown at. Eleven gallery covers were far too small for a day cover (388 to 800 px, most of them 388 px squares stretched 3.5×), the sample journal's too, and the README's app picture was a mock. The website's large paintings (hero meadow, dusk and its lilies, the manifesto lily, the changelog's path, the share card's meadow) were then upscaled 2× with Topaz. | Medium | S | ✓ Done, Oct 25 |
@@ -52,8 +52,9 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 27 | **Ask your journal** | "What made me happiest this spring?" Answers from your own pages, with a "this sends N days to …" note. Uses the search index (15) to pick pages. | High | L | After 25, 15 |
 
 > **Search engines.** Algolia and similar hosted engines would send people's journals to a third party, which
-> breaks "your files are yours" and offline use. In the app, search uses a local index (MiniSearch, Orama, or
-> SQLite FTS5), cached in `.daylily/cache/`. For a **docs site** later, a hosted or static engine is fine,
+> breaks "your files are yours" and offline use. In the app, search uses a local index: Orama, chosen over
+> MiniSearch (no accent folding) and SQLite FTS5 (a native module per platform), held in memory and rebuilt from
+> the files at launch. For a **docs site** later, a hosted or static engine is fine,
 > since docs are public: Pagefind (static, free) or Algolia DocSearch (free for open-source docs).
 
 ---
@@ -122,7 +123,6 @@ Each one off until turned on, and plain about what it sends.
 ## Decisions waiting on the owner
 
 - Buy `daylily.so` (5).
-- What search should feel like (15).
 - Thoughts and notes: whether, and in what shape (23).
 - The first AI connection: an API key for which provider, or Sign in with ChatGPT (25).
 - When to pay for signing, and when Daylily is ready for 1.0.

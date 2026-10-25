@@ -226,7 +226,7 @@ keychain and **never** into the journal folder.
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
 | **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three stats and the meadow (Paper: 06c). |
-| **Search** | Full-text search across all days. Results show date, title and a snippet, and open the day. |
+| **Search** | A dialog over any screen, from ⌘K / Ctrl K, the sidebar's "Search days" or Edit › Search days: results as you type (date, cover, title, a line of the page with the words marked), the chosen day previewed beside them (⌘J hides it), Enter opens the day scrolled to the first match, which glows and fades. Before typing, a quiet hint; nothing found says so. Paper: 13a to 13c. |
 | **Settings** | Journal (folder, what's on disk), Writing & sealing (ghost prompts, the 4am seal, gallery covers), Reminders (on/off, time, a preview), Appearance (light, dark, match the system; the sidebar's sun and moon switch too), About, with where updating stands (Paper 09f, 09g). AI hidden in v1. Paper: 09a to 09e. |
 
 ### 3.5 Behaviours
@@ -241,7 +241,12 @@ keychain and **never** into the journal folder.
   carries a colour chosen by eye (the gallery is all warm light, so sampling would grow one colour); a cover from
   disk is sampled, each pixel voting for the flower nearest its hue. Computed values are cached in
   `.daylily/cache/` and are derivable, never stored in the day file.
-- **Search:** in-memory index built on launch from the files, cached, updated on save. Works fully offline.
+- **Search:** an Orama index in the main process, held in memory and never written anywhere: built from the files a
+  few seconds after launch, kept current by the folder watcher, so a page from another app is found too. A day
+  matches when its title or page holds every word: by a word's start ("walk" finds "walked"), or whole for words of
+  three letters or fewer, ignoring case and accents, with one typo forgiven in words of five letters or more.
+  Common words ("the", "a"…) count only when there's nothing else. Titles rank above the page. Up to 50 days are
+  listed. Works fully offline; nothing searched for leaves the computer.
 - **Reminder:** on by default at 21:00, *"How was your day?"*, once a day. Skipped if today already has words or
   Daylily is the focused window. Never mentions missed days. Changeable or off in Settings. A reminder missed while
   the computer slept comes on waking if under two hours late and the day hasn't ended; opening the app after the time counts as the visit.
@@ -530,7 +535,7 @@ drift, sync Paper back to what was agreed.
 |---|---|
 | v1 | First landing page draft (superseded) |
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto, Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
@@ -589,11 +594,12 @@ web-sized copy goes into the folders above. It was in the repository until 2026-
 | 2026-10-25 | Updates: looked for at launch and every six hours, installed on quit on Windows and the AppImage, pointed to on macOS and the Debian package; the sidebar names the journal and its folder; a polish pass (a journal's first day, the garden in a narrow window, the ghost prompt's ellipsis, a quit that could hang) |
 | 2026-10-25 | An image audit, then a repainted gallery: the twelve covers painted again at 1536 × 1024 with their subject in the middle band, eight new ones (sea, mountains, forest, garden, the moon, stars, a telescope, a rocket launch), the same pictures on the landing page and in the sample journal, and a real screenshot in the README |
 | 2026-10-25 | The website on phones: a full-screen menu for the header's links, the calendar one week at a time, download cards that fit; the large paintings upscaled 2× (Topaz) with a cleaner cutout behind the footer's wordmark; designed in Paper first |
+| 2026-10-25 | Search: every page from ⌘K, an Orama index in memory built from the files, results as you type with the chosen day previewed, opened at the words with a fading glow; designed in Paper first (13a to 13c) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
-Keep it current as items ship or move. The next few: images on the page and link previews, then
-end-to-end tests and search.
+Keep it current as items ship or move. The next few: images on the page, onboarding, then a talk about
+thoughts and notes.
 
 ---
 
