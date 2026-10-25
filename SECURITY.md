@@ -22,4 +22,4 @@ Anything that could expose, change or lose a person's writing, for example:
 ## Supported versions
 
 Daylily is young; fixes go into the latest release only. Update to the newest version from the
-[download page](https://daylily-silk.vercel.app/download).
+[download page](https://daylily.kacem.lol/download).
