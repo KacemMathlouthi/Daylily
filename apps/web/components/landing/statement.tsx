@@ -4,7 +4,6 @@ import { cn } from "@daylily/ui/lib/cn";
 import {
   type MotionValue,
   motion,
-  useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
@@ -90,11 +89,13 @@ function Word({
   const start = index / LOUD_WORD_COUNT;
   const end = (index + 1) / LOUD_WORD_COUNT;
   const opacity = useTransform(progress, [start, end], [0.18, 1]);
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) {
-    return <span>{children}</span>;
-  }
-  return <motion.span style={{ opacity }}>{children}</motion.span>;
+  // Reduced motion shows every word inked from the start. Decided in CSS, as
+  // the server can't know the setting and a branch here wouldn't hydrate
+  return (
+    <motion.span className="motion-reduce:opacity-100!" style={{ opacity }}>
+      {children}
+    </motion.span>
+  );
 }
 
 function Line({
