@@ -88,6 +88,7 @@ const api: DaylilyApi = {
         extension,
         color
       ),
+    search: (query) => ipcRenderer.invoke(CHANNELS.journalSearch, query),
     setConfig: (changes) =>
       ipcRenderer.invoke(CHANNELS.journalSetConfig, changes),
     show: (day?: string) => ipcRenderer.invoke(CHANNELS.journalShow, day),

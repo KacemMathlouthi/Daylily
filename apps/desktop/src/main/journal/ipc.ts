@@ -12,13 +12,18 @@ import {
   daySchema,
   flowerColorSchema,
   pageSchema,
+  searchQuerySchema,
 } from "../../shared/schemas";
 import { flushAllPages } from "../flush";
 import { handle } from "../ipc";
 import type { DeviceSettingsStore } from "../settings";
 import { readConfig, writeConfig } from "./config";
+import { journalSearch } from "./search";
 import type { Journal } from "./store";
 import { watchJournal } from "./watch";
+
+/** Long enough for the app to have opened; the search index is built after it. */
+const WARM_SEARCH_AFTER_MS = 3000;
 
 /** Larger than any photo a phone takes; it keeps a stray video or scan out of memory. */
 const MAX_COVER_BYTES = 30 * 1024 * 1024;
@@ -61,9 +66,28 @@ export function registerJournalIpc({
   settings: DeviceSettingsStore;
 }) {
   let journal = open(firstRoot);
-  let watcher = watchJournal(journal.root, (days) =>
-    broadcast(CHANNELS.journalChanged, days)
-  );
+  let search = journalSearch(journal);
+
+  /** Builds the index in the quiet after opening, so the first search answers at once. */
+  const warmSoon = () => {
+    const current = search;
+    setTimeout(() => {
+      current
+        .warm()
+        .catch((error) => console.error("Could not build search", error));
+    }, WARM_SEARCH_AFTER_MS);
+  };
+  warmSoon();
+
+  /** Tells the page which days changed, and keeps search in step with them. */
+  const watch = () =>
+    watchJournal(journal.root, (days) => {
+      broadcast(CHANNELS.journalChanged, days);
+      search
+        .refresh(days)
+        .catch((error) => console.error("Could not update search", error));
+    });
+  let watcher = watch();
 
   /** Moves to the journal in another folder; nothing in the old one is touched. */
   async function switchTo(root: string) {
@@ -72,9 +96,9 @@ export function registerJournalIpc({
     await journal.flushCache();
     await watcher.close();
     journal = open(root);
-    watcher = watchJournal(journal.root, (days) =>
-      broadcast(CHANNELS.journalChanged, days)
-    );
+    search = journalSearch(journal);
+    warmSoon();
+    watcher = watch();
     // Its own preferences hold from now, whether or not the device remembers the move
     onConfigChange();
     await settings.write({ journalPath: journal.root });
@@ -189,6 +213,10 @@ export function registerJournalIpc({
     }
     return journal.saveCover(day, await readFile(path), extension);
   });
+
+  handle(CHANNELS.journalSearch, (_event, query) =>
+    search.find(searchQuerySchema.parse(query))
+  );
 
   handle(CHANNELS.journalSetConfig, async (_event, changes) => {
     const config = await writeConfig(

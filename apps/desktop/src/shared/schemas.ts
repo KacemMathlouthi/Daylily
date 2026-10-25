@@ -91,3 +91,6 @@ export const flowerColorSchema = z.enum([
 export const coverStampSchema = z.string().regex(/^\d+--?\d+(?:\.\d+)?$/);
 
 export const windowActionSchema = z.enum(WINDOW_ACTIONS);
+
+/** What someone typed to search; nobody types more, and the index never sees more. */
+export const searchQuerySchema = z.string().max(200);

@@ -8,6 +8,7 @@ import type {
   JournalError,
   JournalInfo,
   ListedDay,
+  SearchHit,
   StoredDay,
 } from "./journal";
 
@@ -32,6 +33,7 @@ export const CHANNELS = {
   journalPickCover: "journal:pick-cover",
   journalRead: "journal:read",
   journalSaveCover: "journal:save-cover",
+  journalSearch: "journal:search",
   journalSetConfig: "journal:set-config",
   journalShow: "journal:show",
   journalStats: "journal:stats",
@@ -170,6 +172,11 @@ export interface DaylilyApi {
       extension: CoverExtension,
       color?: FlowerColor
     ) => Promise<Result<string, JournalError>>;
+    /**
+     * Days whose title or page holds every word of `query`, best first, each with
+     * a line of the page around the first match. Searched on this computer only.
+     */
+    search: (query: string) => Promise<SearchHit[]>;
     /** Calls `listener` when the journal moves to another folder. Returns a way to stop. */
     onSwitch: (listener: () => void) => () => void;
     setConfig: (changes: JournalConfigChanges) => Promise<JournalConfig>;
