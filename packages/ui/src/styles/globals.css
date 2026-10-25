@@ -98,6 +98,19 @@
   /* A ghost prompt arrives slowly, so it reads as a thought rather than an alert */
   --animate-ghost-in: ghost-in 700ms var(--ease-soft) both;
 
+  /* Words found by search glow as their day opens, then let go: two seconds, then a 600ms fade */
+  --animate-search-glow: search-glow 2.6s var(--ease-soft) both;
+
+  @keyframes search-glow {
+    0%,
+    77% {
+      background-color: color-mix(in oklab, var(--saffron) 32%, transparent);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
   @keyframes ghost-in {
     from {
       opacity: 0;
@@ -175,6 +188,17 @@
  * here rather than in utility strings because the editor renders this markup.
  */
 @layer components {
+  /* What was searched for (Paper 13a): marked while choosing a day */
+  .search-match {
+    @apply rounded-[3px] bg-saffron/32 text-ink;
+    box-decoration-break: clone;
+  }
+
+  /* And once the day opens (13c), a glow that fades; with reduced motion it simply goes */
+  .search-match-glow {
+    @apply animate-search-glow motion-reduce:[animation-timing-function:step-end];
+  }
+
   .page-content :not(pre) > code {
     @apply rounded-sm bg-paper-tint px-1 py-0.5 font-mono text-[0.85em] text-ink;
   }

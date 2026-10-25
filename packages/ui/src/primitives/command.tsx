@@ -88,6 +88,20 @@ function CommandInput({
   );
 }
 
+/** The input alone, for a field styled by its dialog (Daylily: the search dialog's field). */
+function CommandBareInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+  return (
+    <CommandPrimitive.Input
+      className={cn("w-full outline-hidden", className)}
+      data-slot="command-input"
+      {...props}
+    />
+  );
+}
+
 function CommandList({
   className,
   ...props
@@ -184,6 +198,7 @@ function CommandShortcut({
 
 export {
   Command,
+  CommandBareInput,
   CommandDialog,
   CommandEmpty,
   CommandGroup,

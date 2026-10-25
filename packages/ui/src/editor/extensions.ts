@@ -8,6 +8,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { CodeBlock } from "./code-block";
 import { GhostPrompts, type GhostPromptsOptions } from "./ghost-prompts";
 import { MarkdownPaste, type MarkdownPasteOptions } from "./markdown-paste";
+import { SearchHighlight } from "./search-highlight";
 
 /** Enter on an empty last line of a quote steps out of it, as it does in a list. */
 const QuoteExit = Extension.create({
@@ -78,6 +79,7 @@ export function pageExtensions({
     TaskItem.configure({ nested: true }),
     Markdown,
     QuoteExit,
+    SearchHighlight,
   ];
   if (placeholder) {
     extensions.push(Placeholder.configure({ placeholder }));
