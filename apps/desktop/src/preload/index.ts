@@ -57,6 +57,8 @@ const api: DaylilyApi = {
       ipcRenderer.invoke(CHANNELS.saveGardenImage, png, name),
   },
   journal: {
+    addImage: (day, image) =>
+      ipcRenderer.invoke(CHANNELS.journalAddImage, day, image),
     change: () => ipcRenderer.invoke(CHANNELS.journalChange),
     flowerColor: (day, stamp, color) =>
       ipcRenderer.invoke(CHANNELS.journalFlowerColor, day, stamp, color),

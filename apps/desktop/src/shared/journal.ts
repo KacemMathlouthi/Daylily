@@ -72,6 +72,15 @@ export const COVER_EXTENSIONS = [
 ] as const;
 export type CoverExtension = (typeof COVER_EXTENSIONS)[number];
 
+/** Larger than any photo a phone takes: the most a cover or an image on the page may weigh. */
+export const MAX_IMAGE_BYTES = 30 * 1024 * 1024;
+
+/** Why an image couldn't be added to the page. */
+export type ImageError =
+  | JournalError
+  /** Not a JPEG, PNG, GIF, WebP or AVIF; `heic` when it's an iPhone photo. */
+  | { kind: "not-an-image"; heic: boolean };
+
 /** The name a day's cover is copied in as. */
 export const COVER_NAME = new RegExp(
   `^cover\\.(${COVER_EXTENSIONS.join("|")})$`
@@ -108,6 +117,11 @@ export interface DeviceState {
   /** A theme, or to follow the system's. */
   theme: "light" | "dark" | "system";
 }
+
+/** The only files the page may load from a day's folder: its cover and its images. */
+export const DAY_ASSET_NAME = new RegExp(
+  `^(?:cover|image-\\d{2,3})\\.(?:${COVER_EXTENSIONS.join("|")})$`
+);
 
 /** The scheme the page loads a day's images through; nothing else in the journal is served. */
 export const JOURNAL_SCHEME = "daylily-journal";

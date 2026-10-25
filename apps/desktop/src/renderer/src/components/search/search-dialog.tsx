@@ -22,6 +22,7 @@ import {
   type KeyboardEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -34,6 +35,7 @@ import {
 import { usePastDay } from "../../lib/days";
 import { dateFormat } from "../../lib/format";
 import { fromKey, todayKey } from "../../lib/month";
+import { shownImages } from "../../lib/page-images";
 import { revealFirstMatch, useSearchDialog } from "../../lib/search";
 import { Marked } from "./marked";
 
@@ -101,7 +103,9 @@ function Hit({
 function Preview({ day, query }: { day: string; query: string }) {
   const page = usePastDay(day);
   const markdown = page.kind === "written" ? page.markdown : "";
-  const editor = usePageEditor({ content: markdown, editable: false });
+  // The images of whichever day is chosen: the editor reads them through a ref
+  const images = useMemo(() => shownImages(day), [day]);
+  const editor = usePageEditor({ content: markdown, editable: false, images });
 
   useEffect(() => {
     editor.commands.setContent(markdown, { contentType: "markdown" });

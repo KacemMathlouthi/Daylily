@@ -1,8 +1,5 @@
 import { type DayKey, parseDayKey } from "@daylily/core/day";
-import { JOURNAL_SCHEME } from "../../shared/journal";
-
-/** The only files the page may load from the journal: a day's cover and images. */
-const ASSET_NAME = /^(?:cover|image-\d{2,3})\.(?:avif|gif|jpeg|jpg|png|webp)$/;
+import { DAY_ASSET_NAME, JOURNAL_SCHEME } from "../../shared/journal";
 
 /**
  * The day and file a journal URL names, like `daylily-journal://day/2026-10-21/cover.jpg`,
@@ -31,5 +28,5 @@ export function parseAssetUrl(
   } catch {
     return null;
   }
-  return ASSET_NAME.test(name) ? { day, name } : null;
+  return DAY_ASSET_NAME.test(name) ? { day, name } : null;
 }

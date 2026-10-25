@@ -226,6 +226,7 @@ function TodayScreen() {
               key={`${shownDay}:${page.revision}`}
               onChooseCover={openPicker}
               onFound={forgetFind}
+              onProblem={setNotice}
               onTitle={retitle}
               onWrite={write}
               page={page}

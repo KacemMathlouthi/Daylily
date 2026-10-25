@@ -285,6 +285,67 @@ describe("saveCover", () => {
   });
 });
 
+describe("addImage", () => {
+  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 1, 2, 3]);
+  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+
+  it("copies an image into the day's folder, untouched, as the first image", async () => {
+    const day = key("2026-10-21");
+    expect(await journal.addImage(day, jpeg, "jpg")).toEqual({
+      ok: true,
+      value: "image-01.jpg",
+    });
+    expect(
+      new Uint8Array(await readFile(journal.dayAsset(day, "image-01.jpg")))
+    ).toEqual(jpeg);
+  });
+
+  it("numbers each next image after the highest one there", async () => {
+    const day = key("2026-10-21");
+    await journal.addImage(day, jpeg, "jpg");
+    await journal.addImage(day, png, "png");
+    // One added by hand, out of order
+    await writeFile(journal.dayAsset(day, "image-07.jpg"), "theirs");
+    expect(await journal.addImage(day, jpeg, "jpg")).toEqual({
+      ok: true,
+      value: "image-08.jpg",
+    });
+    const [year, month, date] = ["2026", "10", "21"];
+    expect((await readdir(join(root, year, month, date))).sort()).toEqual([
+      "image-01.jpg",
+      "image-02.png",
+      "image-07.jpg",
+      "image-08.jpg",
+    ]);
+  });
+
+  it("goes past image-99", async () => {
+    const day = key("2026-10-21");
+    await journal.addImage(day, jpeg, "jpg");
+    await writeFile(journal.dayAsset(day, "image-99.jpg"), "theirs");
+    expect(await journal.addImage(day, jpeg, "jpg")).toEqual({
+      ok: true,
+      value: "image-100.jpg",
+    });
+  });
+
+  it("adds nothing to a day that can't be written", async () => {
+    expect(await journal.addImage(key("2026-10-19"), jpeg, "jpg")).toEqual({
+      error: { day: "2026-10-19", kind: "not-writable" },
+      ok: false,
+    });
+    const day = key("2026-10-21");
+    await journal.writeDay(day, page("Words."));
+    now = NEXT_MORNING;
+    await journal.sealDay(day, null);
+    now = new Date("2026-10-21T20:00:00+01:00");
+    expect(await journal.addImage(day, jpeg, "jpg")).toEqual({
+      error: { kind: "sealed" },
+      ok: false,
+    });
+  });
+});
+
 describe("flower colours", () => {
   it("keeps a colour sampled from the cover until the cover changes", async () => {
     const day = key("2026-10-21");
