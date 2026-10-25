@@ -66,14 +66,20 @@
   mask-image: linear-gradient(transparent 0%, rgb(0 0 0 / 0.6) 14%, black 26%);
 }
 
-/* The giant footer wordmark: warm white ink that thins out towards the meadow */
+/* The giant footer wordmark: warm white ink that thins out towards the meadow.
+   The tight leading ends the line box above the y's tails, and the ink only
+   fills that box, so it reaches 0.3em further down and fades there: the tails
+   sink into the grass instead of stopping at a straight edge. */
 @utility text-wordmark-ink {
+  padding-bottom: 0.3em;
   color: transparent;
   background-image: linear-gradient(
     180deg,
-    #fffbf5 8%,
-    rgb(255 246 235 / 0.85) 55%,
-    rgb(255 241 224 / 0.6) 88%
+    #fffbf5 6%,
+    rgb(255 246 235 / 0.85) 41%,
+    rgb(255 241 224 / 0.6) 65%,
+    rgb(255 241 224 / 0.4) 73%,
+    rgb(255 241 224 / 0) 85%
   );
   background-clip: text;
   filter: drop-shadow(0 1.2vw 2.4vw rgb(90 45 20 / 0.2));
