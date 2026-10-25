@@ -1,5 +1,6 @@
+import { NodeSelection } from "@tiptap/pm/state";
 import { type Editor, useEditorState } from "@tiptap/react";
-import { BubbleMenu } from "@tiptap/react/menus";
+import { BubbleMenu, type BubbleMenuProps } from "@tiptap/react/menus";
 import {
   Bold,
   Check,
@@ -215,6 +216,31 @@ function LinkField({
  * The small ink bar over a selection (Paper: "03d"): marks, headings, lists,
  * checklists, code and links. Markdown shortcuts do the same from the keyboard.
  */
+/**
+ * Shown over selected words, as Tiptap's own does, and never over a selected
+ * image: there's nothing in it to format.
+ */
+function hasWordsSelected({
+  editor,
+  element,
+  from,
+  state,
+  to,
+  view,
+}: Parameters<NonNullable<BubbleMenuProps["shouldShow"]>>[0]) {
+  const { selection } = state;
+  if (selection instanceof NodeSelection || selection.empty) {
+    return false;
+  }
+  // Typing a link moves focus into the menu; it stays open meanwhile
+  const inMenu = element.contains(document.activeElement);
+  return (
+    (view.hasFocus() || inMenu) &&
+    editor.isEditable &&
+    state.doc.textBetween(from, to).length > 0
+  );
+}
+
 export function FormatToolbar({ editor }: { editor: Editor }) {
   const [linking, setLinking] = useState(false);
   const active = useEditorState({
@@ -242,6 +268,7 @@ export function FormatToolbar({ editor }: { editor: Editor }) {
       className="flex items-center gap-0.5 rounded-lg bg-ink p-1 shadow-toast"
       editor={editor}
       options={options}
+      shouldShow={hasWordsSelected}
     >
       {linking ? (
         <LinkField editor={editor} onClose={stopLink} />

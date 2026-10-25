@@ -199,6 +199,53 @@
     @apply animate-search-glow motion-reduce:[animation-timing-function:step-end];
   }
 
+  /*
+   * An image is inline in the markdown but reads as a block (Paper 14a). The
+   * empty separators ProseMirror keeps beside an inline node would each add a
+   * blank line around it.
+   */
+  .page-content .node-image {
+    @apply block;
+  }
+
+  .page-content .ProseMirror-separator:has(+ .node-image),
+  .page-content .node-image + .ProseMirror-separator,
+  .page-content
+    .node-image
+    + .ProseMirror-separator
+    + .ProseMirror-trailingBreak {
+    /* ProseMirror's own stylesheet keeps separators inline with !important */
+    @apply hidden!;
+  }
+
+  /* Where a dragged image would land (Paper 14b): a line with a dot, in the gap between blocks */
+  .page-content .drop-line-before,
+  .page-content .drop-line-after {
+    @apply relative;
+  }
+
+  .page-content .drop-line-before::before,
+  .page-content .drop-line-after::after {
+    content: "";
+    background:
+      radial-gradient(
+        circle 3.5px at 3.5px 50%,
+        var(--daylily) 98%,
+        transparent
+      ),
+      linear-gradient(var(--daylily), var(--daylily)) 0 50% / 100% 2px no-repeat;
+    @apply pointer-events-none absolute inset-x-0 h-1.75;
+  }
+
+  /* Centred in the 14px gap between blocks */
+  .page-content .drop-line-before::before {
+    @apply -top-2.75;
+  }
+
+  .page-content .drop-line-after::after {
+    @apply -bottom-2.75;
+  }
+
   .page-content :not(pre) > code {
     @apply rounded-sm bg-paper-tint px-1 py-0.5 font-mono text-[0.85em] text-ink;
   }

@@ -8,6 +8,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { CodeBlock } from "./code-block";
 import { GhostPrompts, type GhostPromptsOptions } from "./ghost-prompts";
 import { MarkdownPaste, type MarkdownPasteOptions } from "./markdown-paste";
+import { PageImage, type PageImageOptions } from "./page-image";
 import { SearchHighlight } from "./search-highlight";
 
 /** Enter on an empty last line of a quote steps out of it, as it does in a list. */
@@ -32,6 +33,12 @@ const QuoteExit = Extension.create({
 export interface PageExtensionsOptions {
   /** Nudges while writing; leave out for pages that are only read. */
   ghostPrompts?: Partial<GhostPromptsOptions>;
+  /**
+   * Where the page's images load from, and how a pasted or dropped one is copied
+   * in. Without it the images still keep their place in the markdown, each shown
+   * as one that can't be found.
+   */
+  images?: PageImageOptions;
   /** Offers to format pasted markdown; leave out for pages that are only read. */
   markdownPaste?: MarkdownPasteOptions;
   /** Faint text on an empty page, such as "How was your day?". */
@@ -55,6 +62,7 @@ const SAFE_LINK = /^(https?:\/\/|mailto:)/i;
 export function pageExtensions({
   placeholder,
   ghostPrompts,
+  images,
   markdownPaste,
 }: PageExtensionsOptions = {}): AnyExtension[] {
   const extensions: AnyExtension[] = [
@@ -77,6 +85,7 @@ export function pageExtensions({
     TableKit.configure({ table: { resizable: false } }),
     TaskList,
     TaskItem.configure({ nested: true }),
+    images ? PageImage.configure(images) : PageImage,
     Markdown,
     QuoteExit,
     SearchHighlight,
