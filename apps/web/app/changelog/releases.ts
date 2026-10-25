@@ -28,9 +28,14 @@ export const RELEASES: Release[] = [
     art: "/images/art/eye.jpg",
     changes: [
       {
-        body: "Three short steps the first time Daylily opens: the three rules, where your journal lives, and a little help.",
+        body: "Three short steps the first time Daylily opens, each beside a new painting: the three rules, your name and your journal, and a little help.",
         color: "text-daylily",
         title: "A welcome",
+      },
+      {
+        body: "Tell Daylily what to call you. It greets you on Home and signs your garden, and it’s kept with your journal.",
+        color: "text-petal",
+        title: "Your name",
       },
       {
         body: "Keep writing in the journal you have, start one in ~/Daylily, or open a folder you already sync. Nothing is moved or copied.",
@@ -38,13 +43,13 @@ export const RELEASES: Release[] = [
         title: "Your folder, your choice",
       },
       {
-        body: "Turn the ghost prompts and the evening reminder on or off, and pick its time, before you write a word.",
-        color: "text-petal",
-        title: "A little help, if you like",
+        body: "Turn the ghost prompts and the evening reminder on or off before you write a word. Then a hello, and today’s page.",
+        color: "text-cornflower",
+        title: "A little help, then hello",
       },
       {
         body: "Help › Welcome to Daylily walks through it again whenever you want.",
-        color: "text-cornflower",
+        color: "text-daylily",
         title: "Any time again",
       },
     ],
