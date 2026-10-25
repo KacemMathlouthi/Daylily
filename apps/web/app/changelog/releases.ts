@@ -25,6 +25,19 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    changes: [
+      {
+        body: "Daylily’s website is now daylily.ink. The manifesto, the changelog and a new version’s download open there from the app, and the old addresses still find their way.",
+        color: "text-daylily",
+        title: "A home of its own",
+      },
+    ],
+    date: "2026-10-26",
+    lead: "Daylily has its own address, written in ink.",
+    title: "In ink.",
+    version: "0.6.1",
+  },
+  {
     art: "/images/art/eye.jpg",
     changes: [
       {
