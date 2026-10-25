@@ -111,8 +111,23 @@ export interface JournalInfo {
   separator: string;
 }
 
+/** A folder offered as the journal while choosing one, as onboarding does. */
+export interface FolderInfo {
+  /** Its preferences: its own if it's a journal already, a new journal's otherwise. */
+  config: JournalConfig;
+  /** The days already written there; none for a new journal. */
+  days: number;
+  /** The folder, with the home folder as `~`. */
+  displayPath: string;
+  path: string;
+  /** Whether Daylily can make and write files there. */
+  writable: boolean;
+}
+
 /** What this computer remembers about the app, rather than the journal. */
 export interface DeviceState {
+  /** Whether onboarding has been through on this computer. */
+  onboarded: boolean;
   sidebarOpen: boolean;
   /** A theme, or to follow the system's. */
   theme: "light" | "dark" | "system";

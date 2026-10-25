@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { systemClock } from "@daylily/core/clock";
 import { app, BrowserWindow, shell } from "electron";
 import { CHANNELS } from "../shared/channels";
+import { setMacMenu } from "./app-menu";
 import { registerDeviceIpc } from "./device-ipc";
 import { isQuitting, saveBeforeClosing, saveOnSleepAndQuit } from "./flush";
 import { registerIpc, whenAppReady } from "./ipc";
@@ -196,6 +197,12 @@ app.whenReady().then(async () => {
   // Looked for while the splash shows; it never holds the app up
   updates.check();
   app.on("second-instance", () => showWindow(settings));
+  if (process.platform === "darwin") {
+    setMacMenu(() => {
+      showWindow(settings);
+      mainWindow?.webContents.send(CHANNELS.appOpenWelcome);
+    });
+  }
 
   // macOS keeps apps alive without windows; clicking the dock icon brings one back
   app.on("activate", () => showWindow(settings));

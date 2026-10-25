@@ -1,15 +1,8 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@daylily/ui/primitives/select";
 import { Switch } from "@daylily/ui/primitives/switch";
 import { useCallback } from "react";
-import { dateFormat } from "../../lib/format";
 import { useJournalConfig } from "../../lib/preferences";
+import { ReminderTimeSelect, reminderTimeLabel } from "../reminder-time";
 import {
   SettingsGroup,
   SettingsHeading,
@@ -17,37 +10,17 @@ import {
   SettingsRows,
 } from "./parts";
 
-const TIME = dateFormat({
-  hour: "numeric",
-  minute: "2-digit",
-});
-
-/** Every half hour of the day, as `HH:MM` with its "9:00 pm" label. */
-const TIMES = Array.from({ length: 48 }, (_, index) => {
-  const hour = Math.floor(index / 2);
-  const minute = (index % 2) * 30;
-  return {
-    label: TIME.format(new Date(2000, 0, 1, hour, minute)).toLowerCase(),
-    value: `${String(hour).padStart(2, "0")}:${minute === 0 ? "00" : "30"}`,
-  };
-});
-const LABELS = new Map(TIMES.map((time) => [time.value, time.label]));
-
 /** Paper's "09c": one evening reminder and what it will look like. */
 export function RemindersSection() {
   const [config, change] = useJournalConfig();
   const { enabled, time } = config.reminder;
-  const label = LABELS.get(time) ?? time;
+  const label = reminderTimeLabel(time);
   const setEnabled = useCallback(
     (next: boolean) => change({ reminder: { enabled: next } }),
     [change]
   );
   const chooseTime = useCallback(
-    (next: string | null) => {
-      if (next) {
-        change({ reminder: { time: next } });
-      }
-    },
+    (next: string) => change({ reminder: { time: next } }),
     [change]
   );
 
@@ -74,26 +47,11 @@ export function RemindersSection() {
             description="Your local time, wherever you are."
             title="Time"
           >
-            <Select
+            <ReminderTimeSelect
               disabled={!enabled}
-              items={TIMES}
-              onValueChange={chooseTime}
+              onChange={chooseTime}
               value={time}
-            >
-              <SelectTrigger
-                aria-label="Reminder time"
-                className="h-7.5 gap-2 rounded-md border-line pr-2.5 pl-3 font-medium text-caption text-ink"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {TIMES.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </SettingsRow>
         </SettingsRows>
       </SettingsGroup>

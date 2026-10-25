@@ -1,5 +1,4 @@
 import { mkdir, readFile, stat } from "node:fs/promises";
-import { homedir } from "node:os";
 import { extname, resolve, sep } from "node:path";
 import { fail, type Result } from "@daylily/core/result";
 import { app, BrowserWindow, dialog, shell } from "electron";
@@ -16,6 +15,7 @@ import {
   coverStampSchema,
   daySchema,
   flowerColorSchema,
+  folderPathSchema,
   imageBytesSchema,
   pageSchema,
   searchQuerySchema,
@@ -24,6 +24,7 @@ import { flushAllPages } from "../flush";
 import { handle } from "../ipc";
 import type { DeviceSettingsStore } from "../settings";
 import { readConfig, writeConfig } from "./config";
+import { inspectFolder, tildeHome } from "./folder";
 import { imageKind } from "./image-kind";
 import { journalSearch } from "./search";
 import type { Journal } from "./store";
@@ -31,14 +32,6 @@ import { watchJournal } from "./watch";
 
 /** Long enough for the app to have opened; the search index is built after it. */
 const WARM_SEARCH_AFTER_MS = 3000;
-
-/** `/home/kacem/Daylily` as `~/Daylily`, the way people say where their files are. */
-function tildeHome(path: string) {
-  const home = homedir();
-  return path === home || path.startsWith(`${home}${sep}`)
-    ? `~${path.slice(home.length)}`
-    : path;
-}
 
 function coverExtension(path: string): CoverExtension | null {
   const extension = extname(path).slice(1).toLowerCase();
@@ -154,10 +147,11 @@ export function registerJournalIpc({
     await shell.openPath(journal.root);
   });
 
-  handle(CHANNELS.journalChange, async (event) => {
-    const window = BrowserWindow.fromWebContents(event.sender);
+  /** Asks for a folder from the window that asked; null if cancelled. */
+  async function askForFolder(sender: Electron.WebContents) {
+    const window = BrowserWindow.fromWebContents(sender);
     if (!window) {
-      return false;
+      return null;
     }
     const { canceled, filePaths } = await dialog.showOpenDialog(window, {
       buttonLabel: "Use this folder",
@@ -166,11 +160,44 @@ export function registerJournalIpc({
       title: "Choose your journal folder",
     });
     const [chosen] = filePaths;
-    if (canceled || !chosen || resolve(chosen) === journal.root) {
+    return canceled || !chosen ? null : resolve(chosen);
+  }
+
+  handle(CHANNELS.journalChange, async (event) => {
+    const chosen = await askForFolder(event.sender);
+    if (!chosen || chosen === journal.root) {
       return false;
     }
-    await switchTo(resolve(chosen));
+    await switchTo(chosen);
     return true;
+  });
+
+  /**
+   * The folders offered to the page while choosing one: the journal's own and
+   * those picked in the dialog. The page may move the journal to these only,
+   * never to a path it made up.
+   */
+  const offered = new Set<string>();
+  const offer = (root: string) => {
+    offered.add(root);
+    return inspectFolder(root === journal.root ? journal : open(root));
+  };
+
+  handle(CHANNELS.journalFolder, () => offer(journal.root));
+
+  handle(CHANNELS.journalPickFolder, async (event) => {
+    const chosen = await askForFolder(event.sender);
+    return chosen ? offer(chosen) : null;
+  });
+
+  handle(CHANNELS.journalUse, async (_event, path) => {
+    const root = folderPathSchema.parse(path);
+    if (!offered.has(root)) {
+      throw new Error(`Refused a journal folder Daylily didn't offer: ${root}`);
+    }
+    if (root !== journal.root) {
+      await switchTo(root);
+    }
   });
 
   handle(CHANNELS.journalFlowerColor, (_event, day, stamp, color) =>

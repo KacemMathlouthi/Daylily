@@ -13,6 +13,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import type { WindowAction } from "../../../shared/channels";
 import { openSearch } from "../lib/search";
 import { useTheme } from "../lib/theme";
+import { openWelcome, useWelcome } from "../lib/welcome";
 
 /** Paper's "12b": 36px, the sidebar's paper, a hairline beneath. */
 export const TITLE_STRIP_HEIGHT = "2.25rem";
@@ -41,6 +42,10 @@ const SCREENS: Record<string, string> = {
 /** "Your journal · Home": where you are, as the window's title. */
 function useWindowTitle() {
   const path = useRouterState({ select: (state) => state.location.pathname });
+  const welcoming = useWelcome().open;
+  if (welcoming) {
+    return "Welcome to Daylily";
+  }
   const screen = path.startsWith("/day/") ? "A past day" : SCREENS[path];
   return screen ? `Your journal · ${screen}` : "Your journal";
 }
@@ -134,6 +139,10 @@ function useMenus(): [string, MenuGroups][] {
       "Help",
       [
         [
+          {
+            label: "Welcome to Daylily",
+            run: openWelcome,
+          },
           {
             label: "About Daylily",
             run: () =>

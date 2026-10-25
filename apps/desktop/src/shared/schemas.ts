@@ -79,9 +79,13 @@ export const configChangesSchema = z.strictObject({
 }) satisfies z.ZodType<JournalConfigChanges>;
 
 export const deviceChangesSchema = z.strictObject({
+  onboarded: z.boolean().optional(),
   sidebarOpen: z.boolean().optional(),
   theme: z.enum(["light", "dark", "system"]).optional(),
 });
+
+/** A journal folder the page passes back; the main process checks it offered it. */
+export const folderPathSchema = z.string().min(1).max(4096);
 
 export const flowerColorSchema = z.enum([
   "daylily",

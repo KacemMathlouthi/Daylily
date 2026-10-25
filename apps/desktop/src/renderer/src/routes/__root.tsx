@@ -8,11 +8,14 @@ import {
 } from "@tanstack/react-router";
 import { type CSSProperties, useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
+import { MacDragStrip } from "../components/mac-drag-strip";
+import { Onboarding } from "../components/onboarding/onboarding";
 import { SearchDialog } from "../components/search/search-dialog";
 import { TITLE_STRIP_HEIGHT, TitleStrip } from "../components/title-strip";
 import { useFocusMode } from "../lib/focus-mode";
 import { useFlowerColors } from "../lib/journal";
 import { openSearch } from "../lib/search";
+import { openWelcome, useWelcome } from "../lib/welcome";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -70,9 +73,12 @@ function useAppShortcuts() {
     const stopOpening = window.daylily.app.onOpenToday(() =>
       navigate({ to: "/today" })
     );
+    // macOS's Help › Welcome to Daylily
+    const stopWelcoming = window.daylily.app.onOpenWelcome(openWelcome);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       stopOpening();
+      stopWelcoming();
     };
   }, [navigate]);
 }
@@ -81,6 +87,7 @@ function AppShell() {
   const [open, setOpen] = useSidebarOpen();
   useFlowerColors(Route.useRouteContext().queryClient);
   const [focused] = useFocusMode();
+  const welcoming = useWelcome().open;
   useAppShortcuts();
 
   return (
@@ -92,20 +99,24 @@ function AppShell() {
         style={SHELL_SIZE}
       >
         {HAS_TITLE_STRIP ? <TitleStrip /> : null}
-        {/* Focus mode leaves only the page */}
-        {focused ? null : <AppSidebar />}
-        <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
-          {/*
-           * macOS hides the title bar, so this strip drags the window there. It overlays the
-           * page, which keeps its own top space. Elsewhere the window has its own frame, and
-           * drag regions would swallow the cursor styles.
-           */}
-          {window.daylily.platform === "darwin" ? (
-            <div className="absolute inset-x-0 top-0 z-10 h-12 [-webkit-app-region:drag]" />
-          ) : null}
-          <Outlet />
-        </SidebarInset>
-        <SearchDialog />
+        {welcoming ? (
+          <Onboarding />
+        ) : (
+          <>
+            {/* Focus mode leaves only the page */}
+            {focused ? null : <AppSidebar />}
+            <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
+              {/*
+               * macOS hides the title bar, so this strip drags the window there. It overlays the
+               * page, which keeps its own top space. Elsewhere the window has its own frame, and
+               * drag regions would swallow the cursor styles.
+               */}
+              {window.daylily.platform === "darwin" ? <MacDragStrip /> : null}
+              <Outlet />
+            </SidebarInset>
+            <SearchDialog />
+          </>
+        )}
       </SidebarProvider>
     </TooltipProvider>
   );
