@@ -27,6 +27,34 @@ export const RELEASES: Release[] = [
   {
     changes: [
       {
+        body: "⌘K, or Ctrl K, from anywhere: every page you’ve written, searched by its title and its words, on your computer and nowhere else.",
+        color: "text-daylily",
+        title: "Search your days",
+      },
+      {
+        body: "Results come as you type, and the chosen day shows beside them with the words marked. ⌘J puts the preview away.",
+        color: "text-saffron",
+        title: "A look before you open",
+      },
+      {
+        body: "Open a day and it scrolls to the words you were looking for, which glow for a moment and fade.",
+        color: "text-cornflower",
+        title: "Opened at the words",
+      },
+      {
+        body: "“Cafe” finds “café”, “walk” finds “walked”, and a small typo in a longer word is forgiven.",
+        color: "text-petal",
+        title: "Finds what you meant",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "Every page you’ve written, a keystroke away. Search runs on your computer, from your own files, and nothing you type leaves it.",
+    title: "Find it again.",
+    version: "0.4.0",
+  },
+  {
+    changes: [
+      {
         body: "The meadow behind “Save as image” is painted at twice the size, so the card stays crisp wherever you share it.",
         color: "text-saffron",
         title: "A sharper share card",
