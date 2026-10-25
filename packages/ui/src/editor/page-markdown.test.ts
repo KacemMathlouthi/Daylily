@@ -71,7 +71,10 @@ describe("a page's images", () => {
     page.state.doc.check();
     page.commands.focus("end");
     page.commands.insertContent("Then tea.");
-    expect(page.getMarkdown()).toContain("![](image-01.jpg)");
+    page.state.doc.check();
+    const saved = page.getMarkdown();
+    expect(saved).toContain("![](image-01.jpg)");
+    expect(saved).toContain("Then tea.");
   });
 
   it("keeps an image on its own line", () => {
@@ -126,6 +129,14 @@ describe("an image as HTML", () => {
     expect(html).toContain('data-src="https://example.com/sky.jpg"');
     page.commands.setContent(html);
     expect(page.getMarkdown()).toBe("![](https://example.com/sky.jpg)");
+  });
+
+  it("never takes an image carried as data, whichever attribute holds it", () => {
+    const page = open("");
+    page.commands.setContent(
+      '<p><img data-src="data:image/png;base64,AAAA" alt=""><img src="data:image/png;base64,AAAA" alt=""></p>'
+    );
+    expect(page.getMarkdown()).not.toContain("data:");
   });
 
   it("still takes an image pasted from elsewhere with a src", () => {
