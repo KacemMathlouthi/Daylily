@@ -8,7 +8,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 
 | | |
 |---|---|
-| **Status** | Website live at [daylily.ink](https://daylily.ink). Desktop app 0.1.0 released for macOS, Windows and Linux (unsigned): writes, saves, reads and seals a real journal folder, and reminds in the evening; what comes next is in `ROADMAP.md`. |
+| **Status** | Website live at [daylily.ink](https://daylily.ink). Desktop app released for macOS, Windows and Linux (unsigned), a version from every merge that changes it: writes, saves, reads, searches and seals a real journal folder, welcomes, and reminds in the evening; what comes next is in `ROADMAP.md`. |
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
