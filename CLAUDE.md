@@ -144,6 +144,8 @@ v1 is the **human core**: write today, seal it, see your days grow. No AI, no sy
 | Local full-text search | Encryption at rest (rely on OS disk encryption) |
 | Evening reminder | Multiple journals |
 | Onboarding, settings, light and dark themes | Codexes, mobile, embedded terminal |
+| | Video, voice notes, files and link previews on the page |
+| | Diagrams (Mermaid), math and other markdown extras |
 
 ### 3.2 Files on disk
 

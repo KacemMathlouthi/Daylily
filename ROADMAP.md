@@ -43,13 +43,12 @@ The owner's order. Build from the top; an item that's blocked waits while the ne
 | 18 | ~~**Image quality audit**~~ | All 82 images measured against the size they're shown at. Eleven gallery covers were far too small for a day cover (388 to 800 px, most of them 388 px squares stretched 3.5×), the sample journal's too, and the README's app picture was a mock. The website's large paintings (hero meadow, dusk and its lilies, the manifesto lily, the changelog's path, the share card's meadow) were then upscaled 2× with Topaz. | Medium | S | ✓ Done, Oct 25 |
 | 19 | ~~**Generate new image assets**~~ | The eleven covers painted again with Codex at 1536 × 1024, subject in the middle band, from the old ones as reference, then the long way home; the landing page's covers and the sample journal's 16 follow them, three of those (notebook, market, pancakes) painted anew. | Medium | M | ✓ Done, Oct 25 |
 | 20 | ~~**More gallery covers**~~ | Twenty covers: eight new, also in the landing page's calendar, the sea, mountains, a forest, a garden, the moon, stars, a telescope under shooting stars and a rocket launch at dusk. The picker scrolls past four rows. | Medium | M | ✓ Done, Oct 25 |
-| 21 | **Media on the page: images and video** | Inline images exist; add video and files, copied into the day's folder (`video-01.mp4`), linked relatively. | High | M | Ready |
-| 22 | **Link previews** | A pasted URL becomes a small card: title, site, picture. Stored as plain markdown (the link stays a link); the preview is fetched once and cached, and can be turned off. | Medium | M | Ready |
-| 23 | **Thoughts and notes** ⚠ | To discuss before anything is designed. Thoughts: quick notes through the day in a running stream; to keep the thesis they could belong to **today**, live in today's folder (`thoughts.md`) and seal with it at 4am. Notes: free-form, Obsidian-style, the biggest departure from "today is the only page". | Medium | M to XL | Blocked: discussion |
-| 24 | **Sidebar by kind** | Journal, Thoughts, Notes, AI, Recent. Shaped by what 23 decides. | Low | S | After 23 |
-| 25 | **Connections** | AI starts with **one** way in: an API key for one provider, or Sign in with ChatGPT. Keys live in the OS keychain, never in the journal. Off until turned on. | High | M | Blocked: which one first |
-| 26 | **Ghost prompts that listen** | The pause question reacts to what you just wrote. Sees today's page only. The signature feature, upgraded. | High | M | After 25 |
-| 27 | **Ask your journal** | "What made me happiest this spring?" Answers from your own pages, with a "this sends N days to …" note. Uses the search index (15) to pick pages. | High | L | After 25, 15 |
+| 21 | **Images on the page** | Pasted, dropped or chosen images, copied into the day's folder (`image-01.jpg`) and linked relatively, so the day stays plain markdown. Video, files and link previews moved to Later. | High | M | Ready |
+| 22 | **Thoughts and notes** ⚠ | To discuss before anything is designed. Thoughts: quick notes through the day in a running stream; to keep the thesis they could belong to **today**, live in today's folder (`thoughts.md`) and seal with it at 4am. Notes: free-form, Obsidian-style, the biggest departure from "today is the only page". | Medium | M to XL | Blocked: discussion |
+| 23 | **Sidebar by kind** | Journal, Thoughts, Notes, AI, Recent. Shaped by what 22 decides. | Low | S | After 22 |
+| 24 | **Connections** | AI starts with **one** way in: an API key for one provider, or Sign in with ChatGPT. Keys live in the OS keychain, never in the journal. Off until turned on. | High | M | Blocked: which one first |
+| 25 | **Ghost prompts that listen** | The pause question reacts to what you just wrote. Sees today's page only. The signature feature, upgraded. | High | M | After 24 |
+| 26 | **Ask your journal** | "What made me happiest this spring?" Answers from your own pages, with a "this sends N days to …" note. Uses the search index (15) to pick pages. | High | L | After 24, 15 |
 
 > **Search engines.** Algolia and similar hosted engines would send people's journals to a third party, which
 > breaks "your files are yours" and offline use. In the app, search uses a local index: Orama, chosen over
@@ -84,6 +83,9 @@ Not ordered yet. Grouped by theme.
 
 | Item | Why | Impact | Effort | Feasibility |
 |---|---|---|---|---|
+| **Video and files on the page** | Video and any file dropped on the page, copied into the day's folder (`video-01.mp4`, `file-01.pdf`) and linked relatively. Builds on images on the page. | Medium | M | After images on the page |
+| **Link previews** | A pasted URL becomes a small card: title, site, picture. Stored as plain markdown (the link stays a link); the preview is fetched once and cached, and can be turned off. | Medium | M | Ready |
+| **Diagrams and more markdown** | Mermaid diagrams, math (KaTeX), callouts, footnotes and highlights drawn on the page, all kept as plain text any editor can read. Sealed days render them too. | Medium | M | Ready |
 | **Write with your voice** | Dictation into the page, with speech-to-text **on the device** (whisper.cpp), since the browser speech API sends audio to Google. Keep the recording as `voice-01.m4a` if wanted. | High | L | Research: model size and speed |
 | **A song for the day** | A Spotify, Apple Music or YouTube link as the day's song, shown as a player card. Builds on link previews. Stored in the frontmatter (`song:`). | Medium | S | After link previews |
 | **Make it yours** | Accent colour, writing font and size, page width, turning features off. Some already exist in Settings. | Medium | M | Ready |
@@ -123,6 +125,6 @@ Each one off until turned on, and plain about what it sends.
 ## Decisions waiting on the owner
 
 - Buy `daylily.so` (5).
-- Thoughts and notes: whether, and in what shape (23).
-- The first AI connection: an API key for which provider, or Sign in with ChatGPT (25).
+- Thoughts and notes: whether, and in what shape (22).
+- The first AI connection: an API key for which provider, or Sign in with ChatGPT (24).
 - When to pay for signing, and when Daylily is ready for 1.0.
