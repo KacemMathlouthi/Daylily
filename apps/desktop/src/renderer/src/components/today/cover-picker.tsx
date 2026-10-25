@@ -165,7 +165,8 @@ export function CoverPicker({
           </DialogClose>
         </div>
 
-        <div className="grid grid-cols-4 gap-2.5">
+        {/* Four rows show at once; the rest scroll, so a small window still fits the dialog */}
+        <div className="-mx-1 grid max-h-102 grid-cols-4 gap-2.5 overflow-y-auto px-1 py-1">
           {GALLERY.map((item) => (
             <GalleryTile
               item={item}
