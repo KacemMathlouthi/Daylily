@@ -25,6 +25,68 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    art: "/images/covers/stars.jpg",
+    changes: [
+      {
+        body: "Eight new covers: the sea, mountains, a forest, a garden, a full moon, the Milky Way, a telescope under shooting stars and a rocket launch far away.",
+        color: "text-cornflower",
+        title: "Twenty covers",
+      },
+      {
+        body: "Every gallery cover painted again, large and wide, so a day’s cover stays sharp and keeps its subject in view.",
+        color: "text-saffron",
+        title: "Sharper covers",
+      },
+      {
+        body: "The cover picker shows four rows and scrolls to the rest.",
+        color: "text-petal",
+        title: "Room to choose",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "The cover gallery, painted again and grown to twenty, with the sea, the mountains and a few night skies.",
+    title: "A fuller gallery.",
+    version: "0.3.0",
+  },
+  {
+    changes: [
+      {
+        body: "Daylily looks for a new version as it opens and every few hours. On Windows and with the AppImage it installs when you quit, or right away with “Restart now”.",
+        color: "text-daylily",
+        title: "Updates itself",
+      },
+      {
+        body: "A quiet card above Settings says when a new version is ready. “Not now” puts it away until the next one.",
+        color: "text-saffron",
+        title: "A word when it’s ready",
+      },
+      {
+        body: "On a Mac or with the Debian package, Daylily says a new version is out and links to its download.",
+        color: "text-cornflower",
+        title: "Everywhere else, a link",
+      },
+      {
+        body: "The top of the sidebar names your journal and its folder, and opens its settings.",
+        color: "text-petal",
+        title: "Your journal, named",
+      },
+      {
+        body: "Days before you started aren’t counted as rested: the calendar, Home and the garden show them as plain ground.",
+        color: "text-daylily",
+        title: "A journal’s first day",
+      },
+      {
+        body: "A quit that could hang now finishes, a ghost prompt keeps its “…” with its words, and the garden fits a narrow window.",
+        color: "text-saffron",
+        title: "Small fixes",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "From this version on, Daylily keeps itself up to date. Version 0.1.0 can’t update itself, so download this one once by hand.",
+    title: "Keeping up.",
+    version: "0.2.0",
+  },
+  {
     art: "/images/art/path.jpg",
     changes: [
       {

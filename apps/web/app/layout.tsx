@@ -51,6 +51,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       className={`${display.variable} ${sans.variable} ${writing.variable} ${mono.variable}`}
+      // The page scrolls smoothly for anchor links; this lets Next jump instantly to a new page's top instead
+      data-scroll-behavior="smooth"
       lang="en"
     >
       {/* Extensions like ColorZilla add attributes to <body> before React hydrates */}

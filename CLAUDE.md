@@ -440,6 +440,10 @@ Work accordingly.
   types release nothing. The website's scopes, `web` and `site`, never release the app.
 
 ### Versions
+- **Every release gets its changelog entry, the same day.** When a merge to `main` releases a version, write
+  its entry in `apps/web/app/changelog/releases.ts` (version and date as on the GitHub Release; a title, a lead
+  and the changes in the app's voice, for the people who use it), in a `docs(web)` PR right after the release.
+  The website's changelog is how people hear what changed; a release without its entry isn't finished.
 - Semantic versioning, `MAJOR.MINOR.PATCH`. The first release, `0.1.0` (2026-10-24), was tagged by hand with written
   notes; every release after it is made from the commits.
 - **Daylily stays below 1.0** until the owner decides it's ready; a breaking change is released as a minor version.
