@@ -99,24 +99,22 @@ function AppShell() {
         style={SHELL_SIZE}
       >
         {HAS_TITLE_STRIP ? <TitleStrip /> : null}
-        {welcoming ? (
-          <Onboarding />
-        ) : (
-          <>
-            {/* Focus mode leaves only the page */}
-            {focused ? null : <AppSidebar />}
-            <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
-              {/*
-               * macOS hides the title bar, so this strip drags the window there. It overlays the
-               * page, which keeps its own top space. Elsewhere the window has its own frame, and
-               * drag regions would swallow the cursor styles.
-               */}
-              {window.daylily.platform === "darwin" ? <MacDragStrip /> : null}
-              <Outlet />
-            </SidebarInset>
-            <SearchDialog />
-          </>
-        )}
+        {/* Onboarding lies over the app, which waits beneath it out of reach */}
+        <div className="contents" inert={welcoming}>
+          {/* Focus mode leaves only the page */}
+          {focused ? null : <AppSidebar />}
+          <SidebarInset className="relative min-w-0 overflow-y-auto bg-paper-page">
+            {/*
+             * macOS hides the title bar, so this strip drags the window there. It overlays the
+             * page, which keeps its own top space. Elsewhere the window has its own frame, and
+             * drag regions would swallow the cursor styles.
+             */}
+            {window.daylily.platform === "darwin" ? <MacDragStrip /> : null}
+            <Outlet />
+          </SidebarInset>
+          <SearchDialog />
+        </div>
+        {welcoming ? <Onboarding /> : null}
       </SidebarProvider>
     </TooltipProvider>
   );

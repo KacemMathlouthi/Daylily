@@ -1,7 +1,7 @@
 import { Switch } from "@daylily/ui/primitives/switch";
 import { Bell, MessageCircleQuestion } from "lucide-react";
 import { type ReactNode, useCallback } from "react";
-import dusk from "../../assets/dusk.jpg";
+import earth from "../../assets/earth.jpg";
 import { ReminderTimeSelect } from "../reminder-time";
 import type { OnboardingStep, StepProps } from "./step";
 
@@ -109,9 +109,9 @@ function ALittleHelp({ choices, change }: StepProps) {
 
 export const helpStep: OnboardingStep = {
   art: {
-    alt: "Daylilies in a meadow at dusk, hills fading into a pink sky",
-    position: "18% 50%",
-    src: dusk,
+    alt: "The earth from space at the end of a day, its edge lit warm",
+    position: "50% 50%",
+    src: earth,
   },
   caption: {
     line: "Most people write in the evening, when the day is done.",
