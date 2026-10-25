@@ -5,14 +5,14 @@ slowly and carefully. This page explains how to make a change that fits.
 
 ## Before you start
 
-- **Read the [manifesto](https://daylily.kacem.lol/manifesto).** Every change is checked against it. Daylily
+- **Read the [manifesto](https://daylily.ink/manifesto).** Every change is checked against it. Daylily
   never writes for you, never guilts you, and never locks your words away. Features that pull against that won't be
   merged, however well they're built.
 - **Open an issue first** for anything bigger than a small fix, so we can agree on the shape before you write code.
   Ideas and questions are welcome in [Discussions](https://github.com/KacemMathlouthi/Daylily/discussions).
 - **Visual changes are designed first.** Layout, colour, a new screen or state: describe or sketch it in an issue.
   The designs live in Paper, and code follows them closely.
-- **See what's planned** in the [roadmap](https://daylily.kacem.lol/roadmap) before starting something new.
+- **See what's planned** in the [roadmap](https://daylily.ink/roadmap) before starting something new.
 
 ## Setting up
 

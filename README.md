@@ -3,16 +3,16 @@
 </p>
 
 <p align="center">
-  <a href="https://daylily.kacem.lol/download/mac"><img alt="Download for macOS" src=".github/readme/download-macos.png" height="44"></a>
-  <a href="https://daylily.kacem.lol/download/windows"><img alt="Download for Windows" src=".github/readme/download-windows.png" height="44"></a>
-  <a href="https://daylily.kacem.lol/download/linux"><img alt="Download for Linux" src=".github/readme/download-linux.png" height="44"></a>
+  <a href="https://daylily.ink/download/mac"><img alt="Download for macOS" src=".github/readme/download-macos.png" height="44"></a>
+  <a href="https://daylily.ink/download/windows"><img alt="Download for Windows" src=".github/readme/download-windows.png" height="44"></a>
+  <a href="https://daylily.ink/download/linux"><img alt="Download for Linux" src=".github/readme/download-linux.png" height="44"></a>
 </p>
 
 <p align="center">
   Free and open source ·
-  <a href="https://daylily.kacem.lol/changelog">Changelog</a> ·
-  <a href="https://daylily.kacem.lol/roadmap">Roadmap</a> ·
-  <a href="https://daylily.kacem.lol">Website</a>
+  <a href="https://daylily.ink/changelog">Changelog</a> ·
+  <a href="https://daylily.ink/roadmap">Roadmap</a> ·
+  <a href="https://daylily.ink">Website</a>
 </p>
 
 Most journaling apps want to write your journal *for* you: AI summaries, chat-to-entry, auto-titles. **Daylily goes
@@ -43,7 +43,7 @@ days are plain markdown files in a folder you own.
 5. **AI asks. It never writes for you.** When it comes, it stays off until you turn it on, one feature at a time.
 6. **Welcome back, never guilt.** No streaks, no wilting. A missed day is bare soil.
 
-The full story is in the [manifesto](https://daylily.kacem.lol/manifesto).
+The full story is in the [manifesto](https://daylily.ink/manifesto).
 
 ## Your journal is a folder
 
@@ -61,19 +61,19 @@ it in twenty years.
 
 ## Install
 
-Download the latest release for your computer from the [download page](https://daylily.kacem.lol/download) or
+Download the latest release for your computer from the [download page](https://daylily.ink/download) or
 [GitHub Releases](https://github.com/KacemMathlouthi/Daylily/releases/latest).
 
 | System | File | First launch |
 |---|---|---|
-| macOS 13 or later | [Apple silicon](https://daylily.kacem.lol/download/mac) · [Intel](https://daylily.kacem.lol/download/mac-intel) `.dmg` | Drag Daylily to Applications, then right-click it and choose **Open** |
-| Windows 10 or later | [`setup.exe`](https://daylily.kacem.lol/download/windows) | **More info**, then **Run anyway** |
-| Linux | [`.AppImage`](https://daylily.kacem.lol/download/linux) · [`.deb`](https://daylily.kacem.lol/download/deb) | `chmod +x` the AppImage and run it, or `sudo apt install ./daylily_*.deb` |
+| macOS 13 or later | [Apple silicon](https://daylily.ink/download/mac) · [Intel](https://daylily.ink/download/mac-intel) `.dmg` | Drag Daylily to Applications, then right-click it and choose **Open** |
+| Windows 10 or later | [`setup.exe`](https://daylily.ink/download/windows) | **More info**, then **Run anyway** |
+| Linux | [`.AppImage`](https://daylily.ink/download/linux) · [`.deb`](https://daylily.ink/download/deb) | `chmod +x` the AppImage and run it, or `sudo apt install ./daylily_*.deb` |
 
 > [!NOTE]
 > Builds aren't signed yet, so macOS and Windows warn you the first time. If macOS still refuses, run
 > `xattr -cr /Applications/Daylily.app`. Signed builds are on the roadmap. Each release lists its
-> [checksums](https://daylily.kacem.lol/download/checksums).
+> [checksums](https://daylily.ink/download/checksums).
 
 ## Build it yourself
 
@@ -97,8 +97,8 @@ Want to help? Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Where it's growing
 
 Search, a welcome for your first run and updates that install themselves are next. Then richer days, AI that asks but
-never writes, and your journal everywhere you write. See the [roadmap](https://daylily.kacem.lol/roadmap) and the
-[changelog](https://daylily.kacem.lol/changelog), and
+never writes, and your journal everywhere you write. See the [roadmap](https://daylily.ink/roadmap) and the
+[changelog](https://daylily.ink/changelog), and
 [suggest a change](https://github.com/KacemMathlouthi/Daylily/issues/new?template=suggestion.yml) anytime.
 
 ## License
