@@ -111,7 +111,7 @@ function Line({
 }) {
   let wordIndex = firstWord;
   return (
-    <div className="flex flex-wrap items-center gap-x-[0.23em]">
+    <div className="flex flex-wrap items-center justify-center gap-x-[0.23em]">
       {segments.map((segment) => {
         if (segment.image) {
           return <Pill key={segment.image.src} {...segment.image} />;
@@ -154,9 +154,9 @@ export function Statement() {
 
   let firstWord = 0;
   return (
-    <section className="flex flex-col bg-paper-raised px-5 pt-24 pb-24 md:px-30 md:pt-35 md:pb-32.5">
+    <section className="flex flex-col items-center bg-paper-raised px-5 pt-24 pb-24 md:px-30 md:pt-35 md:pb-32.5">
       <div
-        className="relative flex flex-col gap-1.5 font-display text-fluid-statement leading-heading-loose tracking-display"
+        className="flex flex-col items-center gap-1.5 text-center font-display text-fluid-statement leading-heading-loose tracking-display"
         ref={ref}
       >
         {QUIET_LINES.map((segments) => (
@@ -181,18 +181,14 @@ export function Statement() {
             />
           );
         })}
-        {/*
-         * Sits beside "then listens.", aligned under "one question,". The offsets are in
-         * em of the headline size, so they track the words at every width.
-         */}
-        <Reveal className="mt-10 lg:absolute lg:top-[3.44em] lg:left-[5.854em] lg:mt-0">
-          <p className="max-w-105 font-sans text-body text-ink-muted leading-7.25 tracking-normal md:text-lg">
-            No autocomplete. No rewrites. No summaries poured into your page.
-            Typos, half-thoughts and broken grammar all count, because they’re
-            true.
-          </p>
-        </Reveal>
       </div>
+      <Reveal className="mt-12">
+        <p className="max-w-115 text-center font-sans text-body text-ink-muted leading-7.25 md:text-lg">
+          No autocomplete. No rewrites. No summaries poured into your page.
+          Typos, half-thoughts and broken grammar all count, because they’re
+          true.
+        </p>
+      </Reveal>
     </section>
   );
 }
