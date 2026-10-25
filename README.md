@@ -23,7 +23,7 @@ Today is the only page you can write. At 4am it seals, honest and unedited, and 
 days are plain markdown files in a folder you own.
 
 <p align="center">
-  <img alt="Daylily's writing screen: today's page with a cover, a title and a few paragraphs, and a faint question at the end of the last line: …and how did that feel?" src=".github/readme/app.webp" width="880">
+  <img alt="Daylily's writing screen: today's page, The long way home, with a cover of daylilies on a hillside at sunset, three short paragraphs, and a faint question at the end of the last line: …what would you tell a friend?" src=".github/readme/app.webp" width="880">
 </p>
 
 <p align="center">
