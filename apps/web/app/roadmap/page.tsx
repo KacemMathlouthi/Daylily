@@ -22,7 +22,7 @@ interface Item {
 
 /**
  * The sheet, cell by cell, two to a row on wide screens. Everything here is
- * past v1 (ROADMAP.md, "Later"); what's in v1 lands in the changelog instead.
+ * past v1 (the maintainer's local ROADMAP.md, "Later"); what's in v1 lands in the changelog instead.
  */
 type Cell =
   | { kind: "section"; name: string; title: ReactNode }

@@ -565,6 +565,9 @@ hand-printed art (`brand-art*.png`), the landing art and the sheets it was cut f
 illustrations, the icon masters, and the GitHub social preview. When the app or the site needs one of them, a
 web-sized copy goes into the folders above. It was in the repository until 2026-10-25, so older commits still hold it.
 
+**`ROADMAP.md` and `.vscode/` are local too** (since 2026-10-25): the working plan and editor settings stay on
+the maintainer's machine. The public plan is the website's `/roadmap`.
+
 `*.mcpb` bundles and `.playwright-mcp/` are ignored.
 
 ---
@@ -609,7 +612,8 @@ web-sized copy goes into the folders above. It was in the repository until 2026-
 | 2026-10-25 | Images on the page: pasted or dropped, copied untouched into the day's folder as `image-NN`, plain markdown; images written in other editors no longer dropped on save; the editor's markdown tested (`packages/ui`). The website: a centred statement on the landing, "For your eyes only." on the Manifesto with a new painting; video, files, link previews and diagrams moved past v1. Designed in Paper first |
 
 ### Next
-The plan, in order, with each item's impact, effort and what blocks it, lives in [`ROADMAP.md`](ROADMAP.md).
+The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
+maintainer's machine (not in git; the website's `/roadmap` is the public version).
 Keep it current as items ship or move. The next few: onboarding, then a talk about thoughts and notes.
 
 ---
