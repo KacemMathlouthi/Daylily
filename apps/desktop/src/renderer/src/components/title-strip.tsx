@@ -61,6 +61,7 @@ function useMaximized() {
 
 function useMenus(): [string, MenuGroups][] {
   const navigate = useNavigate();
+  const welcoming = useWelcome().open;
   const { toggleSidebar } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const act = (action: WindowAction) => () => {
@@ -115,7 +116,10 @@ function useMenus(): [string, MenuGroups][] {
           { label: "Paste", run: act("paste"), shortcut: "Ctrl V" },
           { label: "Select all", run: act("selectAll"), shortcut: "Ctrl A" },
         ],
-        [{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }],
+        // Search opens over the app, which waits beneath onboarding
+        ...(welcoming
+          ? []
+          : [[{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }]]),
       ],
     ],
     [

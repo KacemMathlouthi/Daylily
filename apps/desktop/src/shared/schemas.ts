@@ -71,7 +71,7 @@ export const coverExtensionSchema = z.enum(COVER_EXTENSIONS);
 export const configChangesSchema = z.strictObject({
   galleryCovers: z.boolean().optional(),
   ghostPrompts: z.boolean().optional(),
-  // An empty name goes back to the computer's
+  // An empty name is kept as none, so the computer's name for them is used
   name: z
     .string()
     .trim()

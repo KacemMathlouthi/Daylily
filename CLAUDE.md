@@ -270,12 +270,11 @@ keychain and **never** into the journal folder.
   with "Restart now" (every page is saved first). macOS (until it's signed) and the Debian package can't replace
   themselves, so they say a new version is out and link to its download. A quiet card above Settings says so;
   "Not now" puts it away until the next version. Settings › About shows the state and a "Check now".
-- **Onboarding is a list of steps** (`components/onboarding/steps.ts`): each has its painting and card, its form,
-  whether it can go on, and how it saves. They share one set of choices, saved in step order at the end (the folder
-  is moved to before the help is saved into it), so leaving halfway changes nothing. A new step, such as AI, adds
-  its fields to `OnboardingChoices` and its entry to the list. The page may move the journal only to a folder the
-  main process offered it (the one in use, or one picked in the dialog); opening one never moves, copies or deletes
-  a file. A folder Daylily can't write in holds the step until another is chosen.
+- **Onboarding's steps** live in `apps/desktop/src/renderer/src/components/onboarding/steps.ts`, each with its
+  painting, form, whether it can go on, and how it saves; they share one set of choices, saved in step order at the
+  end, so leaving halfway changes nothing. A new step (AI) adds its fields to `OnboardingChoices` and its entry to
+  the list. The page may move the journal only to a folder the main process offered it, and the app beneath is held
+  (its keys, shortcuts and menus) until onboarding is done.
 - **Sidebar's journal:** the top of the sidebar names the journal and its folder (`~/Daylily`) and opens Settings ›
   Journal; there's one journal, so nothing to pick.
 - **A journal's first day:** days before the earliest page (or today, in an empty journal) weren't rested, they came

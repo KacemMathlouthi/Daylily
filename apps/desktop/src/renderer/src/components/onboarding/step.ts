@@ -65,8 +65,15 @@ export function chosenFolder(folder: FolderChoice): FolderInfo {
 /**
  * Choices for another folder: the help that follows starts from that journal's
  * own preferences, since they live in its folder, and so does a name it keeps.
+ * The same folder chosen again keeps everything already chosen.
  */
-export function withFolder(folder: FolderChoice): Partial<OnboardingChoices> {
+export function withFolder(
+  folder: FolderChoice,
+  current: FolderChoice
+): Partial<OnboardingChoices> {
+  if (chosenFolder(folder).path === chosenFolder(current).path) {
+    return { folder };
+  }
   const { config } = chosenFolder(folder);
   return {
     folder,

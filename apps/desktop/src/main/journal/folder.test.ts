@@ -85,6 +85,7 @@ describe("inspectFolder", () => {
 describe("tildeHome", () => {
   it("shows the home folder as ~, and only that folder", () => {
     const home = join(base, "sam");
+    expect(tildeHome(home, home)).toBe("~");
     expect(tildeHome(join(home, "Daylily"), home)).toBe(
       `~${join(home, "Daylily").slice(home.length)}`
     );

@@ -2,7 +2,12 @@ import { cn } from "@daylily/ui/lib/cn";
 import { Button } from "@daylily/ui/primitives/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import {
+  type KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { closeWelcome, useWelcome } from "../../lib/welcome";
 import { MacDragStrip } from "../mac-drag-strip";
 import { HELLO_MS, Hello } from "./hello";
@@ -29,19 +34,18 @@ function useStartingChoices() {
   const [choices, setChoices] = useState<OnboardingChoices | null>(null);
   useEffect(() => {
     let current = true;
-    Promise.all([
-      window.daylily.journal.folder(),
-      window.daylily.app.info(),
-    ]).then(([folder, app]) => {
-      if (current) {
-        setChoices({
-          folder: { opened: null, suggested: folder, use: "suggested" },
-          ghostPrompts: folder.config.ghostPrompts,
-          name: folder.config.name ?? app.userName ?? "",
-          reminder: folder.config.reminder,
-        });
-      }
-    });
+    Promise.all([window.daylily.journal.folder(), window.daylily.app.info()])
+      .then(([folder, app]) => {
+        if (current) {
+          setChoices({
+            folder: { opened: null, suggested: folder, use: "suggested" },
+            ghostPrompts: folder.config.ghostPrompts,
+            name: folder.config.name ?? app.userName ?? "",
+            reminder: folder.config.reminder,
+          });
+        }
+      })
+      .catch((error) => console.error("Could not start onboarding", error));
     return () => {
       current = false;
     };
@@ -130,24 +134,40 @@ function QuietAction({ action }: QuietActionProps) {
 }
 
 /**
- * Opened again from Help, onboarding can be left as it was with Escape, though
- * not while its choices are being saved.
+ * Keys pressed in onboarding stay in it: the app beneath has its own (⌘B, the
+ * arrows, Escape), and none of them should reach it. Keys pressed with nothing
+ * focused are held back too. Opened again from Help, Escape leaves it as it was,
+ * though not while its choices are being saved.
  */
-function useEscapeWhenDone(busy: boolean) {
+function useKeysKeptIn(busy: boolean) {
   const { done } = useWelcome();
   useEffect(() => {
-    if (!done || busy) {
-      return;
-    }
-    const leave = (event: KeyboardEvent) => {
-      // An open list, as the reminder's time, closes first
-      if (event.key === "Escape" && !event.defaultPrevented) {
-        closeWelcome(false);
+    const holdBack = (event: KeyboardEvent) => {
+      if (event.target === document.body) {
+        event.stopImmediatePropagation();
       }
     };
-    window.addEventListener("keydown", leave);
-    return () => window.removeEventListener("keydown", leave);
-  }, [busy, done]);
+    window.addEventListener("keydown", holdBack, true);
+    return () => window.removeEventListener("keydown", holdBack, true);
+  }, []);
+  return useCallback(
+    (event: ReactKeyboardEvent) => {
+      // An open list, as the reminder's time, closes first
+      if (event.key === "Escape" && done && !busy && !event.defaultPrevented) {
+        closeWelcome(false);
+      }
+      event.stopPropagation();
+    },
+    [busy, done]
+  );
+}
+
+/**
+ * Each new step, and the hello, takes the focus as it arrives, so the keyboard
+ * is never left behind on the page beneath.
+ */
+function takeFocus(node: HTMLElement | null) {
+  node?.focus({ preventScroll: true });
 }
 
 /**
@@ -183,7 +203,7 @@ export function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const client = useQueryClient();
-  useEscapeWhenDone(saving || phase !== "steps");
+  const keepKeys = useKeysKeptIn(saving || phase !== "steps");
   useGoodbye(phase, setPhase);
 
   const step = ONBOARDING_STEPS[index] ?? ONBOARDING_STEPS[0];
@@ -259,12 +279,19 @@ export function Onboarding() {
   const ready = step.ready?.(choices) ?? true;
 
   return (
+    // biome-ignore lint/a11y/noNoninteractiveElementInteractions: the dialog keeps its controls' keys from the app beneath
     <div
+      aria-label="Welcome to Daylily"
+      aria-modal="true"
       className={cn(
         "fixed inset-x-0 top-(--title-strip) bottom-0 z-40 flex bg-paper-page transition-opacity ease-soft motion-reduce:transition-none",
         phase === "leaving" && "pointer-events-none opacity-0"
       )}
+      onKeyDown={keepKeys}
+      ref={phase === "steps" ? undefined : takeFocus}
+      role="dialog"
       style={{ transitionDuration: `${LEAVE_MS}ms` }}
+      tabIndex={-1}
     >
       {phase === "steps" ? null : <WindowDrag />}
       {phase === "steps" ? (
@@ -277,6 +304,8 @@ export function Onboarding() {
               // Nothing changes while the choices are saved, so what's saved is what shows
               inert={saving}
               key={step.id}
+              ref={takeFocus}
+              tabIndex={-1}
             >
               <Progress at={index} of={ONBOARDING_STEPS.length} />
               <Form change={change} choices={choices} />

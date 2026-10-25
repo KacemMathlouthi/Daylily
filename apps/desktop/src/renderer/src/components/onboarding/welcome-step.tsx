@@ -79,7 +79,12 @@ export const welcomeStep: OnboardingStep = {
     run: async ({ choices, change, goTo }) => {
       const opened = await window.daylily.journal.pickFolder();
       if (opened) {
-        change(withFolder({ ...choices.folder, opened, use: "opened" }));
+        change(
+          withFolder(
+            { ...choices.folder, opened, use: "opened" },
+            choices.folder
+          )
+        );
         goTo("folder");
       }
     },

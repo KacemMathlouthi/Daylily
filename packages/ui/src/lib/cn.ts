@@ -51,6 +51,7 @@ export const cn = createCn({
         "code",
         "display",
         "display-lg",
+        "display-md",
         "display-sm",
         "display-xl",
         "display-xs",

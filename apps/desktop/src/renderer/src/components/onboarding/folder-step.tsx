@@ -145,14 +145,8 @@ function NameField({ choices, change }: StepProps) {
 function MakeItYours({ choices, change }: StepProps) {
   const { folder } = choices;
   const { suggested, opened } = folder;
-  // Another folder brings its journal's preferences; choosing the same one again keeps what was typed
   const choose = useCallback(
-    (next: FolderChoice) =>
-      change(
-        chosenFolder(next).path === chosenFolder(folder).path
-          ? { folder: next }
-          : withFolder(next)
-      ),
+    (next: FolderChoice) => change(withFolder(next, folder)),
     [change, folder]
   );
 

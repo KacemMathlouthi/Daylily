@@ -16,7 +16,11 @@ export function useComputerName() {
  * journal, or their computer's name for them.
  */
 export function usePersonName() {
-  const chosen = useJournalInfo()?.config.name ?? null;
+  const info = useJournalInfo();
   const computer = useComputerName();
-  return chosen ?? computer;
+  // Nothing until the journal is read, so a chosen name never flickers in
+  if (!info) {
+    return null;
+  }
+  return info.config.name ?? computer;
 }
