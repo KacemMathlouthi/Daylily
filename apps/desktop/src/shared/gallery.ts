@@ -4,13 +4,13 @@ import type { FlowerColor } from "@daylily/core/flower";
  * The bundled cover gallery, in Paper's order ("03c Writing · cover picker"),
  * then the places and night skies added after: `resources/covers/<id>.jpg`,
  * 1536 × 1024, painted with the subject in the middle band so a day cover's
- * wide strip still shows it. Each carries a flower colour chosen by eye: every
- * picture is warm golden light with orange daylilies, so sampling them would grow
- * a garden of one colour. The picker shows them; sealing gives one at random to a
+ * wide strip still shows it. Each carries a flower colour chosen by eye: the
+ * pictures share one warm palette, so sampling them would grow a garden of
+ * mostly one colour. The picker shows them; sealing gives one at random to a
  * day written without a cover.
  */
 export const GALLERY_COVERS = [
-  ["long-way-home", "Daylilies on a hillside at sunset", "daylily"],
+  ["long-way-home", "Daylilies along a fence at sunset", "daylily"],
   ["first-light", "Daylilies in a meadow at first light", "saffron"],
   ["river", "A river at dusk", "cornflower"],
   ["tea", "Tea by a sunny window", "petal"],
