@@ -32,7 +32,7 @@ export const RELEASES: Release[] = [
         title: "Search your days",
       },
       {
-        body: "Results come as you type, and the chosen day shows beside them with the words marked. ⌘J puts the preview away.",
+        body: "Results come as you type, and the chosen day shows beside them with the words marked. ⌘J, or Ctrl J, puts the preview away.",
         color: "text-saffron",
         title: "A look before you open",
       },

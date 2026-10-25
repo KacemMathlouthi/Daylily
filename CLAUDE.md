@@ -243,10 +243,12 @@ keychain and **never** into the journal folder.
   `.daylily/cache/` and are derivable, never stored in the day file.
 - **Search:** an Orama index in the main process, held in memory and never written anywhere: built from the files a
   few seconds after launch, kept current by the folder watcher, so a page from another app is found too. A day
-  matches when its title or page holds every word: by a word's start ("walk" finds "walked"), or whole for words of
-  three letters or fewer, ignoring case and accents, with one typo forgiven in words of five letters or more.
-  Common words ("the", "a"…) count only when there's nothing else. Titles rank above the page. Up to 50 days are
-  listed. Works fully offline; nothing searched for leaves the computer.
+  matches when its title or page holds every word: by a word's start ("walk" finds "walked"); whole for words of
+  three letters or fewer, or with a plural "s" ("sea" finds "seas", never "seat"); and with one typo forgiven in
+  any word of five letters or more, even beside short ones ("sea brekfast"). Case and accents are ignored, and a
+  search splits where the page does ("didn't" is "didn" and "t"). Common words ("the", "a"…) count only when
+  there's nothing else. Titles rank above the page, and a match in a title is marked too. Up to 50 days are
+  listed, then "50+". Works fully offline; nothing searched for leaves the computer.
 - **Reminder:** on by default at 21:00, *"How was your day?"*, once a day. Skipped if today already has words or
   Daylily is the focused window. Never mentions missed days. Changeable or off in Settings. A reminder missed while
   the computer slept comes on waking if under two hours late and the day hasn't ended; opening the app after the time counts as the visit.
