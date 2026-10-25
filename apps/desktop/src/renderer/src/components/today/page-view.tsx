@@ -15,6 +15,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { coverLabel } from "../../lib/covers";
+import { useFindOnPage } from "../../lib/search";
 import { pageCoverUrl, type TodayPage } from "../../lib/today-page";
 import { DayCover } from "../day/day-cover";
 import { DayDate } from "../day/day-date";
@@ -34,6 +35,8 @@ export function PageView({
   onWrite,
   onTitle,
   onChooseCover,
+  find,
+  onFound,
   promptSlot,
 }: {
   page: TodayPage;
@@ -43,6 +46,10 @@ export function PageView({
   onWrite: (change: PageChange) => void;
   onTitle: (title: string) => void;
   onChooseCover: () => void;
+  /** What search was looking for: the page opens at it, the cursor still at the end. */
+  find: string | undefined;
+  /** Called once the found words have glowed, to let them go. */
+  onFound: () => void;
   /** Where the paste prompt sits: above the status bar, centred on the page. */
   promptSlot: HTMLElement | null;
 }) {
@@ -57,6 +64,7 @@ export function PageView({
     onMarkdownPaste: setPaste,
     placeholder: "How was your day?",
   });
+  useFindOnPage(editor, find, { onDone: onFound, writing: !sealed });
 
   const changeTitle = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) =>

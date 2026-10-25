@@ -11,6 +11,7 @@ import { useSidebar } from "@daylily/ui/primitives/sidebar";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import type { WindowAction } from "../../../shared/channels";
+import { openSearch } from "../lib/search";
 import { useTheme } from "../lib/theme";
 
 /** Paper's "12b": 36px, the sidebar's paper, a hairline beneath. */
@@ -109,6 +110,7 @@ function useMenus(): [string, MenuGroups][] {
           { label: "Paste", run: act("paste"), shortcut: "Ctrl V" },
           { label: "Select all", run: act("selectAll"), shortcut: "Ctrl A" },
         ],
+        [{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }],
       ],
     ],
     [

@@ -1,7 +1,7 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import type { PageChange } from "@daylily/ui/editor/use-page-editor";
 import { cn } from "@daylily/ui/lib/cn";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { DayHeader } from "../components/day/day-header";
 import { PageMenu } from "../components/day/page-menu";
@@ -14,6 +14,7 @@ import { useFocusChrome } from "../lib/focus-mode";
 import { dayFileLabel, useJournalInfo } from "../lib/journal-info";
 import type { DayKey } from "../lib/month";
 import { useGhostPrompts } from "../lib/preferences";
+import { validateFind } from "../lib/search";
 import {
   loadPage,
   type PageCover,
@@ -29,6 +30,7 @@ import { useToday } from "../lib/use-today";
 
 export const Route = createFileRoute("/today")({
   component: TodayScreen,
+  validateSearch: validateFind,
 });
 
 /**
@@ -129,6 +131,12 @@ function useSaveLabel(page: TodayPage, load: PageLoad, notice: string | null) {
 
 /** Paper's "03 Writing" and its states (03a to 03c): today's page, the only one you can write. */
 function TodayScreen() {
+  const { find } = Route.useSearch();
+  const navigate = useNavigate();
+  const forgetFind = useCallback(
+    () => navigate({ replace: true, search: {}, to: "/today" }),
+    [navigate]
+  );
   const today = useToday();
   const now = useNow();
   const { phase, shownDay, shownPage: page } = useSealTransition(today);
@@ -212,10 +220,12 @@ function TodayScreen() {
           {/* Shown once the day's file is read, so the editor opens on its words */}
           {load.state === "loading" ? null : (
             <PageView
+              find={find}
               ghostPrompts={ghostPrompts}
               // Opened afresh when another app changed the file
               key={`${shownDay}:${page.revision}`}
               onChooseCover={openPicker}
+              onFound={forgetFind}
               onTitle={retitle}
               onWrite={write}
               page={page}

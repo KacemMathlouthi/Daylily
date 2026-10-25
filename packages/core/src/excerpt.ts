@@ -10,6 +10,7 @@ const UNDERSCORES =
 const STRIKETHROUGH = /~~(?=\S)(.*?\S)~~/g;
 // A heading underlined on the next line, with = or -
 const SETEXT_HEADING = /^(?:[^\n]+\n)+[ \t]*(?:=+|-+)[ \t]*(?:\n|$)/;
+const SETEXT_UNDERLINE = /\n[ \t]*(?:=+|-+)[ \t]*(?=\n|$)/g;
 const RULE = /^\s*(?:[-*_]\s*){3,}$/;
 // Headings name a part of the page; the excerpt is its words
 const HEADINGS_ONLY = /^(?:\s*#{1,6}\s[^\n]*(?:\n|$))+$/;
@@ -17,6 +18,14 @@ const LINE_ENDINGS = /\r\n?/g;
 const SPACES = /\s+/g;
 const PARAGRAPH_BREAK = /\n\s*\n/;
 const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
+function paragraphs(markdown: string) {
+  return markdown
+    .replace(LINE_ENDINGS, "\n")
+    .replace(IMAGE, "")
+    .replace(LINK, "$1")
+    .split(PARAGRAPH_BREAK);
+}
 
 function plainText(paragraph: string) {
   return paragraph
@@ -46,12 +55,7 @@ function fitting(text: string, max: number) {
  * near `max` characters: what a card shows of a day, such as "one year ago today".
  */
 export function pageExcerpt(markdown: string, max = 180) {
-  const paragraphs = markdown
-    .replace(LINE_ENDINGS, "\n")
-    .replace(IMAGE, "")
-    .replace(LINK, "$1")
-    .split(PARAGRAPH_BREAK);
-  for (const paragraph of paragraphs) {
+  for (const paragraph of paragraphs(markdown)) {
     const body = paragraph.replace(SETEXT_HEADING, "");
     if (RULE.test(body) || HEADINGS_ONLY.test(body)) {
       continue;
@@ -68,4 +72,16 @@ export function pageExcerpt(markdown: string, max = 180) {
     return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
   }
   return "";
+}
+
+/**
+ * The whole page as plain text, a paragraph to a line, headings included: what
+ * search reads and quotes. Images and link addresses are left out.
+ */
+export function pageText(markdown: string) {
+  return paragraphs(markdown)
+    .filter((paragraph) => !RULE.test(paragraph))
+    .map((paragraph) => plainText(paragraph.replace(SETEXT_UNDERLINE, "")))
+    .filter((text) => text !== "")
+    .join("\n");
 }

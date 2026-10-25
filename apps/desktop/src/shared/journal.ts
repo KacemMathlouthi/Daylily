@@ -1,6 +1,7 @@
 import type { DayKey } from "@daylily/core/day";
 import type { DayFileError } from "@daylily/core/day-file";
 import type { FlowerColor } from "@daylily/core/flower";
+import type { Snippet } from "@daylily/core/search-text";
 
 /** A day as the calendar and garden need it, without its page. */
 interface DaySummary {
@@ -32,6 +33,26 @@ export interface UnreadableDay {
 }
 
 export type ListedDay = DaySummary | UnreadableDay;
+
+/**
+ * Enough for anyone to find a day; more is a list nobody reads. Search returns
+ * one more, so the list can say there were more.
+ */
+export const MAX_SEARCH_HITS = 50;
+
+/** The longest search: the field stops there, and the main process refuses more. */
+export const MAX_QUERY_LENGTH = 200;
+
+/** A day that holds what was searched for, with a line of it to show. */
+export interface SearchHit {
+  color: FlowerColor | null;
+  cover: string | null;
+  day: DayKey;
+  /** The page around the first match, with the matches marked. */
+  snippet: Snippet;
+  state: DaySummary["state"];
+  title: string;
+}
 
 export type JournalError =
   | DayFileError
