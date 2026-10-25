@@ -47,6 +47,16 @@ const CELLS: Cell[] = [
     title: "A song for the day",
   },
   {
+    body: "Videos and files beside your words, kept in the day’s folder. A pasted link becomes a small card with its title and picture.",
+    kind: "item",
+    title: "Video, files and links",
+  },
+  {
+    body: "Diagrams, math, callouts and footnotes, drawn on the page and kept as plain text any editor can read.",
+    kind: "item",
+    title: "Diagrams and more",
+  },
+  {
     body: "Your accent colour, your writing font and size, the width of the page. Turn off anything you don’t need.",
     kind: "item",
     title: "Make it yours",
