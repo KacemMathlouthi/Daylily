@@ -25,6 +25,24 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    changes: [
+      {
+        body: "Today’s page could stop opening when an image was the last thing on it. It opens again, with everything you wrote.",
+        color: "text-daylily",
+        title: "Pages that end with a picture",
+      },
+      {
+        body: "An image from the web on your page is shown as its card from the very start, without Daylily ever reaching for it.",
+        color: "text-cornflower",
+        title: "Quieter still",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "A quick fix for pages that end with a picture.",
+    title: "Back to the page.",
+    version: "0.5.1",
+  },
+  {
     art: "/images/covers/bike.jpg",
     changes: [
       {
