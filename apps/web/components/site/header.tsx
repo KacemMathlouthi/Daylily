@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/site/button-link";
 import { GithubMark } from "./github-mark";
 import { GITHUB_URL, NAV_LINKS } from "./links";
+import { MobileMenu } from "./mobile-menu";
 
 const SCROLLED_AFTER_PX = 24;
 const LANDING_SECTIONS = ["features", "garden", "calendar"];
@@ -119,6 +120,7 @@ export function Header() {
         <div className="flex items-center justify-end gap-2 xl:w-55">
           <ButtonLink
             aria-label="Daylily on GitHub"
+            className="hidden lg:inline-flex"
             href={GITHUB_URL}
             size="pill-icon"
             variant="paper"
@@ -128,6 +130,7 @@ export function Header() {
           <ButtonLink href="/download" size="pill-md" variant="ink">
             Download
           </ButtonLink>
+          <MobileMenu active={active} />
         </div>
       </div>
     </header>
