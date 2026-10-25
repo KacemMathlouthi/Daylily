@@ -25,6 +25,35 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    art: "/images/art/eye.jpg",
+    changes: [
+      {
+        body: "Three short steps the first time Daylily opens: the three rules, where your journal lives, and a little help.",
+        color: "text-daylily",
+        title: "A welcome",
+      },
+      {
+        body: "Keep writing in the journal you have, start one in ~/Daylily, or open a folder you already sync. Nothing is moved or copied.",
+        color: "text-saffron",
+        title: "Your folder, your choice",
+      },
+      {
+        body: "Turn the ghost prompts and the evening reminder on or off, and pick its time, before you write a word.",
+        color: "text-petal",
+        title: "A little help, if you like",
+      },
+      {
+        body: "Help › Welcome to Daylily walks through it again whenever you want.",
+        color: "text-cornflower",
+        title: "Any time again",
+      },
+    ],
+    date: "2026-10-25",
+    lead: "Daylily now says hello. If you’ve been writing already, you’ll see it once too, with your journal already chosen.",
+    title: "A proper welcome.",
+    version: "0.6.0",
+  },
+  {
     changes: [
       {
         body: "Today’s page could stop opening when an image was the last thing on it. It opens again, with everything you wrote.",
