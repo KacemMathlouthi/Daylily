@@ -17,6 +17,8 @@ export interface PageImageOptions {
    * out for pages that are only read.
    */
   add?: (file: File) => Promise<string | null>;
+  /** Where the page's images are kept, in words: "the day’s folder" unless said. */
+  folder?: string;
   /**
    * Where an image on the page loads from, or null when it can't be shown.
    * Daylily never loads images from the web, so web addresses come back null.

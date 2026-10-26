@@ -7,12 +7,14 @@ import { type PageChange, usePageEditor } from "./use-page-editor";
 // React's act() checks this flag before it runs effects outside a test renderer
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
-let root: Root | undefined;
+const roots: Root[] = [];
 let opened: ReturnType<typeof usePageEditor> | undefined;
 
 afterEach(() => {
-  act(() => root?.unmount());
-  root = undefined;
+  for (const root of roots.splice(0)) {
+    act(() => root.unmount());
+  }
+  document.body.replaceChildren();
   opened = undefined;
 });
 
@@ -33,9 +35,10 @@ function open(content: string, editable = true) {
   const onChange = vi.fn();
   const element = document.createElement("div");
   document.body.append(element);
-  root = createRoot(element);
+  const root = createRoot(element);
+  roots.push(root);
   act(() =>
-    root?.render(
+    root.render(
       <Page content={content} editable={editable} onChange={onChange} />
     )
   );

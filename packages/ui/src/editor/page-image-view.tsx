@@ -42,6 +42,7 @@ export function PageImageView({
   const src: string = node.attrs.src ?? "";
   const alt: string = node.attrs.alt ?? "";
   const url: string | null = extension.options.resolve(src);
+  const folder: string = extension.options.folder ?? "the day’s folder";
   const [broken, setBroken] = useState(false);
   const fail = useCallback(() => setBroken(true), []);
 
@@ -60,7 +61,7 @@ export function PageImageView({
     content = (
       <Unshown
         icon={ImageOff}
-        note="Daylily shows the images it keeps in the day’s folder."
+        note={`Daylily shows the images it keeps in ${folder}.`}
         title={`${name} can’t be shown`}
       />
     );
@@ -68,7 +69,7 @@ export function PageImageView({
     content = (
       <Unshown
         icon={ImageOff}
-        note="It’s gone from the day’s folder, or can’t be read. Its place on the page is kept."
+        note={`It’s gone from ${folder}, or can’t be read. Its place on the page is kept.`}
         title={`${name} can’t be shown`}
       />
     );

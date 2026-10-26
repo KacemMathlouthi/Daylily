@@ -79,6 +79,7 @@ export function usePageEditor({
       images: {
         // Through the ref, so the latest callbacks are used
         resolve: (src) => imagesRef.current?.resolve(src) ?? null,
+        ...(images?.folder ? { folder: images.folder } : {}),
         ...(adds
           ? {
               add: (file) =>
