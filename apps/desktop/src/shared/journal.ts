@@ -60,15 +60,35 @@ export const MAX_SEARCH_HITS = 50;
 export const MAX_QUERY_LENGTH = 200;
 
 /** A day that holds what was searched for, with a line of it to show. */
-export interface SearchHit {
+export interface DayHit {
   color: FlowerColor | null;
   cover: string | null;
   day: DayKey;
+  /** Unique among the results: the day itself. */
+  id: string;
+  kind: "day";
   /** The page around the first match, with the matches marked. */
   snippet: Snippet;
   state: DaySummary["state"];
   title: string;
 }
+
+/** A thought that holds what was searched for. */
+export interface ThoughtHit {
+  day: DayKey;
+  /** Unique among the results: the day and where the thought sits in it. */
+  id: string;
+  /** Its place among the day's thoughts, in the order written. */
+  index: number;
+  kind: "thought";
+  /** The thought around the first match, with the matches marked. */
+  snippet: Snippet;
+  /** `HH:MM`, or null for text above a day's first thought. */
+  time: string | null;
+}
+
+/** Days and thoughts found together, best match first. */
+export type SearchHit = DayHit | ThoughtHit;
 
 export type JournalError =
   | DayFileError

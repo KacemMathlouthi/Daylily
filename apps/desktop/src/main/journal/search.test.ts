@@ -135,4 +135,43 @@ describe("journalSearch", () => {
     expect(found).toContain("2025-07-12");
     expect(found).not.toContain("2026-05-01");
   });
+
+  it("finds thoughts beside pages, each with its day, time and place", async () => {
+    now = new Date("2025-07-12T21:00:00+01:00");
+    await journal.writeThoughts(key("2025-07-12"), [
+      { body: "Coffee first.", time: "08:00" },
+      { body: "I could hear the sea from the hotel room.", time: "22:05" },
+    ]);
+    const search = journalSearch(journal);
+    const hits = await search.find("hotel");
+    expect(hits).toEqual([
+      expect.objectContaining({
+        day: "2025-07-12",
+        id: "2025-07-12#1",
+        index: 1,
+        kind: "thought",
+        time: "22:05",
+      }),
+    ]);
+    expect((await search.find("sea")).map((hit) => hit.kind).sort()).toEqual([
+      "day",
+      "day",
+      "thought",
+    ]);
+  });
+
+  it("finds a day with only thoughts, and follows its thoughts as they change", async () => {
+    now = new Date("2026-03-04T21:00:00+01:00");
+    await journal.writeThoughts(key("2026-03-04"), [
+      { body: "A lighthouse, far off.", time: "19:00" },
+    ]);
+    const search = journalSearch(journal);
+    expect(await search.find("lighthouse")).toHaveLength(1);
+    await journal.writeThoughts(key("2026-03-04"), [
+      { body: "Only the harbour now.", time: "19:00" },
+    ]);
+    await search.refresh([key("2026-03-04")]);
+    expect(await search.find("lighthouse")).toEqual([]);
+    expect(await search.find("harbour")).toHaveLength(1);
+  });
 });
