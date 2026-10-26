@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as GardenRouteImport } from './routes/garden'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ThoughtsRouteImport } from './routes/thoughts'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as DayKeyRouteImport } from './routes/day.$key'
 
@@ -36,6 +37,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThoughtsRoute = ThoughtsRouteImport.update({
+  id: '/thoughts',
+  path: '/thoughts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TodayRoute = TodayRouteImport.update({
   id: '/today',
   path: '/today',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/garden': typeof GardenRoute
   '/settings': typeof SettingsRoute
+  '/thoughts': typeof ThoughtsRoute
   '/today': typeof TodayRoute
   '/day/$key': typeof DayKeyRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/garden': typeof GardenRoute
   '/settings': typeof SettingsRoute
+  '/thoughts': typeof ThoughtsRoute
   '/today': typeof TodayRoute
   '/day/$key': typeof DayKeyRoute
 }
@@ -69,21 +77,36 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/garden': typeof GardenRoute
   '/settings': typeof SettingsRoute
+  '/thoughts': typeof ThoughtsRoute
   '/today': typeof TodayRoute
   '/day/$key': typeof DayKeyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/calendar' | '/garden' | '/settings' | '/today' | '/day/$key'
+    | '/'
+    | '/calendar'
+    | '/garden'
+    | '/settings'
+    | '/thoughts'
+    | '/today'
+    | '/day/$key'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendar' | '/garden' | '/settings' | '/today' | '/day/$key'
+  to:
+    | '/'
+    | '/calendar'
+    | '/garden'
+    | '/settings'
+    | '/thoughts'
+    | '/today'
+    | '/day/$key'
   id:
     | '__root__'
     | '/'
     | '/calendar'
     | '/garden'
     | '/settings'
+    | '/thoughts'
     | '/today'
     | '/day/$key'
   fileRoutesById: FileRoutesById
@@ -93,6 +116,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   GardenRoute: typeof GardenRoute
   SettingsRoute: typeof SettingsRoute
+  ThoughtsRoute: typeof ThoughtsRoute
   TodayRoute: typeof TodayRoute
   DayKeyRoute: typeof DayKeyRoute
 }
@@ -127,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/thoughts': {
+      id: '/thoughts'
+      path: '/thoughts'
+      fullPath: '/thoughts'
+      preLoaderRoute: typeof ThoughtsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/today': {
       id: '/today'
       path: '/today'
@@ -149,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   GardenRoute: GardenRoute,
   SettingsRoute: SettingsRoute,
+  ThoughtsRoute: ThoughtsRoute,
   TodayRoute: TodayRoute,
   DayKeyRoute: DayKeyRoute,
 }

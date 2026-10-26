@@ -1,4 +1,5 @@
 import { parseDayKey } from "@daylily/core/day";
+import { isThoughtTime } from "@daylily/core/thoughts-file";
 import { z } from "zod";
 import {
   type AppInfo,
@@ -60,6 +61,25 @@ export const pageSchema = z.object({
   cover: z.string().regex(COVER_NAME).nullable(),
   title: z.string().max(1000),
 });
+
+/** A day's thoughts as the page sends them; far more than anyone writes in a day. */
+export const thoughtsSchema = z
+  .array(
+    z.object({
+      body: z.string().max(MAX_PAGE_CHARS),
+      time: z.string().refine(isThoughtTime).nullable(),
+    })
+  )
+  .max(10_000)
+  // All of a day's thoughts together, as for a page
+  .refine(
+    (thoughts) =>
+      thoughts.reduce((total, thought) => total + thought.body.length, 0) <=
+      MAX_PAGE_CHARS,
+    "Too long"
+  );
+
+export const imageOwnerSchema = z.enum(["page", "thoughts"]);
 
 export const imageBytesSchema = z
   .instanceof(Uint8Array)

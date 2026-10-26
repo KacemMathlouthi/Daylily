@@ -169,11 +169,11 @@ export function updateTodayPage(
   scheduleSave(day, () => {
     const page = store.get().get(day);
     return page
-      ? {
+      ? window.daylily.journal.write(day, {
           body: page.markdown,
           cover: page.cover?.name ?? null,
           title: page.title,
-        }
+        })
       : null;
   });
 }

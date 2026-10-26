@@ -8,6 +8,7 @@ import {
   type CoverExtension,
   type ImageError,
   MAX_IMAGE_BYTES,
+  THOUGHT_DAYS_PER_PAGE,
 } from "../../shared/journal";
 import {
   configChangesSchema,
@@ -17,17 +18,20 @@ import {
   flowerColorSchema,
   folderPathSchema,
   imageBytesSchema,
+  imageOwnerSchema,
   pageSchema,
   searchQuerySchema,
+  thoughtsSchema,
 } from "../../shared/schemas";
 import { flushAllPages } from "../flush";
 import { handle } from "../ipc";
 import type { DeviceSettingsStore } from "../settings";
-import { readConfig, writeConfig } from "./config";
+import { readConfig, thoughtsIntroduced, writeConfig } from "./config";
 import { inspectFolder, tildeHome } from "./folder";
 import { imageKind } from "./image-kind";
 import { journalSearch } from "./search";
 import type { Journal } from "./store";
+import { introductionThoughts } from "./thoughts-intro";
 import { watchJournal } from "./watch";
 
 /** Long enough for the app to have opened; the search index is built after it. */
@@ -227,7 +231,7 @@ export function registerJournalIpc({
 
   handle<Result<string, ImageError>>(
     CHANNELS.journalAddImage,
-    (_event, day, image) => {
+    (_event, day, image, owner) => {
       // An empty file is no image either, rather than a broken request
       if (image instanceof Uint8Array && image.byteLength === 0) {
         return fail({ heic: false, kind: "not-an-image" });
@@ -237,7 +241,12 @@ export function registerJournalIpc({
       if (found.kind !== "image") {
         return fail({ heic: found.kind === "heic", kind: "not-an-image" });
       }
-      return journal.addImage(daySchema.parse(day), bytes, found.extension);
+      return journal.addImage(
+        daySchema.parse(day),
+        bytes,
+        found.extension,
+        imageOwnerSchema.optional().parse(owner ?? undefined)
+      );
     }
   );
 
@@ -265,6 +274,54 @@ export function registerJournalIpc({
 
   handle(CHANNELS.journalSearch, (_event, query) =>
     search.find(searchQuerySchema.parse(query))
+  );
+
+  /**
+   * Gives the Thoughts screen's own notes the first time a journal's thoughts
+   * are listed, rather than as it opens, so a folder only looked at during
+   * onboarding is left as it was. Once per journal, remembered in its config.
+   */
+  const introducing = new Map<string, Promise<void>>();
+  function introduceThoughts(current: Journal) {
+    const running = introducing.get(current.root);
+    if (running) {
+      return running;
+    }
+    const introduction = (async () => {
+      if (await thoughtsIntroduced(current.root)) {
+        return;
+      }
+      const added = await current.addThoughts((time) =>
+        introductionThoughts(process.platform, time)
+      );
+      if (added.ok) {
+        await writeConfig(current.root, { thoughtsIntroduced: true });
+      }
+    })()
+      .catch((error) => console.error("Could not introduce thoughts", error))
+      .finally(() => {
+        introducing.delete(current.root);
+      });
+    introducing.set(current.root, introduction);
+    return introduction;
+  }
+
+  handle(CHANNELS.thoughtsPage, async (_event, before) => {
+    if (before === null) {
+      await introduceThoughts(journal);
+    }
+    return journal.thoughtsPage(
+      before === null ? null : daySchema.parse(before),
+      THOUGHT_DAYS_PER_PAGE
+    );
+  });
+
+  handle(CHANNELS.thoughtsRead, (_event, day) =>
+    journal.readThoughts(daySchema.parse(day))
+  );
+
+  handle(CHANNELS.thoughtsWrite, (_event, day, thoughts) =>
+    journal.writeThoughts(daySchema.parse(day), thoughtsSchema.parse(thoughts))
   );
 
   handle(CHANNELS.journalSetConfig, async (_event, changes) => {

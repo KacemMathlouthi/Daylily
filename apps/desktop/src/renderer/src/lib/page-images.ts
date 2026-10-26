@@ -44,17 +44,19 @@ export function shownImages(day: string): PageImageOptions {
  */
 export function writtenImages(
   day: string,
-  onProblem: (message: string) => void
+  onProblem: (message: string) => void,
+  /** Thoughts never seal, so their images go into any day that has begun. */
+  owner: "page" | "thoughts" = "page"
 ): PageImageOptions {
   return {
     add: async (file) => {
       if (file.size > MAX_IMAGE_BYTES) {
-        onProblem("That image is over 30 MB, too large to add to the page.");
+        onProblem("That image is over 30 MB, too large to add.");
         return null;
       }
       try {
         const bytes = new Uint8Array(await file.arrayBuffer());
-        const added = await window.daylily.journal.addImage(day, bytes);
+        const added = await window.daylily.journal.addImage(day, bytes, owner);
         if (added.ok) {
           return added.value;
         }

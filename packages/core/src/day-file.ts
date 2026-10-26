@@ -230,6 +230,19 @@ export function updateFrontmatter(text: string, changes: FrontmatterChanges) {
   return rewrite(text, changes);
 }
 
+/**
+ * Changes frontmatter fields and puts `body` after them, keeping other fields,
+ * comments, the BOM and line endings as written. For files beside the page,
+ * like the day's thoughts.
+ */
+export function rewriteFile(
+  text: string,
+  changes: FrontmatterChanges,
+  body: string
+) {
+  return rewrite(text, changes, body);
+}
+
 export interface PageContent {
   /** The page's markdown. */
   body: string;

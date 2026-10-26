@@ -1,6 +1,5 @@
-import type { PageContent } from "@daylily/core/day-file";
+import type { Result } from "@daylily/core/result";
 import type { JournalError } from "../../../shared/journal";
-import type { DayKey } from "./month";
 import { createStore } from "./store";
 
 /**
@@ -11,20 +10,29 @@ const SAVE_AFTER_MS = 500;
 /** After a failed save, how long before trying again. */
 const RETRY_MS = 5000;
 
+/**
+ * What a save is for: a day's page under its day, or its thoughts under
+ * `thoughts:` and the day. Each saves on its own.
+ */
+type SaveKey = string;
+
+/** Writes the latest content, or null when there's nothing to write. */
+type Writer = () => Promise<Result<unknown, JournalError>> | null;
+
 /** "unsaved" means changed since the last save, with a save on its way. */
 export type SaveState =
   | { kind: "unsaved" }
   | { kind: "saved" }
   | { kind: "failed"; message: string };
 
-const states = createStore<ReadonlyMap<DayKey, SaveState>>(new Map());
-const timers = new Map<DayKey, ReturnType<typeof setTimeout>>();
-const readers = new Map<DayKey, () => PageContent | null>();
+const states = createStore<ReadonlyMap<SaveKey, SaveState>>(new Map());
+const timers = new Map<SaveKey, ReturnType<typeof setTimeout>>();
+const writers = new Map<SaveKey, Writer>();
 // One save at a time, in order, so an older page never lands after a newer one
 let writing: Promise<void> = Promise.resolve();
 
-function setState(day: DayKey, state: SaveState) {
-  states.set((current) => new Map(current).set(day, state));
+function setState(key: SaveKey, state: SaveState) {
+  states.set((current) => new Map(current).set(key, state));
 }
 
 /** Kind words for what went wrong, and whether trying again could help. */
@@ -42,7 +50,7 @@ function describe(error: JournalError) {
       };
     case "malformed":
       return {
-        message: "Today’s file can’t be read, so Daylily won’t write over it.",
+        message: "This file can’t be read, so Daylily won’t write over it.",
         retry: false,
       };
     default:
@@ -54,60 +62,64 @@ function describe(error: JournalError) {
   }
 }
 
-function retryLater(day: DayKey) {
-  if (!timers.has(day)) {
+function retryLater(key: SaveKey) {
+  if (!timers.has(key)) {
     timers.set(
-      day,
-      setTimeout(() => save(day), RETRY_MS)
+      key,
+      setTimeout(() => save(key), RETRY_MS)
     );
   }
 }
 
-async function write(day: DayKey) {
-  const page = readers.get(day)?.();
-  if (!page) {
+async function write(key: SaveKey) {
+  const writer = writers.get(key);
+  if (!writer) {
     return;
   }
   try {
-    const result = await window.daylily.journal.write(day, page);
+    const pending = writer();
+    if (pending === null) {
+      return;
+    }
+    const result = await pending;
     if (!result.ok) {
       const { message, retry } = describe(result.error);
-      setState(day, { kind: "failed", message });
+      setState(key, { kind: "failed", message });
       if (retry) {
-        retryLater(day);
+        retryLater(key);
       }
       return;
     }
   } catch (error) {
-    console.error("Could not save the page", error);
-    setState(day, {
+    console.error("Could not save", error);
+    setState(key, {
       kind: "failed",
       message: describe({ code: "", kind: "io" }).message,
     });
-    retryLater(day);
+    retryLater(key);
     return;
   }
   // Changes made while it was writing are still waiting for their own save
-  if (!timers.has(day)) {
-    setState(day, { kind: "saved" });
+  if (!timers.has(key)) {
+    setState(key, { kind: "saved" });
   }
 }
 
-function save(day: DayKey) {
-  clearTimeout(timers.get(day));
-  timers.delete(day);
-  writing = writing.then(() => write(day));
+function save(key: SaveKey) {
+  clearTimeout(timers.get(key));
+  timers.delete(key);
+  writing = writing.then(() => write(key));
   return writing;
 }
 
-/** Notes that a day changed; `read` gives its latest content when the save goes out. */
-export function scheduleSave(day: DayKey, read: () => PageContent | null) {
-  readers.set(day, read);
-  setState(day, { kind: "unsaved" });
-  if (!timers.has(day)) {
+/** Notes that something changed; `writer` writes its latest content when the save goes out. */
+export function scheduleSave(key: SaveKey, writer: Writer) {
+  writers.set(key, writer);
+  setState(key, { kind: "unsaved" });
+  if (!timers.has(key)) {
     timers.set(
-      day,
-      setTimeout(() => save(day), SAVE_AFTER_MS)
+      key,
+      setTimeout(() => save(key), SAVE_AFTER_MS)
     );
   }
 }
@@ -118,20 +130,20 @@ export async function flushSaves() {
   await writing;
 }
 
-/** Whether a day has changes of its own not yet safely in its file. */
-export function hasUnsavedChanges(day: DayKey) {
-  const state = states.get().get(day);
-  return timers.has(day) || (state !== undefined && state.kind !== "saved");
+/** Whether something has changes of its own not yet safely in its file. */
+export function hasUnsavedChanges(key: SaveKey) {
+  const state = states.get().get(key);
+  return timers.has(key) || (state !== undefined && state.kind !== "saved");
 }
 
-/** Records a day as matching its file, such as just after reading it. */
-export function markSaved(day: DayKey) {
-  setState(day, { kind: "saved" });
+/** Records something as matching its file, such as just after reading it. */
+export function markSaved(key: SaveKey) {
+  setState(key, { kind: "saved" });
 }
 
 /** Where a day's saving stands; undefined before it has been read or changed. */
-export function useSaveState(day: DayKey): SaveState | undefined {
-  return states.use().get(day);
+export function useSaveState(key: SaveKey): SaveState | undefined {
+  return states.use().get(key);
 }
 
 /** Starts over, as when the journal moves to another folder; anything unsaved was saved first. */
@@ -140,6 +152,6 @@ export function forgetSaves() {
     clearTimeout(timer);
   }
   timers.clear();
-  readers.clear();
+  writers.clear();
   states.set(new Map());
 }

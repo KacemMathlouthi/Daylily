@@ -20,6 +20,7 @@ import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   Calendar,
   House,
+  Lightbulb,
   type LucideIcon,
   Moon,
   PanelLeftClose,
@@ -48,6 +49,7 @@ const NAV: {
 }[] = [
   { icon: House, label: "Home", to: "/" },
   { icon: PenLine, label: "Today", to: "/today" },
+  { icon: Lightbulb, label: "Thoughts", to: "/thoughts" },
   { also: "/day/$key", icon: Calendar, label: "Calendar", to: "/calendar" },
   { icon: Sprout, label: "Garden", to: "/garden" },
 ];

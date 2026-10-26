@@ -9,6 +9,12 @@ import {
 } from "../../../shared/journal";
 import { forgetSaves } from "./autosave";
 import type { DayKey } from "./month";
+import {
+  forgetThoughts,
+  forgetThoughtsOf,
+  receiveThoughts,
+  showsThoughtsOf,
+} from "./thoughts";
 import { followPageFile, forgetPages } from "./today-page";
 
 /** A written day as the screens show it: calendar tiles, flowers, cards. */
@@ -129,6 +135,9 @@ export function followJournalMoves(client: QueryClient) {
   return window.daylily.journal.onSwitch(() => {
     forgetSaves();
     forgetPages();
+    forgetThoughts();
+    // Reads still on their way belong to the journal left behind
+    thoughtReads.clear();
     client.resetQueries({ queryKey: ["journal"] });
   });
 }
@@ -174,8 +183,41 @@ export function followJournal(client: QueryClient) {
     for (const day of changed) {
       client.invalidateQueries({ queryKey: dayKeyOf(day) });
     }
+    await followThoughts(changed);
     client.invalidateQueries({ queryKey: ["journal", "stats"] });
   });
+}
+
+/**
+ * Each day's latest read of its thoughts: a read that finishes after a newer one,
+ * or after the journal moved, is dropped rather than shown.
+ */
+const thoughtReads = new Map<DayKey, number>();
+let lastThoughtRead = 0;
+
+/** Reads again the thoughts of changed days the Thoughts screen holds or has read past. */
+async function followThoughts(changed: DayKey[]) {
+  await Promise.all(
+    changed.filter(showsThoughtsOf).map(async (day) => {
+      lastThoughtRead += 1;
+      const read = lastThoughtRead;
+      thoughtReads.set(day, read);
+      try {
+        const found = await window.daylily.thoughts.read(day);
+        if (thoughtReads.get(day) !== read) {
+          return;
+        }
+        thoughtReads.delete(day);
+        if (found) {
+          receiveThoughts(found);
+        } else {
+          forgetThoughtsOf(day);
+        }
+      } catch (error) {
+        console.error("Could not read a day's thoughts", error);
+      }
+    })
+  );
 }
 
 /** Small is enough to find a cover's colour, and quick to read. */
