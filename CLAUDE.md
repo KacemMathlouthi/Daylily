@@ -229,7 +229,8 @@ the title changed, so a file named in another app keeps its name until its title
 Frontmatter holds `title` (written even when empty, so the note isn't titled by its file), `pinned: true` while
 pinned, `created`, `updated` and `app`, and keeps unknown fields; a file without a title is titled by its name.
 Images go in `notes/images/` as `image-NN` and are linked as `images/image-01.jpg`, so renaming a note never
-breaks them. A new note leaves no file until its first word.
+breaks them. Names Windows keeps for devices (`con`, `lpt1`…) are never used, and a name is cut to fit every
+system's limit, in bytes. A new note leaves no file until its first word.
 
 **Settings are split.** Journal preferences (reminder time, the name Daylily calls you) live in `.daylily/config.json`. Machine-local
 state (journal path, window size, theme, the sidebar's collapsed state) lives on the device, since each
@@ -331,7 +332,8 @@ keychain and **never** into the journal folder.
   each thought on its own, beside the pages.
 - **Notes:** saved like the page, half a second after a change and before closing or sleeping. Opening one
   writes nothing. A note that changed in another app is read again unless it has words of its own still to save,
-  which win as they're written; one whose file went while it was open is written again rather than lose its words.
+  which win as they're written; if its file goes while it still has words to save, it's written again rather
+  than lose them, and once everything was saved it simply leaves the screen.
   Moving a note to the Trash saves it first, puts its file in the system's Trash, where it can be restored, and
   opens the next note; it's the one way a file leaves the journal, and only when asked. A note that can't be read
   is shown as such and never written over.
