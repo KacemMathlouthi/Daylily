@@ -235,7 +235,8 @@ function foundLabel(hits: SearchHit[], more: boolean) {
 function NotePreview({ hit, query }: { hit: NoteHit; query: string }) {
   const { data } = useQuery({
     queryFn: () => window.daylily.notes.read(hit.name),
-    queryKey: ["journal", "note", hit.name],
+    // Read again when the note has changed since
+    queryKey: ["journal", "note", hit.name, hit.updated],
   });
   const markdown = data?.ok ? (data.value?.body ?? "") : "";
   const images = useMemo(() => shownNoteImages(), []);

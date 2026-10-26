@@ -48,12 +48,15 @@ beforeEach(() => {
   write.mockReset();
   read.mockReset();
   trash.mockReset();
-  // Saved under a name from its title, as the main process does
-  write.mockImplementation((name: string | null, note: { title: string }) =>
-    Promise.resolve({
-      ok: true,
-      value: stored(name ?? "untitled.md", note.title),
-    })
+  // Named from its title when new or renamed, as the main process does
+  write.mockImplementation(
+    (name: string | null, note: { title: string }, rename: boolean) => {
+      const fromTitle = `${note.title.toLowerCase().replaceAll(" ", "-") || "untitled"}.md`;
+      return Promise.resolve({
+        ok: true,
+        value: stored(name === null || rename ? fromTitle : name, note.title),
+      });
+    }
   );
   trash.mockResolvedValue({ ok: true });
   vi.stubGlobal("window", { daylily: { notes: { read, trash, write } } });
@@ -117,6 +120,8 @@ describe("a note's name", () => {
       false
     );
 
+    expect(chosen().name).toBe("bo.md");
+
     leaveTitle(id);
     await flushSaves();
     expect(write).toHaveBeenLastCalledWith(
@@ -124,6 +129,22 @@ describe("a note's name", () => {
       expect.objectContaining({ title: "Books to read" }),
       true
     );
+    expect(chosen().name).toBe("books-to-read.md");
+
+    // Settled: the next save keeps the new name
+    changeNote(id, { body: "Piranesi" });
+    await flushSaves();
+    expect(write).toHaveBeenLastCalledWith(
+      "books-to-read.md",
+      expect.anything(),
+      false
+    );
+  });
+
+  it("says when the note asked for has gone", async () => {
+    read.mockResolvedValue({ ok: true, value: null });
+    expect(await openNote("gone.md")).toBe(false);
+    expect(chosenNote()).toBeUndefined();
   });
 
   it("isn't asked to change when only the words do", async () => {
@@ -179,10 +200,28 @@ describe("moving a note to the Trash", () => {
       false
     );
     expect(trash).toHaveBeenCalledWith("trip.md");
+    // Saved before it went
+    expect(write.mock.invocationCallOrder.at(-1)).toBeLessThan(
+      trash.mock.invocationCallOrder[0] ?? 0
+    );
     expect(chosenNote()).toBeUndefined();
     expect(noteRows([listed("trip.md", "2026-10-20T09:00:00Z")]).length).toBe(
       0
     );
+  });
+
+  it("keeps it when its last words couldn't be saved", async () => {
+    read.mockResolvedValue({ ok: true, value: stored("trip.md", "Trip") });
+    openNote("trip.md");
+    await vi.waitFor(() => expect(chosen().load).toBe("ready"));
+    write.mockResolvedValue({
+      error: { code: "ENOSPC", kind: "io" },
+      ok: false,
+    });
+    changeNote(chosen().id, { body: "Last words." });
+    expect((await trashNote(chosen().id)).ok).toBe(false);
+    expect(trash).not.toHaveBeenCalled();
+    expect(chosenNote()?.body).toBe("Last words.");
   });
 
   it("keeps it when the Trash refuses", async () => {

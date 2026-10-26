@@ -99,6 +99,7 @@ function fromFile(id: string, stored: StoredNote, revision: number): OpenNote {
   };
 }
 
+/** Reads a note's file into the screen; false when it's gone. */
 async function read(id: string, name: string) {
   try {
     const found = await window.daylily.notes.read(name);
@@ -111,19 +112,24 @@ async function read(id: string, name: string) {
     } else {
       // Gone before it could be read
       forget(id);
+      return false;
     }
   } catch (error) {
     console.error("Could not read the note", error);
     setNote(id, (note) => ({ ...note, load: "unreadable" }));
   }
+  return true;
 }
 
-/** Puts a note's file on screen, reading it the first time. */
-export function openNote(name: string) {
+/**
+ * Puts a note's file on screen, reading it the first time. Resolves false when
+ * there's no such note, as for a search result whose file has gone since.
+ */
+export function openNote(name: string): Promise<boolean> {
   const open = [...held.get().values()].find((note) => note.name === name);
   if (open) {
     choose(open.id);
-    return;
+    return Promise.resolve(true);
   }
   const id = newId();
   hold({
@@ -137,7 +143,7 @@ export function openNote(name: string) {
     title: "",
   });
   choose(id);
-  read(id, name);
+  return read(id, name);
 }
 
 /** A new note on screen, waiting for its first word: the one already waiting, if there is one. */
@@ -248,6 +254,10 @@ export async function trashNote(id: string) {
   if (!note) {
     return { ok: true } as const;
   }
+  // Its last words didn't reach the file: the Trash would keep an older note
+  if (hasUnsavedChanges(saveKey(id))) {
+    return { error: { code: "UNSAVED", kind: "io" }, ok: false } as const;
+  }
   if (note.name !== null) {
     const trashed = await window.daylily.notes.trash(note.name);
     if (!trashed.ok) {
@@ -284,10 +294,21 @@ async function reread(note: OpenNote) {
   if (name === null) {
     return;
   }
-  const found = await window.daylily.notes.read(name);
+  let found: Awaited<ReturnType<typeof window.daylily.notes.read>>;
+  try {
+    found = await window.daylily.notes.read(name);
+  } catch (error) {
+    console.error("Could not read a changed note", error);
+    found = { error: { code: "UNKNOWN", kind: "io" }, ok: false };
+  }
   const current = held.get().get(id);
-  // Changed on screen, or renamed, while it was being read
-  if (!current || current.name !== name || hasUnsavedChanges(saveKey(id))) {
+  // Changed on screen, saved, or renamed while it was being read: what was
+  // read may be older than what's held
+  if (
+    current !== note ||
+    current.name !== name ||
+    hasUnsavedChanges(saveKey(id))
+  ) {
     return;
   }
   if (!found.ok) {

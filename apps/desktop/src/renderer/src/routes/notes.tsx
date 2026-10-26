@@ -50,16 +50,19 @@ function useSaveLabel(note: OpenNote | undefined, notice: string | null) {
   if (save?.kind === "failed") {
     return { dot: "bg-daylily", label: save.message };
   }
-  const folder = info ? [info.displayRoot, "notes"].join(info.separator) : "";
+  if (!info) {
+    return { dot: "bg-ink-ghost", label: "" };
+  }
+  const folder = [info.displayRoot, "notes"].join(info.separator);
   if (!note?.name) {
     return {
       dot: "bg-ink-ghost",
-      label: `Each note is saved to ${folder || "your journal"} from its first word.`,
+      label: `Each note is saved to ${folder} from its first word.`,
     };
   }
   return {
     dot: save?.kind === "unsaved" ? "bg-saffron" : "bg-moss",
-    label: `Saved to ${[folder, note.name].join(info?.separator ?? "/")}`,
+    label: `Saved to ${[folder, note.name].join(info.separator)}`,
   };
 }
 
@@ -94,9 +97,14 @@ function NotesScreen() {
   // Opened from search: that note, at what was found
   useEffect(() => {
     if (search.note) {
-      openNote(search.note);
+      // Gone since it was found: the search is let go, and the list opens as usual
+      openNote(search.note).then((found) => {
+        if (!found) {
+          forgetFound();
+        }
+      });
     }
-  }, [search.note]);
+  }, [forgetFound, search.note]);
 
   // Nothing open: the first note in the list, or a new one in an empty folder
   useEffect(() => {

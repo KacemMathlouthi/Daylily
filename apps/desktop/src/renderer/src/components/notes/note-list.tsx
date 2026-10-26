@@ -31,7 +31,9 @@ function NoteItem({
 }) {
   const { listed, open } = row;
   const readable = listed.state === "ok";
-  const title = (open?.title ?? (readable ? listed.title : "")).trim();
+  // The title being written, once the note is read; until then, as listed
+  const listedTitle = readable ? listed.title : "";
+  const title = (open?.load === "ready" ? open.title : listedTitle).trim();
   const { name } = listed;
   const choose = useCallback(() => onOpen(name), [name, onOpen]);
   return (

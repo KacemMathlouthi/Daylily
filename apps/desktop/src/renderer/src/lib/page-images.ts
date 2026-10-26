@@ -12,6 +12,8 @@ import {
 const HERE = /^\.\//;
 /** Where a note links its images: the notes' own images folder. */
 const NOTE_IMAGES = "images/";
+/** That folder, as an image that can't be shown names it. */
+const NOTE_IMAGES_FOLDER = "your notes’ images folder";
 
 /**
  * Where a page's image loads from: a file Daylily keeps in the day's folder, or
@@ -100,7 +102,7 @@ export function writtenImages(
 
 /** A note in the search preview: its images shown, never added to. */
 export function shownNoteImages(): PageImageOptions {
-  return { resolve: noteImageUrl };
+  return { folder: NOTE_IMAGES_FOLDER, resolve: noteImageUrl };
 }
 
 /** A note's images: shown, and a pasted or dropped file copied into `notes/images`. */
@@ -109,6 +111,7 @@ export function noteImages(
 ): PageImageOptions {
   return {
     add: addImage((bytes) => window.daylily.notes.addImage(bytes), onProblem),
+    folder: NOTE_IMAGES_FOLDER,
     resolve: noteImageUrl,
   };
 }
