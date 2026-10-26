@@ -83,7 +83,7 @@ The full picture, beyond v1. What ships first is in [§3](#3-v1-specification).
 - A canvas like the page, newest first: write, press ⌘ Enter, and the next thought begins. Each keeps the time
   you started it, shown in a lane beside it as the changelog shows a release's date, which stays in view as you
   scroll.
-- **Never sealed.** Any thought, any day, can be changed. The page is what seals; thoughts are the notes before it.
+- **Never sealed.** Any thought, on any day that has begun, can be changed. The page is what seals; thoughts are the notes before it.
 - Not a notes app: no folders, tags or links. A day with only thoughts grows no flower.
 
 ### Nudges (ghost prompts): the signature interaction
@@ -203,11 +203,12 @@ app: daylily/0.1.0
 - `words` and `updated` are rewritten on every save. `created` is set once.
 - Unknown fields are preserved on save. Users and other tools may add their own.
 
-**Thoughts** are kept beside the page in `thoughts.md`, oldest first, each under a line that is exactly
-`## HH:MM` (the time it was begun, on the clock where it was written; a heading inside a thought, or one in a
-code block, stays text). Frontmatter holds `created`, `updated`, `tz` and `app`, and keeps unknown fields; text
-above the first time is kept as it is. The file is never sealed and the page's hash never covers it, so a sealed
-day's thoughts can still change. A day with thoughts but no page isn't a written day.
+**Thoughts** are kept beside the page in `thoughts.md`, oldest first, each under a line holding only `## HH:MM`:
+the time it was begun, on the clock where it was written. Spaces around it are forgiven, as other editors add
+them; a heading inside a thought, or a time in a code block, stays text. Frontmatter holds `created`,
+`updated`, `tz` and `app`, and keeps unknown fields; text above the first time is kept as it is. The file is
+never sealed and the page's hash never covers it, so a sealed day's thoughts can still change. A day with
+thoughts but no page isn't a written day.
 
 **Settings are split.** Journal preferences (reminder time, the name Daylily calls you) live in `.daylily/config.json`. Machine-local
 state (journal path, window size, theme, the sidebar's collapsed state) lives on the device, since each
@@ -300,7 +301,10 @@ keychain and **never** into the journal folder.
   that has begun takes thoughts and their images (`image-NN`, numbered with the page's). The first time a
   journal's thoughts are listed, two thoughts explaining them are written into today's file, once per journal
   (`thoughtsIntroduced` in `.daylily/config.json`), not when it's opened, so a folder only looked at during
-  onboarding is left as it was. Changes from other apps are followed for the days on screen. Search doesn't
+  onboarding is left as it was. It's the one exception to "opening leaves no trace": visiting Thoughts starts
+  today's folder for them, even in an empty journal, though with no page the day still isn't a written one.
+  A day whose last thought is deleted keeps its `thoughts.md`, since Daylily never deletes files, and stops
+  counting as a day with thoughts. Changes from other apps are followed for the days on screen. Search doesn't
   cover thoughts yet.
 - **Sidebar's journal:** the top of the sidebar names the journal and its folder (`~/Daylily`) and opens Settings ›
   Journal; there's one journal, so nothing to pick.
