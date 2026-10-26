@@ -140,13 +140,14 @@ and later codex publishing.
 
 ## 3. v1 specification
 
-v1 is the **human core**: write today, seal it, see your days grow. No AI, no sync, no import.
+v1 is the **human core**: write today, seal it, see your days grow. No sync, no import, and AI only as ghost
+prompts that listen, through one connection, off until turned on.
 
 ### 3.1 Scope
 
 | In v1 | Not in v1 |
 |---|---|
-| Today's page editor (title, cover, inline images) | AI of any kind |
+| Today's page editor (title, cover, inline images) | Ask your journal, look-backs, highlights, cover generation |
 | Thoughts through the day, never sealed | Notes, folders, tags and links between pages |
 | Sealing at 4am, read-only past days | Sync (users may place the folder in a synced folder) |
 | Garden, calendar, contribution graph | Import from other apps |
@@ -154,6 +155,7 @@ v1 is the **human core**: write today, seal it, see your days grow. No AI, no sy
 | Local full-text search | Encryption at rest (rely on OS disk encryption) |
 | Evening reminder | Multiple journals |
 | Onboarding, settings, light and dark themes | Codexes, mobile, embedded terminal |
+| One AI connection, off until turned on, for ghost prompts that listen | More AI providers and local models |
 | | Video, voice notes, files and link previews on the page |
 | | Diagrams (Mermaid), math and other markdown extras |
 

@@ -95,6 +95,11 @@ const CELLS: Cell[] = [
     title: "Your model, your choice",
   },
   {
+    body: "“What made me happiest this spring?” Answered from your own pages, and it tells you first how many days it would send.",
+    kind: "item",
+    title: "Ask your journal",
+  },
+  {
     body: "A week, a month, a year: what went right, what was hard, and the patterns you might have missed.",
     kind: "item",
     title: "Look-backs",
