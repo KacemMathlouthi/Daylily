@@ -9,6 +9,12 @@ import {
 } from "../../../shared/journal";
 import { forgetSaves } from "./autosave";
 import type { DayKey } from "./month";
+import {
+  forgetThoughts,
+  forgetThoughtsOf,
+  receiveThoughts,
+  showsThoughtsOf,
+} from "./thoughts";
 import { followPageFile, forgetPages } from "./today-page";
 
 /** A written day as the screens show it: calendar tiles, flowers, cards. */
@@ -129,6 +135,7 @@ export function followJournalMoves(client: QueryClient) {
   return window.daylily.journal.onSwitch(() => {
     forgetSaves();
     forgetPages();
+    forgetThoughts();
     client.resetQueries({ queryKey: ["journal"] });
   });
 }
@@ -174,8 +181,27 @@ export function followJournal(client: QueryClient) {
     for (const day of changed) {
       client.invalidateQueries({ queryKey: dayKeyOf(day) });
     }
+    await followThoughts(changed);
     client.invalidateQueries({ queryKey: ["journal", "stats"] });
   });
+}
+
+/** Reads again the thoughts of changed days the Thoughts screen holds or has read past. */
+async function followThoughts(changed: DayKey[]) {
+  await Promise.all(
+    changed.filter(showsThoughtsOf).map(async (day) => {
+      try {
+        const found = await window.daylily.thoughts.read(day);
+        if (found) {
+          receiveThoughts(found);
+        } else {
+          forgetThoughtsOf(day);
+        }
+      } catch (error) {
+        console.error("Could not read a day's thoughts", error);
+      }
+    })
+  );
 }
 
 /** Small is enough to find a cover's colour, and quick to read. */

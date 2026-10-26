@@ -36,6 +36,7 @@ const SCREENS: Record<string, string> = {
   "/calendar": "Calendar",
   "/garden": "Garden",
   "/settings": "Settings",
+  "/thoughts": "Thoughts",
   "/today": "Today",
 };
 
