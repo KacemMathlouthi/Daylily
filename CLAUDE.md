@@ -85,6 +85,8 @@ The full picture, beyond v1. What ships first is in [§3](#3-v1-specification).
   scroll.
 - **Never sealed.** Any thought, on any day that has begun, can be changed. The page is what seals; thoughts are the notes before it.
 - Not a notes app: no folders, tags or links. A day with only thoughts grows no flower.
+- **Separate from the journal.** Thoughts and the daily page are two things in one app: thoughts live on their
+  own screen and are never shown on a day's page, sealed or not, in the calendar or in the garden.
 
 ### Nudges (ghost prompts): the signature interaction
 - When you stop typing, faint text fades in where the cursor is: *"and how did you feel about that?"*,
@@ -654,7 +656,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
 maintainer's machine (not in git; the website's `/roadmap` is the public version).
-Keep it current as items ship or move. The next few: end-to-end tests, then search across thoughts.
+Keep it current as items ship or move. The next few: end-to-end tests, then thoughts in search.
 
 ---
 
