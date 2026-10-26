@@ -25,6 +25,34 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    changes: [
+      {
+        body: "Search now looks through your thoughts as well as your pages, best match first. A thought shows its time where a day shows its cover; open it and the Thoughts screen takes you there, however far back.",
+        color: "text-daylily",
+        title: "Search finds thoughts",
+      },
+      {
+        body: "The sidebar keeps your journal (Today, Calendar, Garden) and your notebook (Thoughts) apart, so each has its place.",
+        color: "text-saffron",
+        title: "A tidier sidebar",
+      },
+      {
+        body: "Shortcuts are shown as the keys you press, like Ctrl + K, and “Search days” is now just Search.",
+        color: "text-cornflower",
+        title: "Keys you can read",
+      },
+      {
+        body: "Thoughts sit a little further apart, and the screen always keeps one ready for you, even after you delete them all.",
+        color: "text-petal",
+        title: "Thoughts, smoothed",
+      },
+    ],
+    date: "2026-10-26",
+    lead: "Everything you write, found in one place.",
+    title: "Found again.",
+    version: "0.8.0",
+  },
+  {
     art: "/images/covers/train.jpg",
     changes: [
       {
