@@ -1,6 +1,5 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import { cn } from "@daylily/ui/lib/cn";
-import { Kbd } from "@daylily/ui/primitives/kbd";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +35,7 @@ import { useJournalInfo } from "../lib/journal-info";
 import { openSearch } from "../lib/search";
 import { useTheme } from "../lib/theme";
 import type { FileRoutesByTo } from "../route-tree.gen";
+import { MOD_KEY, Shortcut } from "./shortcut";
 import { UpdateCard } from "./update-card";
 
 type AppPath = keyof FileRoutesByTo;
@@ -185,9 +185,9 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SideTip label="Search days" railOnly>
+        <SideTip label="Search" railOnly>
           <button
-            aria-label="Search days"
+            aria-label="Search"
             className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 hover:border-ink-ghost group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
             onClick={openSearch}
             type="button"
@@ -200,16 +200,9 @@ export function AppSidebar() {
             <span
               className={cn("grow text-caption text-ink-subtle", RAIL_HIDDEN)}
             >
-              Search days
+              Search
             </span>
-            <Kbd
-              className={cn(
-                "bg-transparent px-0 font-sans text-ink-faint",
-                RAIL_HIDDEN
-              )}
-            >
-              {isMac ? "⌘K" : "Ctrl K"}
-            </Kbd>
+            <Shortcut className={RAIL_HIDDEN} keys={[MOD_KEY, "K"]} />
           </button>
         </SideTip>
       </SidebarHeader>

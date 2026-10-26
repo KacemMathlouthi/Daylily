@@ -28,7 +28,7 @@ export const RELEASES: Release[] = [
     art: "/images/covers/train.jpg",
     changes: [
       {
-        body: "A new place in the sidebar for what comes to you as the day goes: something someone said, an idea on the way somewhere. Write one, press ⌘ Enter (Ctrl Enter on Windows and Linux), and the next begins.",
+        body: "A new place in the sidebar for what comes to you as the day goes: something someone said, an idea on the way somewhere. Write one, press ⌘ + Enter (Ctrl + Enter on Windows and Linux), and the next begins.",
         color: "text-daylily",
         title: "Thoughts",
       },

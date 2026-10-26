@@ -14,7 +14,6 @@ import {
   DialogContent,
   DialogTitle,
 } from "@daylily/ui/primitives/dialog";
-import { Kbd } from "@daylily/ui/primitives/kbd";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
@@ -37,6 +36,7 @@ import { dateFormat } from "../../lib/format";
 import { fromKey, todayKey } from "../../lib/month";
 import { shownImages } from "../../lib/page-images";
 import { revealFirstMatch, useSearchDialog } from "../../lib/search";
+import { MOD_KEY, Shortcut } from "../shortcut";
 import { Marked } from "./marked";
 
 const HIT_DATE = dateFormat({
@@ -51,7 +51,6 @@ const PREVIEW_DATE = dateFormat({
   weekday: "long",
   year: "numeric",
 });
-const isMac = window.daylily.platform === "darwin";
 
 function HitCover({ hit }: { hit: SearchHit }) {
   return hit.cover ? (
@@ -198,11 +197,18 @@ function Results({
       </div>
       <div className="flex items-center justify-between border-line border-t px-5 py-2.5 text-ink-faint text-xs">
         <span className="flex gap-4">
-          <span>↑↓ to move</span>
-          <span>↵ to open the day</span>
+          <span className="flex items-center gap-1.5">
+            <Shortcut keys={["↑"]} />
+            <Shortcut keys={["↓"]} />
+            to move
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Shortcut keys={["Enter"]} />
+            to open the day
+          </span>
         </span>
-        <span>
-          {isMac ? "⌘J" : "Ctrl J"}{" "}
+        <span className="flex items-center gap-1.5">
+          <Shortcut keys={[MOD_KEY, "J"]} />
           {preview ? "hides the preview" : "shows the preview"}
         </span>
       </div>
@@ -318,9 +324,7 @@ export function SearchDialog() {
               placeholder="Search your days"
               value={query}
             />
-            <Kbd className="h-auto border border-line bg-transparent px-1.75 py-0.75 font-sans text-ink-faint">
-              esc
-            </Kbd>
+            <Shortcut keys={["Esc"]} />
           </div>
 
           {searching ? null : (

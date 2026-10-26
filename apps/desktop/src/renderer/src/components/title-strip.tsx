@@ -76,7 +76,7 @@ function useMenus(): [string, MenuGroups][] {
           {
             label: "New page",
             run: () => navigate({ to: "/today" }),
-            shortcut: "Ctrl N",
+            shortcut: "Ctrl+N",
           },
         ],
         [
@@ -98,7 +98,7 @@ function useMenus(): [string, MenuGroups][] {
             label: "Settings",
             run: () =>
               navigate({ search: { section: "journal" }, to: "/settings" }),
-            shortcut: "Ctrl ,",
+            shortcut: "Ctrl+,",
           },
         ],
         [{ label: "Quit Daylily", run: act("quit") }],
@@ -108,35 +108,35 @@ function useMenus(): [string, MenuGroups][] {
       "Edit",
       [
         [
-          { label: "Undo", run: act("undo"), shortcut: "Ctrl Z" },
-          { label: "Redo", run: act("redo"), shortcut: "Ctrl Y" },
+          { label: "Undo", run: act("undo"), shortcut: "Ctrl+Z" },
+          { label: "Redo", run: act("redo"), shortcut: "Ctrl+Y" },
         ],
         [
-          { label: "Cut", run: act("cut"), shortcut: "Ctrl X" },
-          { label: "Copy", run: act("copy"), shortcut: "Ctrl C" },
-          { label: "Paste", run: act("paste"), shortcut: "Ctrl V" },
-          { label: "Select all", run: act("selectAll"), shortcut: "Ctrl A" },
+          { label: "Cut", run: act("cut"), shortcut: "Ctrl+X" },
+          { label: "Copy", run: act("copy"), shortcut: "Ctrl+C" },
+          { label: "Paste", run: act("paste"), shortcut: "Ctrl+V" },
+          { label: "Select all", run: act("selectAll"), shortcut: "Ctrl+A" },
         ],
         // Search opens over the app, which waits beneath onboarding
         ...(welcoming
           ? []
-          : [[{ label: "Search days…", run: openSearch, shortcut: "Ctrl K" }]]),
+          : [[{ label: "Search…", run: openSearch, shortcut: "Ctrl+K" }]]),
       ],
     ],
     [
       "View",
       [
         [
-          { label: "Sidebar", run: toggleSidebar, shortcut: "Ctrl B" },
+          { label: "Sidebar", run: toggleSidebar, shortcut: "Ctrl+B" },
           {
             label: theme === "dark" ? "Light mode" : "Dark mode",
             run: toggleTheme,
           },
         ],
         [
-          { label: "Zoom in", run: act("zoom-in"), shortcut: "Ctrl +" },
-          { label: "Zoom out", run: act("zoom-out"), shortcut: "Ctrl −" },
-          { label: "Actual size", run: act("zoom-reset"), shortcut: "Ctrl 0" },
+          { label: "Zoom in", run: act("zoom-in"), shortcut: "Ctrl++" },
+          { label: "Zoom out", run: act("zoom-out"), shortcut: "Ctrl+−" },
+          { label: "Actual size", run: act("zoom-reset"), shortcut: "Ctrl+0" },
         ],
       ],
     ],
