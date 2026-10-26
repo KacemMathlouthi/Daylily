@@ -5,11 +5,11 @@ import {
   usePageEditor,
 } from "@daylily/ui/editor/use-page-editor";
 import { cn } from "@daylily/ui/lib/cn";
-import { Kbd } from "@daylily/ui/primitives/kbd";
 import { type KeyboardEvent, useCallback, useEffect, useMemo } from "react";
 import { dateFormat } from "../../lib/format";
 import { dayKey, fromKey } from "../../lib/month";
 import { writtenImages } from "../../lib/page-images";
+import { useFindOnPage } from "../../lib/search";
 import {
   changeThought,
   leaveThought,
@@ -18,6 +18,7 @@ import {
   useFocusing,
 } from "../../lib/thoughts";
 import { useNow } from "../../lib/use-now";
+import { MOD_KEY, Shortcut } from "../shortcut";
 
 const WEEKDAY = dateFormat({ weekday: "long" });
 const MONTH_DAY = dateFormat({ day: "numeric", month: "short" });
@@ -26,10 +27,6 @@ const FULL_DATE = dateFormat({
   month: "short",
   year: "numeric",
 });
-
-/** ⌘ Enter on macOS, Ctrl Enter elsewhere: on to the next thought. */
-const NEXT_THOUGHT_KEYS =
-  window.daylily.platform === "darwin" ? "⌘ Enter" : "Ctrl Enter";
 
 /** The day under a thought's time: "Today · Sunday", "Yesterday · Saturday", "Oct 12 · Monday". */
 function dayLabel(day: string, today: string) {
@@ -87,8 +84,12 @@ function ThoughtEditor({
   day,
   thought,
   today,
+  find,
+  onFound,
   onProblem,
 }: {
+  find: string | undefined;
+  onFound: () => void;
   day: string;
   thought: ShownThought;
   today: string;
@@ -110,6 +111,8 @@ function ThoughtEditor({
     ...(thought.begun ? {} : { placeholder: "What’s on your mind?" }),
   });
 
+  useFindOnPage(editor, find, { onDone: onFound });
+
   const [focusing, focused] = useFocusing();
   useEffect(() => {
     if (focusing === id) {
@@ -119,12 +122,12 @@ function ThoughtEditor({
   }, [editor, focused, focusing, id]);
 
   useEffect(() => {
-    const leave = () => leaveThought(day, id);
+    const leave = () => leaveThought(day, id, today);
     editor.on("blur", leave);
     return () => {
       editor.off("blur", leave);
     };
-  }, [day, editor, id]);
+  }, [day, editor, id, today]);
 
   const nextOnEnter = useCallback(
     (event: KeyboardEvent) => {
@@ -141,7 +144,7 @@ function ThoughtEditor({
       <PageContent
         // The empty line the editor keeps after a list is for typing into, so
         // it shows only while the thought is being written
-        className="[&_.ProseMirror:not(.ProseMirror-focused)>p:last-child:has(>br.ProseMirror-trailingBreak:only-child)]:hidden [&_.ProseMirror]:min-h-7.75"
+        className="[&_.ProseMirror:not(.ProseMirror-focused)>p:last-child:not(.is-editor-empty):has(>br.ProseMirror-trailingBreak:only-child)]:hidden [&_.ProseMirror]:min-h-7.75"
         editor={editor}
       />
       <FormatToolbar editor={editor} />
@@ -155,8 +158,14 @@ export function ThoughtRow({
   thought,
   today,
   newest,
+  find,
+  onFound,
   onProblem,
 }: {
+  /** What search was looking for, when this is the thought it found: it glows there. */
+  find?: string | undefined;
+  /** Called once the found words have glowed, to let them go. */
+  onFound: () => void;
   day: string;
   thought: ShownThought;
   today: string;
@@ -176,16 +185,16 @@ export function ThoughtRow({
       <div className="flex w-full min-w-0 max-w-170 flex-col gap-3 pt-0.75">
         <ThoughtEditor
           day={day}
+          find={find}
+          onFound={onFound}
           onProblem={onProblem}
           thought={thought}
           today={today}
         />
         {newest ? (
           <p className="flex items-center gap-1.5 text-caption text-ink-faint">
-            <Kbd className="h-auto rounded-[5px] border border-line bg-paper-sunk px-1.5 font-mono text-ink-muted text-tag leading-4">
-              {NEXT_THOUGHT_KEYS}
-            </Kbd>
-            starts the next thought
+            <Shortcut keys={[MOD_KEY, "Enter"]} />
+            <span className="pl-0.5">starts the next thought</span>
           </p>
         ) : null}
       </div>

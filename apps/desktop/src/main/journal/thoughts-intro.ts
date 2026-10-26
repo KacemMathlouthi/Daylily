@@ -9,7 +9,7 @@ export function introductionThoughts(
   platform: string,
   time: string
 ): Thought[] {
-  const next = platform === "darwin" ? "⌘ Enter" : "Ctrl Enter";
+  const next = platform === "darwin" ? "⌘ + Enter" : "Ctrl + Enter";
   return [
     {
       body: [

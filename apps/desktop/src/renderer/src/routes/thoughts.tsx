@@ -1,8 +1,8 @@
 import { cn } from "@daylily/ui/lib/cn";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Maximize, Minimize } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { type MouseEvent, useCallback, useEffect, useRef } from "react";
 import type { ThoughtsPage } from "../../../shared/journal";
 import { StatusBar } from "../components/day/status-bar";
 import { TOOL_BUTTON } from "../components/day/tool-button";
@@ -14,11 +14,15 @@ import { useSaveState } from "../lib/autosave";
 import { useFocusChrome } from "../lib/focus-mode";
 import { useJournalInfo } from "../lib/journal-info";
 import type { DayKey } from "../lib/month";
+import { validateFoundThought } from "../lib/search";
 import {
+  keepOpenThought,
   readBackTo,
   receiveThoughts,
   startNextThought,
+  thoughtAt,
   thoughtsSaveKey,
+  useAllRead,
   useThoughtCount,
   useThoughtEntries,
 } from "../lib/thoughts";
@@ -27,6 +31,7 @@ import { useToday } from "../lib/use-today";
 
 export const Route = createFileRoute("/thoughts")({
   component: ThoughtsScreen,
+  validateSearch: validateFoundThought,
 });
 
 const THOUGHTS_KEY = ["journal", "thoughts"] as const;
@@ -117,22 +122,93 @@ function useSaveLabel(today: DayKey, notice: string | null) {
   };
 }
 
+/**
+ * A thought opened from search (Paper 13d): the days are read back until its
+ * day is in, then it's the one to glow. Undefined when nothing was asked for, or
+ * once it's clear the thought is gone.
+ */
+function useFoundThought({
+  day,
+  place,
+  more,
+  reading,
+  readMore,
+  forget,
+}: {
+  day: string | undefined;
+  place: number | undefined;
+  more: boolean;
+  reading: boolean;
+  readMore: () => unknown;
+  forget: () => void;
+}) {
+  const allRead = useAllRead();
+  const found =
+    day !== undefined && place !== undefined
+      ? thoughtAt(day, place)
+      : undefined;
+  const looking = day !== undefined && found === undefined;
+  useEffect(() => {
+    if (!looking || reading) {
+      return;
+    }
+    if (allRead) {
+      // Every day is in and it isn't there: changed since it was found
+      forget();
+    } else if (more) {
+      readMore();
+    }
+  }, [allRead, forget, looking, more, readMore, reading]);
+  return found;
+}
+
 /** Paper's "15 Thoughts": caught as the day goes, newest first, never sealed. */
 function ThoughtsScreen() {
   const today = useToday();
   const entries = useThoughtEntries(today);
-  const { fetchNextPage, hasNextPage, isFetchingNextPage } = useThoughtPages();
+  const { fetchNextPage, hasNextPage, isFetchingNextPage, isPending } =
+    useThoughtPages();
   const readMore = useCallback(() => fetchNextPage(), [fetchNextPage]);
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const forgetFound = useCallback(
+    () => navigate({ replace: true, search: {}, to: "/thoughts" }),
+    [navigate]
+  );
+  const found = useFoundThought({
+    day: search.day,
+    forget: forgetFound,
+    more: hasNextPage,
+    place: search.place,
+    reading: isFetchingNextPage || isPending,
+    readMore,
+  });
   const sentinel = useReadOnScroll(hasNextPage, isFetchingNextPage, readMore);
   const { chrome, focused, setFocused } = useFocusChrome();
   const [notice, setNotice] = useNotice();
   const count = useThoughtCount(today);
   const { dot, label } = useSaveLabel(today, notice);
 
-  // The open thought takes the cursor as the screen opens, and again each new day
+  // The open thought takes the cursor as the screen opens, and again each new
+  // day. Opened from search, it's still there, but the cursor goes to what was
+  // found; both are safe to run twice, as development does
+  const openedFromSearchOn = useRef(search.day === undefined ? null : today);
   useEffect(() => {
-    startNextThought(today);
+    if (openedFromSearchOn.current === today) {
+      keepOpenThought(today);
+    } else {
+      startNextThought(today);
+    }
   }, [today]);
+
+  const writeOnPaper = useCallback(
+    (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest("article")) {
+        startNextThought(today);
+      }
+    },
+    [today]
+  );
 
   const isMac = window.daylily.platform === "darwin";
   const toggleFocus = useCallback(
@@ -165,16 +241,23 @@ function ThoughtsScreen() {
           )}
         </button>
       </header>
-      <div className="flex grow justify-center px-8 pt-7.5 pb-24">
+      {/* A click on the paper itself, not on a thought, goes to the thought being written */}
+      {/* biome-ignore lint/a11y: the keyboard reaches the open thought by itself; this is a convenience for the mouse */}
+      <div
+        className="flex grow cursor-text justify-center px-8 pt-7.5 pb-24"
+        onClick={writeOnPaper}
+      >
         {/* The lane hangs in the margin, so the words sit where the page's do */}
-        <div className="flex w-full max-w-254 flex-col gap-11 xl:pr-42">
+        <div className="flex w-full max-w-254 flex-col gap-14 xl:pr-42">
           {entries.map((entry, index) =>
             entry.kind === "thought" ? (
               <ThoughtRow
                 day={entry.day}
+                find={entry.thought.id === found ? search.find : undefined}
                 // A day read again from its file gets new ids, so its editors start over
                 key={entry.thought.id}
                 newest={index === 0 && entry.day === today}
+                onFound={forgetFound}
                 onProblem={setNotice}
                 thought={entry.thought}
                 today={today}
