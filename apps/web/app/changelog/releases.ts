@@ -25,6 +25,35 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    art: "/images/covers/train.jpg",
+    changes: [
+      {
+        body: "A new place in the sidebar for what comes to you as the day goes: something someone said, an idea on the way somewhere. Write one, press ⌘ Enter (Ctrl Enter on Windows and Linux), and the next begins.",
+        color: "text-daylily",
+        title: "Thoughts",
+      },
+      {
+        body: "Each thought keeps the time you started it, set beside it in large type that stays in view as you scroll back through the days.",
+        color: "text-saffron",
+        title: "Every one under its time",
+      },
+      {
+        body: "Pictures, lists, quotes and the format toolbar work as on the page. Thoughts never seal, so you can come back and change any of them.",
+        color: "text-petal",
+        title: "As rich as the page",
+      },
+      {
+        body: "They’re kept beside each day’s page in thoughts.md, plain text any editor opens. Two thoughts of Daylily’s own explain them the first time; delete them whenever you like.",
+        color: "text-cornflower",
+        title: "Plain files, as always",
+      },
+    ],
+    date: "2026-10-26",
+    lead: "Your page asks how the day was, once, in the evening. Thoughts catch what happens before that.",
+    title: "Thoughts by day.",
+    version: "0.7.0",
+  },
+  {
     changes: [
       {
         body: "Daylily’s website is now daylily.ink. The manifesto, the changelog and a new version’s download open there from the app, and the old addresses still find their way.",
