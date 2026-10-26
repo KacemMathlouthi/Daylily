@@ -86,6 +86,13 @@ The full picture, beyond v1. What ships first is in [§3](#3-v1-specification).
 - **Never sealed.** Any thought, on any day that has begun, can be changed. The page is what seals; thoughts are the notes before it.
 - Not a notes app: no folders, tags or links. A day with only thoughts grows no flower.
 
+### Notes
+- **What you keep.** Pages without a date that you come back to and change: books to read, gift ideas, a recipe
+  you keep adjusting, plans for a trip. The journal's back pages.
+- One flat list beside the note that's open, pinned notes on top, then the rest by when they last changed.
+- **Never sealed**, and no flower: notes aren't days.
+- Not a knowledge base: no folders, tags, links between notes or templates. The folder opens in Obsidian for that.
+
 ### Nudges (ghost prompts): the signature interaction
 - When you stop typing, faint text fades in where the cursor is: *"and how did you feel about that?"*,
   *"what do you want to do about it?"*, *"who else was there?"*
@@ -148,7 +155,8 @@ prompts that listen, through one connection, off until turned on.
 | In v1 | Not in v1 |
 |---|---|
 | Today's page editor (title, cover, inline images) | Ask your journal, look-backs, highlights, cover generation |
-| Thoughts through the day, never sealed | Notes, folders, tags and links between pages |
+| Thoughts through the day, never sealed | Folders, tags and links between notes |
+| Notes: undated pages you keep, never sealed | Turning a thought into a note |
 | Sealing at 4am, read-only past days | Sync (users may place the folder in a synced folder) |
 | Garden, calendar, contribution graph | Import from other apps |
 | Curated offline nudges | Looking-back notes on sealed days |
@@ -172,6 +180,10 @@ One journal per user. One folder per day, holding the page and all of its media.
         thoughts.md          # the day's thoughts, never sealed
         cover.jpg
         image-01.jpg
+  notes/
+    books-to-read.md   # one file per note, named from its title
+    images/
+      image-01.jpg     # images on notes, shared by all of them
   .daylily/
     config.json        # journal preferences, travels with the folder
     cache/             # derived data (search index, flower colours); safe to delete
@@ -210,6 +222,16 @@ them; a heading inside a thought, or a time in a code block, stays text. Frontma
 never sealed and the page's hash never covers it, so a sealed day's thoughts can still change. A day with
 thoughts but no page isn't a written day.
 
+**Notes** are the markdown files directly in `notes/`, one per note, named from the title (`Books to read` is
+`books-to-read.md`; lowercase, safe on every system, `-2` when the name is taken, `untitled.md` with no title).
+A note is renamed to follow its title once the title is left, never while it's being written, and only when
+the title changed, so a file named in another app keeps its name until its title is changed in Daylily.
+Frontmatter holds `title` (written even when empty, so the note isn't titled by its file), `pinned: true` while
+pinned, `created`, `updated` and `app`, and keeps unknown fields; a file without a title is titled by its name.
+Images go in `notes/images/` as `image-NN` and are linked as `images/image-01.jpg`, so renaming a note never
+breaks them. Names Windows keeps for devices (`con`, `lpt1`…) are never used, and a name is cut to fit every
+system's limit, in bytes. A new note leaves no file until its first word.
+
 **Settings are split.** Journal preferences (reminder time, the name Daylily calls you) live in `.daylily/config.json`. Machine-local
 state (journal path, window size, theme, the sidebar's collapsed state) lives on the device, since each
 screen may want its own. Secrets, such as future API keys, go in the OS
@@ -244,13 +266,14 @@ keychain and **never** into the journal folder.
 | **Launch** | A small frameless splash window (300 × 390) the instant the app starts: the six-petal bloom over the dusk meadow, "Opening your journal…", a progress bar that follows real loading, and a quote. The main window loads hidden behind it; the splash stays at least ~1.4s for the bloom, then fades as the app appears on Home. Paper: 01c. |
 | **Onboarding** | Three steps (Paper 10d to 10h), each beside a painting: *welcome* (the three rules, over the eye), *make it yours* (what Daylily should call you, the computer's name to begin with, and the journal: keep the one in use, create one at `~/Daylily`, or open a folder you already have, over the rocket), *a little help* (ghost prompts and the evening reminder with its time, over the earth). Then *Hello, name.* with the hand-printed mark opening petal by petal, fading into today's page. Shown once on every computer, people who wrote before it existed too, and again from Help › Welcome to Daylily (Escape leaves it then). Choices are saved together at the end. |
 | **Home / Today** | Opens on *"How was your day?"* with the cursor placed. Title, cover and editor. Autosave. |
-| **Sidebar** | Home on its own, then two groups titled in small type: **Journal** (Today, Calendar, Garden) and **Notebook** (Thoughts). In the rail the titles go and the groups keep a little space between them. A group for the AI features, **Companion**, comes when they do (Paper 16a, 16b). |
+| **Sidebar** | Home on its own, then two groups titled in small type: **Journal** (Today, Calendar, Garden) and **Notebook** (Thoughts, Notes). In the rail the titles go and the groups keep a little space between them. A group for the AI features, **Companion**, comes when they do (Paper 16a, 16b). |
 | **Thoughts** | A canvas of every thought, newest first, the page's width, with a lane to its left holding each one's time in serif and its day under it, sticky as it scrolls (Paper: 15a to 15d). The open thought at the top waits for its first word under "Now"; ⌘ + Enter starts the next from anywhere. Each thought is the page's editor: markdown, the format toolbar, images. Days come fourteen at a time as you scroll back. Today always keeps a thought to write in, even after every other is deleted, and a click on the blank paper goes to it. In the sidebar's Notebook. |
+| **Notes** | A list of notes beside the one open (Paper 17a): pinned first, then "Recent", each with its title, when it changed and how it begins; "+" starts a new note, which waits on top as "New note · Now". The note is its title in the page's large serif and the page's editor under it. Over it, when it changed, its pin, a ⋯ menu (pin, show in folder, move to Trash: 17c) and focus mode; under it, where it's saved and its words. An empty folder opens on a new note with a quiet line about what notes are (17b). |
 | **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. Images pasted or dropped onto the page (Paper: 14a, 14b). |
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
 | **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three stats and the meadow (Paper: 06c). |
-| **Search** | A dialog over any screen, from ⌘ + K / Ctrl + K, the sidebar's "Search" or Edit › Search: days and thoughts in one list as you type, best match first (a day: date, cover, title, a line of its page; a thought: its time where a day has its cover, its day, a line of it; the words marked), the chosen one previewed beside them (⌘ + J hides it). Enter opens the day scrolled to the first match, or the Thoughts screen at the thought, reading back as far as it takes; either glows and fades. Before typing, a quiet hint; nothing found says so. Paper: 13a to 13d. |
+| **Search** | A dialog over any screen, from ⌘ + K / Ctrl + K, the sidebar's "Search" or Edit › Search: days, thoughts and notes in one list as you type, best match first (a day: date, cover, title, a line of its page; a thought: its time where a day has its cover, its day, a line of it; a note: a page's tile, when it changed, its title, a line of it; the words marked), the chosen one previewed beside them (⌘ + J hides it). Enter opens the day scrolled to the first match, the Thoughts screen at the thought, reading back as far as it takes, or the note; each glows and fades. Before typing, a quiet hint; nothing found says so. Paper: 13a to 13d, 17d. |
 | **Settings** | Journal (folder, what's on disk), Writing & sealing (ghost prompts, the 4am seal, gallery covers), Reminders (on/off, time, a preview), Appearance (light, dark, match the system; the sidebar's sun and moon switch too), About, with where updating stands (Paper 09f, 09g). AI hidden in v1. Paper: 09a to 09e. |
 
 ### 3.5 Behaviours
@@ -307,6 +330,13 @@ keychain and **never** into the journal folder.
   A day whose last thought is deleted keeps its `thoughts.md`, since Daylily never deletes files, and stops
   counting as a day with thoughts. Changes from other apps are followed for the days on screen. Search finds
   each thought on its own, beside the pages.
+- **Notes:** saved like the page, half a second after a change and before closing or sleeping. Opening one
+  writes nothing. A note that changed in another app is read again unless it has words of its own still to save,
+  which win as they're written; if its file goes while it still has words to save, it's written again rather
+  than lose them, and once everything was saved it simply leaves the screen.
+  Moving a note to the Trash saves it first, puts its file in the system's Trash, where it can be restored, and
+  opens the next note; it's the one way a file leaves the journal, and only when asked. A note that can't be read
+  is shown as such and never written over.
 - **Shortcuts are shown as keys**, each on its own cap with a plus between them (Ctrl + K, ⌘ + Enter), wherever
   the app names one; the title strip's menus write them as Windows does (Ctrl+K).
 - **Sidebar's journal:** the top of the sidebar names the journal and its folder (`~/Daylily`) and opens Settings ›
@@ -446,7 +476,8 @@ Work accordingly.
 ### Data safety
 - **Never lose user words.** Atomic writes (temp file, fsync, rename), save on every lifecycle event, and tests for
   crash recovery.
-- Never rewrite a sealed day's content. Never delete user files.
+- Never rewrite a sealed day's content. Never delete user files: a note moved to the Trash, when asked, goes
+  to the system's Trash, where it can be restored.
 - Preserve unknown frontmatter and markdown exactly as written.
 - All dates go through the injected clock and an explicit time zone. Store ISO 8601 with offsets.
 
@@ -584,7 +615,7 @@ drift, sync Paper back to what was agreed.
 | Page | Contents |
 |---|---|
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added · 13d Search · days and thoughts, best first · 15a to 15d Thoughts (today, the first one, editing an older one, the time staying as you scroll) · 16a Sidebar · grouped · 16b Sidebar · grouped, as it grows (later) |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added · 13d Search · days and thoughts, best first · 15a to 15d Thoughts (today, the first one, editing an older one, the time staying as you scroll) · 16a Sidebar · grouped · 16b Sidebar · grouped, as it grows (later) · 17a to 17d Notes (a note open, the first one, the note's menu, notes in search) |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 
@@ -654,6 +685,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-26 | Thoughts: a screen to write through the day, newest first under each one's time, kept in `thoughts.md` beside the page and never sealed, with two notes of its own given once to every journal; notes as a separate kind of page were decided against. Designed in Paper first (15a to 15d) |
 | 2026-10-26 | Thoughts polished: never left without a thought to write in, a little more space between them; search finds thoughts beside the pages, best first, and opens them where they are; the sidebar grouped into Journal and Notebook; shortcuts shown as keys. Designed in Paper first (13d, 16a, 16b) |
 | 2026-10-26 | Daylily's own domain, **daylily.ink**: the website, the README and the app's links moved there, the old addresses redirect to it; the Paper file tidied into labelled columns, outdated boards archived; the landing seals at 4am, not midnight |
+| 2026-10-26 | Notes: the pages you keep, undated and never sealed, one markdown file each in `notes/`, named from their titles; a list beside the open note, pinned first; moved to the system's Trash when asked; found by search. Opening any page no longer saves it again. Designed in Paper first (17a to 17d) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the

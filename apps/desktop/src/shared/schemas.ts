@@ -1,4 +1,5 @@
 import { parseDayKey } from "@daylily/core/day";
+import { isNoteName } from "@daylily/core/note-file";
 import { isThoughtTime } from "@daylily/core/thoughts-file";
 import { z } from "zod";
 import {
@@ -80,6 +81,16 @@ export const thoughtsSchema = z
   );
 
 export const imageOwnerSchema = z.enum(["page", "thoughts"]);
+
+/** A note the renderer names: only a file directly in the notes folder. */
+export const noteNameSchema = z.string().refine(isNoteName, "Not a note");
+
+/** A note as the page sends it; as long as a day's page may be. */
+export const noteSchema = z.object({
+  body: z.string().max(MAX_PAGE_CHARS),
+  pinned: z.boolean(),
+  title: z.string().max(1000),
+});
 
 export const imageBytesSchema = z
   .instanceof(Uint8Array)

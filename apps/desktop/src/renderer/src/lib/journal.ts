@@ -9,6 +9,7 @@ import {
 } from "../../../shared/journal";
 import { forgetSaves } from "./autosave";
 import type { DayKey } from "./month";
+import { forgetNotes } from "./notes";
 import {
   forgetThoughts,
   forgetThoughtsOf,
@@ -136,6 +137,7 @@ export function followJournalMoves(client: QueryClient) {
     forgetSaves();
     forgetPages();
     forgetThoughts();
+    forgetNotes();
     // Reads still on their way belong to the journal left behind
     thoughtReads.clear();
     client.resetQueries({ queryKey: ["journal"] });

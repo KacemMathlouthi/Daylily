@@ -20,6 +20,7 @@ import {
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   Calendar,
+  FileText,
   House,
   Lightbulb,
   type LucideIcon,
@@ -66,7 +67,10 @@ const NAV: { title: string | null; links: NavLink[] }[] = [
     title: "Journal",
   },
   {
-    links: [{ icon: Lightbulb, label: "Thoughts", to: "/thoughts" }],
+    links: [
+      { icon: Lightbulb, label: "Thoughts", to: "/thoughts" },
+      { icon: FileText, label: "Notes", to: "/notes" },
+    ],
     title: "Notebook",
   },
 ];

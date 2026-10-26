@@ -36,6 +36,7 @@ export type DayFileError =
 /** The fields Daylily writes, in the order a new file lists them. */
 const FIELDS = [
   "title",
+  "pinned",
   "cover",
   "created",
   "updated",
@@ -48,7 +49,9 @@ const FIELDS = [
 type Field = (typeof FIELDS)[number];
 
 /** A value to write, or null to remove the field. */
-export type FrontmatterChanges = Partial<Record<Field, string | number | null>>;
+export type FrontmatterChanges = Partial<
+  Record<Field, string | number | boolean | null>
+>;
 
 // A bare file name: the cover lives in the day's own folder, never elsewhere
 const FILE_NAME = /^(?!\.{1,2}$)[^/\\:\0]+$/;
@@ -140,30 +143,39 @@ function parseFrontmatter(
   return ok(doc);
 }
 
-function readMeta(doc: Document): Result<DayMeta, DayFileError> {
-  try {
-    return ok(metaSchema.parse(doc.toJS()));
-  } catch (error) {
-    // toJS throws on YAML that parses but can't be resolved, like too many aliases
-    return fail({ kind: "malformed", message: String(error) });
-  }
-}
-
-/** Reads a day's markdown file: its frontmatter fields and its page. */
-export function readDayFile(text: string): Result<DayFile, DayFileError> {
+/**
+ * Reads a markdown file's frontmatter as plain values, unchecked, and what
+ * follows it. For files with fields of their own, like notes.
+ */
+export function readFrontmatter(
+  text: string
+): Result<{ body: string; fields: unknown }, DayFileError> {
   const parts = split(text);
   const doc = parseFrontmatter(parts.frontmatter);
   if (!doc.ok) {
     return doc;
   }
-  const meta = readMeta(doc.value);
-  if (!meta.ok) {
-    return meta;
+  let fields: unknown;
+  try {
+    fields = doc.value.toJS();
+  } catch (error) {
+    // toJS throws on YAML that parses but can't be resolved, like too many aliases
+    return fail({ kind: "malformed", message: String(error) });
   }
-  return ok({
-    body: parts.body.replace(LEADING_BLANK_LINES, ""),
-    meta: meta.value,
-  });
+  return ok({ body: parts.body.replace(LEADING_BLANK_LINES, ""), fields });
+}
+
+/** Reads a day's markdown file: its frontmatter fields and its page. */
+export function readDayFile(text: string): Result<DayFile, DayFileError> {
+  const file = readFrontmatter(text);
+  if (!file.ok) {
+    return file;
+  }
+  // Each field falls back on its own; only fields that aren't a set of them fail
+  const meta = metaSchema.safeParse(file.value.fields);
+  return meta.success
+    ? ok({ body: file.value.body, meta: meta.data })
+    : fail({ kind: "malformed", message: meta.error.message });
 }
 
 /**
@@ -171,7 +183,7 @@ export function readDayFile(text: string): Result<DayFile, DayFileError> {
  * Daylily's fields that follows it, so a title added after the first words still
  * sits on top. Fields other tools added keep their places.
  */
-function place(doc: Document, field: Field, value: string | number) {
+function place(doc: Document, field: Field, value: string | number | boolean) {
   const map = doc.contents;
   if (!isMap(map) || doc.has(field)) {
     doc.set(field, value);

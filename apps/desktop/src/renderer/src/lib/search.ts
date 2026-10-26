@@ -1,3 +1,4 @@
+import { isNoteName } from "@daylily/core/note-file";
 import type { usePageEditor } from "@daylily/ui/editor/use-page-editor";
 import { useEffect, useRef } from "react";
 import { createStore } from "./store";
@@ -34,6 +35,16 @@ export function validateFoundThought(search: Record<string, unknown>): {
     Number.isInteger(place) &&
     place >= 0
     ? { ...validateFind(search), day, place }
+    : {};
+}
+
+/** A note opened from search: its file, and what was searched for. */
+export function validateFoundNote(search: Record<string, unknown>): {
+  find?: string;
+  note?: string;
+} {
+  return typeof search.note === "string" && isNoteName(search.note)
+    ? { ...validateFind(search), note: search.note }
     : {};
 }
 

@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile, rename, rm, stat } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, dayPath, parseDayKey, today } from "@daylily/core/day";
@@ -10,6 +10,15 @@ import {
 } from "@daylily/core/day-file";
 import { pageExcerpt } from "@daylily/core/excerpt";
 import type { FlowerColor } from "@daylily/core/flower";
+import {
+  isNoteName,
+  NOTE_IMAGES_FOLDER,
+  NOTES_FOLDER,
+  type NoteContent,
+  noteFileName,
+  readNoteFile,
+  writeNoteFile,
+} from "@daylily/core/note-file";
 import { fail, ok, type Result } from "@daylily/core/result";
 import { hasEnded, sealDayFile, sealState, sealTime } from "@daylily/core/seal";
 import {
@@ -25,8 +34,10 @@ import {
   type CoverExtension,
   type JournalError,
   type ListedDay,
+  type ListedNote,
   PAGE_IMAGE_NAME,
   type StoredDay,
+  type StoredNote,
   type ThoughtDay,
   type ThoughtsPage,
   type UnreadableDay,
@@ -117,7 +128,7 @@ async function folderNames(path: string, pattern: RegExp) {
 /** The last number `PAGE_IMAGE_NAME` allows: past it, a name couldn't be served. */
 const MAX_IMAGE_NUMBER = 999;
 
-/** One past the highest image number in a day's folder, or 1 in a new one. */
+/** One past the highest image number in a folder, or 1 in a new one. */
 async function nextImageNumber(folder: string) {
   let highest = 0;
   for (const entry of await listFolder(folder)) {
@@ -125,6 +136,44 @@ async function nextImageNumber(folder: string) {
     highest = Math.max(highest, number);
   }
   return highest + 1;
+}
+
+/**
+ * Copies an image into `folder` as the next `image-NN.<ext>`, untouched, and
+ * returns its name. Names already taken, by Daylily or anyone, are skipped,
+ * never written over.
+ */
+async function copyImageIn(
+  folder: string,
+  bytes: Uint8Array,
+  extension: CoverExtension
+): Promise<Result<string, JournalError>> {
+  for (
+    let number = await nextImageNumber(folder);
+    number <= MAX_IMAGE_NUMBER;
+    number += 1
+  ) {
+    const name = `image-${String(number).padStart(2, "0")}.${extension}`;
+    // biome-ignore lint/performance/noAwaitInLoops: the next name is tried only once this one is taken
+    if (await createFileAtomic(join(folder, name), bytes)) {
+      return ok(name);
+    }
+  }
+  // Every name to image-999 is taken: said as the disk refusing one more
+  return fail({ code: "EEXIST", kind: "io" });
+}
+
+/** A save stamps a note's frontmatter a moment before the disk stamps its file. */
+const SAVE_SLACK_MS = 2000;
+
+/** When a note last changed: as its file says, or as the disk does for one written elsewhere. */
+async function noteUpdated(path: string, written: string | null) {
+  const changed = (await stat(path)).mtime;
+  // Another app's edit moves the file's time on, not the frontmatter's
+  return written !== null &&
+    Date.parse(written) >= changed.getTime() - SAVE_SLACK_MS
+    ? written
+    : changed.toISOString();
 }
 
 /**
@@ -159,6 +208,124 @@ export function createJournal({
   const dayAsset = (day: DayKey, name: string) =>
     inJournal(...dayPath(day).slice(0, 3), name);
   const thoughtsFile = (day: DayKey) => dayAsset(day, THOUGHTS_FILE);
+  const notesFolder = inJournal(NOTES_FOLDER);
+  const noteImagesFolder = inJournal(NOTES_FOLDER, NOTE_IMAGES_FOLDER);
+
+  /** Where a note lives; only a note's own name, never a path elsewhere. */
+  function noteFile(name: string) {
+    if (!isNoteName(name)) {
+      throw new Error(`Refused a note name: ${name}`);
+    }
+    return inJournal(NOTES_FOLDER, name);
+  }
+
+  /** The notes in the folder, by name, as the disk lists them. */
+  async function noteNames() {
+    try {
+      const entries = await readdir(notesFolder, { withFileTypes: true });
+      return entries
+        .filter((entry) => entry.isFile() && isNoteName(entry.name))
+        .map((entry) => entry.name);
+    } catch (error) {
+      if (errorCode(error) === "ENOENT") {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  /** A note as read from its file, or why it can't be. */
+  async function toStoredNote(
+    name: string,
+    text: string
+  ): Promise<Result<StoredNote, DayFileError>> {
+    const note = readNoteFile(text, name);
+    if (!note.ok) {
+      return note;
+    }
+    const { body, pinned, title, updated } = note.value;
+    return ok({
+      body,
+      name,
+      pinned,
+      title,
+      updated: await noteUpdated(noteFile(name), updated),
+    });
+  }
+
+  /**
+   * Gives a saved note the name its title asks for, if it's free: written whole
+   * under the new name first, so the words are never only half in either.
+   */
+  async function renameNote(name: string, text: string, title: string) {
+    const others = new Set(
+      (await noteNames())
+        .filter((other) => other !== name)
+        .map((other) => other.toLowerCase())
+    );
+    for (;;) {
+      const wanted = noteFileName(title, (each) =>
+        others.has(each.toLowerCase())
+      );
+      if (wanted === name) {
+        return name;
+      }
+      if (wanted.toLowerCase() === name.toLowerCase()) {
+        // The same file where names ignore case: only the letters change
+        // biome-ignore lint/performance/noAwaitInLoops: the loop ends here
+        await rename(noteFile(name), noteFile(wanted));
+        return wanted;
+      }
+      if (await createFileAtomic(noteFile(wanted), text)) {
+        await rm(noteFile(name), { force: true });
+        return wanted;
+      }
+      others.add(wanted.toLowerCase());
+    }
+  }
+
+  /**
+   * The name a note's file has on disk: where names ignore case (macOS,
+   * Windows), `Books.md` may be asked for as `books.md`.
+   */
+  async function spelledOnDisk(name: string) {
+    const names = await noteNames();
+    if (names.includes(name)) {
+      return name;
+    }
+    return (
+      names.find((each) => each.toLowerCase() === name.toLowerCase()) ?? name
+    );
+  }
+
+  /**
+   * Writes a note that has a file, and gives it the name `title` asks for, when
+   * one is given. A note whose file went while it was open is written again,
+   * words and all.
+   */
+  async function saveExisting(
+    name: string,
+    text: string,
+    title: string | false
+  ) {
+    await writeFileAtomic(noteFile(name), text);
+    return title === false ? name : await renameNote(name, text, title);
+  }
+
+  /** Writes a new note under a free name from its title, and returns the name. */
+  async function createNote(title: string, text: string) {
+    const taken = new Set(
+      (await noteNames()).map((each) => each.toLowerCase())
+    );
+    for (;;) {
+      const name = noteFileName(title, (each) => taken.has(each.toLowerCase()));
+      // biome-ignore lint/performance/noAwaitInLoops: a name taken this moment by another app is skipped
+      if (await createFileAtomic(noteFile(name), text)) {
+        return name;
+      }
+      taken.add(name.toLowerCase());
+    }
+  }
 
   function queued<T>(path: string, task: () => Promise<T>): Promise<T> {
     const previous = queues.get(path) ?? Promise.resolve();
@@ -383,23 +550,27 @@ export function createJournal({
           if (locked) {
             return fail(locked);
           }
-          const folder = inJournal(...dayPath(day).slice(0, 3));
-          for (
-            let number = await nextImageNumber(folder);
-            number <= MAX_IMAGE_NUMBER;
-            number += 1
-          ) {
-            const name = `image-${String(number).padStart(2, "0")}.${extension}`;
-            // biome-ignore lint/performance/noAwaitInLoops: the next name is tried only once this one is taken
-            if (await createFileAtomic(dayAsset(day, name), bytes)) {
-              return ok(name);
-            }
-          }
-          // Every name to image-999 is taken: said as the disk refusing one more
-          return fail({ code: "EEXIST", kind: "io" });
+          return copyImageIn(
+            inJournal(...dayPath(day).slice(0, 3)),
+            bytes,
+            extension
+          );
         })
       );
     },
+
+    /**
+     * Copies an image into `notes/images` as the next `image-NN.<ext>`,
+     * returning the path a note links it by, like `images/image-01.jpg`.
+     */
+    addNoteImage: (
+      bytes: Uint8Array,
+      extension: CoverExtension
+    ): Promise<Result<string, JournalError>> =>
+      guarded(async () => {
+        const added = await copyImageIn(noteImagesFolder, bytes, extension);
+        return added.ok ? ok(`${NOTE_IMAGES_FOLDER}/${added.value}`) : added;
+      }),
 
     /**
      * Adds thoughts after today's, begun now, as when the feature's own notes are
@@ -464,12 +635,57 @@ export function createJournal({
       return listed.filter((day) => day !== null);
     },
 
+    /** Every note in the notes folder, in no order; the screen sorts them. */
+    async listNotes(): Promise<ListedNote[]> {
+      const listed = await Promise.all(
+        (await noteNames()).map(async (name): Promise<ListedNote | null> => {
+          const path = noteFile(name);
+          try {
+            const note = await toStoredNote(name, await readFile(path, "utf8"));
+            if (!note.ok) {
+              return {
+                name,
+                state: "unreadable",
+                updated: await noteUpdated(path, null),
+              };
+            }
+            const { body, ...summary } = note.value;
+            return { ...summary, excerpt: pageExcerpt(body), state: "ok" };
+          } catch (error) {
+            // Gone between listing the folder and reading it, by another app
+            if (errorCode(error) === "ENOENT") {
+              return null;
+            }
+            throw error;
+          }
+        })
+      );
+      return listed.filter((note) => note !== null);
+    },
+
+    /** Where an image on a note lives, for showing it. */
+    noteAsset: (name: string) =>
+      inJournal(NOTES_FOLDER, NOTE_IMAGES_FOLDER, name),
+
+    /** Where a note lives, for showing it in the file manager or moving it to the Trash. */
+    noteFile,
+
     /** A day's page and fields, or null when nothing was written that day. */
     async readDay(
       day: DayKey
     ): Promise<Result<StoredDay | null, DayFileError>> {
       const text = await readIfThere(dayFile(day));
       return text === null ? ok(null) : toStored(day, text);
+    },
+
+    /** A note and its words, under its name as spelled on disk, or null when there's no such note. */
+    async readNote(
+      name: string
+    ): Promise<Result<StoredNote | null, DayFileError>> {
+      const text = await readIfThere(noteFile(name));
+      return text === null
+        ? ok(null)
+        : toStoredNote(await spelledOnDisk(name), text);
     },
 
     /** A day's thoughts, or null when it has none. */
@@ -596,6 +812,47 @@ export function createJournal({
           }
           await writeFileAtomic(path, text.value);
           return toStored(day, text.value);
+        })
+      );
+    },
+
+    /**
+     * Saves a note: a new one (`name` null) under a free name from its title,
+     * starting the notes folder, or nothing while it's empty; one that exists where it is, or under a name
+     * from its title when `rename` asks, once its title has settled. Notes never
+     * seal. A file that can't be read is never written over.
+     */
+    writeNote(
+      name: string | null,
+      note: NoteContent,
+      { rename: renaming = false }: { rename?: boolean } = {}
+    ): Promise<Result<StoredNote | null, JournalError>> {
+      // One queue for every note: a rename looks at the names the others hold
+      return queued(notesFolder, () =>
+        guarded(async () => {
+          // A new note with nothing in it leaves no trace
+          if (
+            name === null &&
+            note.title.trim() === "" &&
+            note.body.trim() === ""
+          ) {
+            return ok(null);
+          }
+          const existing =
+            name === null ? null : await readIfThere(noteFile(name));
+          const text = writeNoteFile(existing, note, {
+            app,
+            now: clock.now(),
+            timeZone: clock.timeZone(),
+          });
+          if (!text.ok) {
+            return text;
+          }
+          const saved =
+            name === null
+              ? await createNote(note.title, text.value)
+              : await saveExisting(name, text.value, renaming && note.title);
+          return toStoredNote(saved, text.value);
         })
       );
     },

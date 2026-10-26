@@ -47,6 +47,30 @@ export interface ThoughtsPage {
   next: DayKey | null;
 }
 
+/** A note as the list shows it, without its words; one that can't be read is shown, never rewritten. */
+export type ListedNote =
+  | {
+      /** Its opening words, for the line under its title. */
+      excerpt: string;
+      /** Its file in the notes folder, like `books-to-read.md`: how it's named everywhere. */
+      name: string;
+      pinned: boolean;
+      state: "ok";
+      title: string;
+      /** When it last changed, ISO 8601. */
+      updated: string;
+    }
+  | { name: string; state: "unreadable"; updated: string };
+
+/** A note and its words. */
+export interface StoredNote {
+  body: string;
+  name: string;
+  pinned: boolean;
+  title: string;
+  updated: string;
+}
+
 /** How many days of thoughts come at a time, as the screen scrolls back. */
 export const THOUGHT_DAYS_PER_PAGE = 14;
 
@@ -87,8 +111,20 @@ export interface ThoughtHit {
   time: string | null;
 }
 
-/** Days and thoughts found together, best match first. */
-export type SearchHit = DayHit | ThoughtHit;
+/** A note that holds what was searched for. */
+export interface NoteHit {
+  /** Unique among the results: the note's file. */
+  id: string;
+  kind: "note";
+  name: string;
+  /** The note around the first match, with the matches marked. */
+  snippet: Snippet;
+  title: string;
+  updated: string;
+}
+
+/** Days, thoughts and notes found together, best match first. */
+export type SearchHit = DayHit | ThoughtHit | NoteHit;
 
 export type JournalError =
   | DayFileError
@@ -190,4 +226,9 @@ export const JOURNAL_SCHEME = "daylily-journal";
 /** Where the page finds a file in a day's folder, like its cover. */
 export function journalAssetUrl(day: string, name: string) {
   return `${JOURNAL_SCHEME}://day/${day}/${encodeURIComponent(name)}`;
+}
+
+/** Where a note finds one of its images, kept in `notes/images`. */
+export function noteAssetUrl(name: string) {
+  return `${JOURNAL_SCHEME}://note/${encodeURIComponent(name)}`;
 }

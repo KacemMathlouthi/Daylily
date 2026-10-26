@@ -79,6 +79,7 @@ export function usePageEditor({
       images: {
         // Through the ref, so the latest callbacks are used
         resolve: (src) => imagesRef.current?.resolve(src) ?? null,
+        ...(images?.folder ? { folder: images.folder } : {}),
         ...(adds
           ? {
               add: (file) =>
@@ -110,7 +111,9 @@ export function usePageEditor({
   }, [editor, enabled, hasGhostPrompts]);
 
   useEffect(() => {
-    editor.setEditable(editable);
+    // Quietly: by default Tiptap reports this as an edit, which would save a
+    // page, and stamp it changed, only for being opened
+    editor.setEditable(editable, false);
   }, [editor, editable]);
 
   return editor;

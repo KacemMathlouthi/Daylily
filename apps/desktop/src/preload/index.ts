@@ -109,6 +109,23 @@ const api: DaylilyApi = {
     use: (path) => ipcRenderer.invoke(CHANNELS.journalUse, path),
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
+  notes: {
+    addImage: (image) => ipcRenderer.invoke(CHANNELS.notesAddImage, image),
+    list: () => ipcRenderer.invoke(CHANNELS.notesList),
+    onChange: (listener) => {
+      const forward = (_event: IpcRendererEvent, names: string[]) =>
+        listener(names);
+      ipcRenderer.on(CHANNELS.notesChanged, forward);
+      return () => {
+        ipcRenderer.off(CHANNELS.notesChanged, forward);
+      };
+    },
+    read: (name) => ipcRenderer.invoke(CHANNELS.notesRead, name),
+    show: (name) => ipcRenderer.invoke(CHANNELS.notesShow, name),
+    trash: (name) => ipcRenderer.invoke(CHANNELS.notesTrash, name),
+    write: (name, note, rename) =>
+      ipcRenderer.invoke(CHANNELS.notesWrite, name, note, rename),
+  },
   platform: process.platform,
   thoughts: {
     page: (before) => ipcRenderer.invoke(CHANNELS.thoughtsPage, before),

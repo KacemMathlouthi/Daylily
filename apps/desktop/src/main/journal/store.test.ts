@@ -4,6 +4,7 @@ import {
   readdir,
   readFile,
   rm,
+  utimes,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -620,5 +621,141 @@ describe("thoughts", () => {
     expect((await journal.addImage(key("2026-10-21"), bytes, "png")).ok).toBe(
       false
     );
+  });
+});
+
+describe("notes", () => {
+  const note = (title: string, body = "Words.", pinned = false) => ({
+    body,
+    pinned,
+    title,
+  });
+  const notesFolder = () => join(root, "notes");
+
+  async function saved(
+    ...args: Parameters<Journal["writeNote"]>
+  ): Promise<string> {
+    const result = await journal.writeNote(...args);
+    if (!(result.ok && result.value)) {
+      throw new Error(`Not saved: ${JSON.stringify(result)}`);
+    }
+    return result.value.name;
+  }
+
+  it("saves a new note under a name from its title", async () => {
+    const name = await saved(null, note("Books to read", "- [ ] Piranesi"));
+    expect(name).toBe("books-to-read.md");
+    const text = await readFile(join(notesFolder(), name), "utf8");
+    expect(text).toContain("title: Books to read");
+    expect(text).toContain("- [ ] Piranesi");
+  });
+
+  it("leaves no trace for a new note with nothing in it", async () => {
+    expect(await journal.writeNote(null, note("", " "))).toEqual({
+      ok: true,
+      value: null,
+    });
+    expect(await journal.listNotes()).toEqual([]);
+    expect(await readdir(root)).toEqual([]);
+  });
+
+  it("keeps a note pinned", async () => {
+    const name = await saved(null, note("Gifts", "Words.", true));
+    expect(await journal.readNote(name)).toMatchObject({
+      value: { pinned: true },
+    });
+    expect(await journal.listNotes()).toMatchObject([{ pinned: true }]);
+  });
+
+  it("says a note changed in another app changed when the disk says so", async () => {
+    const name = await saved(null, note("Trip"));
+    const path = join(notesFolder(), name);
+    const later = new Date(now.getTime() + 60 * 60 * 1000);
+    await utimes(path, later, later);
+    expect(await journal.listNotes()).toMatchObject([
+      { updated: later.toISOString() },
+    ]);
+  });
+
+  it("never takes a name another note has", async () => {
+    await saved(null, note("Books"));
+    expect(await saved(null, note("books"))).toBe("books-2.md");
+  });
+
+  it("keeps a note's name while its title is being written", async () => {
+    const name = await saved(null, note("Bo"));
+    expect(await saved(name, note("Books to read"))).toBe("bo.md");
+  });
+
+  it("renames a note to its title once settled, keeping its words", async () => {
+    const name = await saved(null, note("Bo", "Piranesi"));
+    const renamed = await saved(name, note("Books to read", "Piranesi"), {
+      rename: true,
+    });
+    expect(renamed).toBe("books-to-read.md");
+    expect(await readdir(notesFolder())).toEqual(["books-to-read.md"]);
+    const read = await journal.readNote(renamed);
+    expect(read).toMatchObject({ ok: true, value: { body: "Piranesi\n" } });
+  });
+
+  it("doesn't rename over another note", async () => {
+    await saved(null, note("Gifts"));
+    const name = await saved(null, note("Ideas"));
+    expect(await saved(name, note("Gifts"), { rename: true })).toBe(
+      "gifts-2.md"
+    );
+    expect((await readdir(notesFolder())).sort()).toEqual([
+      "gifts-2.md",
+      "gifts.md",
+    ]);
+  });
+
+  it("lists notes written in another app, titled by their name", async () => {
+    await mkdir(notesFolder(), { recursive: true });
+    await writeFile(join(notesFolder(), "Balcony plants.md"), "Basil.\n");
+    await writeFile(join(notesFolder(), "photo.jpg"), "");
+    const [listed, ...others] = await journal.listNotes();
+    expect(others).toEqual([]);
+    expect(listed).toMatchObject({
+      excerpt: "Basil.",
+      name: "Balcony plants.md",
+      pinned: false,
+      state: "ok",
+      title: "Balcony plants",
+    });
+  });
+
+  it("lists a note it can't read, and never writes over it", async () => {
+    await mkdir(notesFolder(), { recursive: true });
+    const path = join(notesFolder(), "broken.md");
+    await writeFile(path, "---\ntitle: [\n---\nWords.\n");
+    expect(await journal.listNotes()).toMatchObject([
+      { name: "broken.md", state: "unreadable" },
+    ]);
+    const written = await journal.writeNote("broken.md", note("Fixed"));
+    expect(written.ok).toBe(false);
+    expect(await readFile(path, "utf8")).toBe("---\ntitle: [\n---\nWords.\n");
+  });
+
+  it("writes again a note whose file went while it was open", async () => {
+    const name = await saved(null, note("Trip"));
+    await rm(join(notesFolder(), name));
+    expect(await saved(name, note("Trip", "Still here."))).toBe(name);
+    expect(await journal.readNote(name)).toMatchObject({
+      value: { body: "Still here.\n" },
+    });
+  });
+
+  it("refuses a name that isn't a note's", async () => {
+    expect(() => journal.noteFile("../2026/10/21/2026-10-21.md")).toThrow();
+    await expect(journal.readNote(".hidden.md")).rejects.toThrow();
+  });
+
+  it("copies an image into the notes' images folder", async () => {
+    const added = await journal.addNoteImage(new Uint8Array([1, 2]), "png");
+    expect(added).toEqual({ ok: true, value: "images/image-01.png" });
+    expect(await readdir(join(notesFolder(), "images"))).toEqual([
+      "image-01.png",
+    ]);
   });
 });

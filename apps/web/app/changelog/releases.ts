@@ -25,6 +25,35 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    art: "/images/covers/cake.jpg",
+    changes: [
+      {
+        body: "A new place in the notebook for what you keep and come back to: books to read, gift ideas, a recipe you keep changing. Notes have no date and never seal; change them whenever you like.",
+        color: "text-daylily",
+        title: "Notes",
+      },
+      {
+        body: "Each note is a markdown file in your journal’s notes folder, named from its title, so it reads well in any app. Pin the ones you open most, and move one to the Trash when you’re done with it; it can be restored from there.",
+        color: "text-saffron",
+        title: "Files you can read",
+      },
+      {
+        body: "Search looks through your notes too, beside your days and thoughts, and opens a note at the words you were looking for.",
+        color: "text-cornflower",
+        title: "Search finds notes",
+      },
+      {
+        body: "Opening today’s page or your thoughts no longer saves them again, so the time a page was last changed stays true.",
+        color: "text-petal",
+        title: "Only changed when you change it",
+      },
+    ],
+    date: "2026-10-26",
+    lead: "The pages you keep, beside the ones you write each day.",
+    title: "Kept.",
+    version: "0.9.0",
+  },
+  {
     changes: [
       {
         body: "Search now looks through your thoughts as well as your pages, best match first. A thought shows its time where a day shows its cover; open it and the Thoughts screen takes you there, however far back.",
