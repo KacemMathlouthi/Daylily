@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { configChangesSchema } from "../../shared/schemas";
-import { readConfig, writeConfig } from "./config";
+import { readConfig, thoughtsIntroduced, writeConfig } from "./config";
 
 const DEFAULTS = {
   galleryCovers: true,
@@ -87,5 +87,18 @@ describe("writeConfig", () => {
     expect((await readConfig(root)).name).toBe("Kacem");
     await writeConfig(root, configChangesSchema.parse({ name: "" }));
     expect((await readConfig(root)).name).toBeNull();
+  });
+
+  it("remembers the thoughts' own notes were given, and keeps it through other changes", async () => {
+    expect(await thoughtsIntroduced(root)).toBe(false);
+    await writeConfig(root, { thoughtsIntroduced: true });
+    await writeConfig(root, { ghostPrompts: false });
+    expect(await thoughtsIntroduced(root)).toBe(true);
+  });
+
+  it("never lets the page say the notes were given", () => {
+    expect(() =>
+      configChangesSchema.parse({ thoughtsIntroduced: true })
+    ).toThrow();
   });
 });

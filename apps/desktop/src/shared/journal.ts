@@ -2,6 +2,7 @@ import type { DayKey } from "@daylily/core/day";
 import type { DayFileError } from "@daylily/core/day-file";
 import type { FlowerColor } from "@daylily/core/flower";
 import type { Snippet } from "@daylily/core/search-text";
+import type { Thought } from "@daylily/core/thoughts-file";
 
 /** A day as the calendar and garden need it, without its page. */
 interface DaySummary {
@@ -33,6 +34,21 @@ export interface UnreadableDay {
 }
 
 export type ListedDay = DaySummary | UnreadableDay;
+
+/** A day's thoughts, in the order written; a file that can't be read is shown, never rewritten. */
+export type ThoughtDay =
+  | { day: DayKey; state: "ok"; thoughts: Thought[] }
+  | { day: DayKey; state: "unreadable" };
+
+/** A few days of thoughts, newest first, and the day the next few come before. */
+export interface ThoughtsPage {
+  days: ThoughtDay[];
+  /** Null once the earliest day with thoughts is in. */
+  next: DayKey | null;
+}
+
+/** How many days of thoughts come at a time, as the screen scrolls back. */
+export const THOUGHT_DAYS_PER_PAGE = 14;
 
 /**
  * Enough for anyone to find a day; more is a list nobody reads. Search returns

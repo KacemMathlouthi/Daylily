@@ -66,8 +66,8 @@ const api: DaylilyApi = {
       ipcRenderer.invoke(CHANNELS.saveGardenImage, png, name),
   },
   journal: {
-    addImage: (day, image) =>
-      ipcRenderer.invoke(CHANNELS.journalAddImage, day, image),
+    addImage: (day, image, owner) =>
+      ipcRenderer.invoke(CHANNELS.journalAddImage, day, image, owner),
     change: () => ipcRenderer.invoke(CHANNELS.journalChange),
     flowerColor: (day, stamp, color) =>
       ipcRenderer.invoke(CHANNELS.journalFlowerColor, day, stamp, color),
@@ -110,6 +110,12 @@ const api: DaylilyApi = {
     write: (day, page) => ipcRenderer.invoke(CHANNELS.journalWrite, day, page),
   },
   platform: process.platform,
+  thoughts: {
+    page: (before) => ipcRenderer.invoke(CHANNELS.thoughtsPage, before),
+    read: (day) => ipcRenderer.invoke(CHANNELS.thoughtsRead, day),
+    write: (day, thoughts) =>
+      ipcRenderer.invoke(CHANNELS.thoughtsWrite, day, thoughts),
+  },
   updates: {
     check: () => ipcRenderer.invoke(CHANNELS.updatesCheck),
     dismiss: () => ipcRenderer.invoke(CHANNELS.updatesDismiss),

@@ -1,6 +1,7 @@
 import type { PageContent } from "@daylily/core/day-file";
 import type { FlowerColor } from "@daylily/core/flower";
 import type { Result } from "@daylily/core/result";
+import type { Thought } from "@daylily/core/thoughts-file";
 import type {
   CoverExtension,
   DeviceState,
@@ -12,6 +13,8 @@ import type {
   ListedDay,
   SearchHit,
   StoredDay,
+  ThoughtDay,
+  ThoughtsPage,
 } from "./journal";
 
 /**
@@ -47,6 +50,9 @@ export const CHANNELS = {
   journalUse: "journal:use",
   journalWrite: "journal:write",
   saveGardenImage: "garden:save-image",
+  thoughtsPage: "thoughts:page",
+  thoughtsRead: "thoughts:read",
+  thoughtsWrite: "thoughts:write",
   updatesChanged: "updates:changed",
   updatesCheck: "updates:check",
   updatesDismiss: "updates:dismiss",
@@ -155,7 +161,9 @@ export interface DaylilyApi {
      */
     addImage: (
       day: string,
-      image: Uint8Array
+      image: Uint8Array,
+      /** Thoughts never seal, so their images go into any day that has begun. */
+      owner?: "page" | "thoughts"
     ) => Promise<Result<string, ImageError>>;
     /** Keeps the flower colour sampled from a day's cover, stamped with the cover file it came from. */
     flowerColor: (
@@ -222,6 +230,21 @@ export interface DaylilyApi {
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;
+  /**
+   * Thoughts: kept beside each day's page in `thoughts.md`, never sealed. The
+   * first time a journal's are listed, the screen's own two notes are given.
+   */
+  thoughts: {
+    /** Days with thoughts, newest first: from the newest, or those before `before`. */
+    page: (before: string | null) => Promise<ThoughtsPage>;
+    /** A day's thoughts, or null when it has none. */
+    read: (day: string) => Promise<ThoughtDay | null>;
+    /** Saves a day's thoughts, in the order written. Null when there was nothing to keep. */
+    write: (
+      day: string,
+      thoughts: Thought[]
+    ) => Promise<Result<Thought[] | null, JournalError>>;
+  };
   /** New versions of Daylily, looked for at launch and every few hours. */
   updates: {
     /** Looks now, unless a look or a download is already under way. */

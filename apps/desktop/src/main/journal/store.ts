@@ -12,6 +12,14 @@ import { pageExcerpt } from "@daylily/core/excerpt";
 import type { FlowerColor } from "@daylily/core/flower";
 import { fail, ok, type Result } from "@daylily/core/result";
 import { hasEnded, sealDayFile, sealState, sealTime } from "@daylily/core/seal";
+import {
+  readThoughtsFile,
+  THOUGHTS_FILE,
+  type Thought,
+  type ThoughtsStamp,
+  thoughtTime,
+  writeThoughtsFile,
+} from "@daylily/core/thoughts-file";
 import { countMarkdownWords } from "@daylily/core/words";
 import {
   type CoverExtension,
@@ -19,6 +27,8 @@ import {
   type ListedDay,
   PAGE_IMAGE_NAME,
   type StoredDay,
+  type ThoughtDay,
+  type ThoughtsPage,
   type UnreadableDay,
 } from "../../shared/journal";
 import { createFileAtomic, writeFileAtomic } from "./atomic-write";
@@ -42,6 +52,33 @@ async function readIfThere(path: string) {
     }
     throw error;
   }
+}
+
+const isBlank = (thought: Thought) => thought.body.trim() === "";
+
+/**
+ * A day's thoughts file after `change`, and the thoughts as they now read; null
+ * when there's no file and nothing to keep, so the day is left without a trace.
+ */
+function changedThoughts(
+  existing: string | null,
+  change: (current: readonly Thought[]) => readonly Thought[],
+  stamp: ThoughtsStamp
+): Result<{ text: string; thoughts: Thought[] } | null, DayFileError> {
+  const current = existing === null ? ok([]) : readThoughtsFile(existing);
+  if (!current.ok) {
+    return current;
+  }
+  const thoughts = change(current.value);
+  if (existing === null && thoughts.every(isBlank)) {
+    return ok(null);
+  }
+  const text = writeThoughtsFile(existing, thoughts, stamp);
+  if (!text.ok) {
+    return text;
+  }
+  const saved = readThoughtsFile(text.value);
+  return saved.ok ? ok({ text: text.value, thoughts: saved.value }) : saved;
 }
 
 /** A gallery picture for a day sealed without a cover, with the flower it grows. */
@@ -121,6 +158,7 @@ export function createJournal({
   const dayFile = (day: DayKey) => inJournal(...dayPath(day));
   const dayAsset = (day: DayKey, name: string) =>
     inJournal(...dayPath(day).slice(0, 3), name);
+  const thoughtsFile = (day: DayKey) => dayAsset(day, THOUGHTS_FILE);
 
   function queued<T>(path: string, task: () => Promise<T>): Promise<T> {
     const previous = queues.get(path) ?? Promise.resolve();
@@ -170,6 +208,14 @@ export function createJournal({
   function writable(day: DayKey, existing: string | null) {
     const now = today(clock);
     return day === now || (day < now && existing !== null);
+  }
+
+  /**
+   * Why a day's thoughts can't change now, or null when they can: they never
+   * seal, so any day that has begun takes them.
+   */
+  function thoughtsLocked(day: DayKey): JournalError | null {
+    return day > today(clock) ? { day, kind: "not-writable" } : null;
   }
 
   /** Why a day's cover or images can't change now, or null when they can. */
@@ -229,6 +275,72 @@ export function createJournal({
     });
   }
 
+  /** Every day with a folder, oldest first, whatever it holds. */
+  async function dayFolders(): Promise<DayKey[]> {
+    const years = await folderNames(journalRoot, YEAR);
+    const months = await Promise.all(
+      years.map(async (year) =>
+        (await folderNames(join(journalRoot, year), TWO_DIGITS)).map(
+          (month) => [year, month] as const
+        )
+      )
+    );
+    const dates = await Promise.all(
+      months
+        .flat()
+        .map(async ([year, month]) =>
+          (await folderNames(join(journalRoot, year, month), TWO_DIGITS)).map(
+            (date) => parseDayKey(`${year}-${month}-${date}`)
+          )
+        )
+    );
+    return dates
+      .flat()
+      .filter((day) => day !== null)
+      .sort();
+  }
+
+  /** A day's thoughts as the screen shows them, or null when it has none. */
+  async function readThoughtDay(day: DayKey): Promise<ThoughtDay | null> {
+    const text = await readIfThere(thoughtsFile(day));
+    if (text === null) {
+      return null;
+    }
+    const thoughts = readThoughtsFile(text);
+    return thoughts.ok
+      ? { day, state: "ok", thoughts: thoughts.value }
+      : { day, state: "unreadable" };
+  }
+
+  /** Writes a day's thoughts as given; none on a day without a file leaves no trace. */
+  function saveThoughts(
+    day: DayKey,
+    change: (current: readonly Thought[]) => readonly Thought[]
+  ): Promise<Result<Thought[] | null, JournalError>> {
+    const path = thoughtsFile(day);
+    return queued(path, () =>
+      guarded(async () => {
+        const locked = thoughtsLocked(day);
+        if (locked) {
+          return fail(locked);
+        }
+        const next = changedThoughts(await readIfThere(path), change, {
+          app,
+          now: clock.now(),
+          timeZone: clock.timeZone(),
+        });
+        if (!next.ok) {
+          return next;
+        }
+        if (next.value === null) {
+          return ok(null);
+        }
+        await writeFileAtomic(path, next.value.text);
+        return ok(next.value.thoughts);
+      })
+    );
+  }
+
   async function guarded<T>(
     work: () => Promise<Result<T, JournalError>>
   ): Promise<Result<T, JournalError>> {
@@ -253,12 +365,17 @@ export function createJournal({
     addImage(
       day: DayKey,
       bytes: Uint8Array,
-      extension: CoverExtension
+      extension: CoverExtension,
+      /** Thoughts never seal, so their images go into any day that has begun. */
+      owner: "page" | "thoughts" = "page"
     ): Promise<Result<string, JournalError>> {
-      const path = dayFile(day);
+      const path = owner === "page" ? dayFile(day) : thoughtsFile(day);
       return queued(path, () =>
         guarded(async () => {
-          const locked = mediaLocked(day, await readIfThere(path));
+          const locked =
+            owner === "page"
+              ? mediaLocked(day, await readIfThere(path))
+              : thoughtsLocked(day);
           if (locked) {
             return fail(locked);
           }
@@ -279,6 +396,16 @@ export function createJournal({
         })
       );
     },
+
+    /**
+     * Adds thoughts after today's, begun now, as when the feature's own notes are
+     * given; `make` is told the time they're stamped with.
+     */
+    addThoughts: (make: (time: string) => readonly Thought[]) =>
+      saveThoughts(today(clock), (current) => [
+        ...current,
+        ...make(thoughtTime(clock.now(), clock.timeZone())),
+      ]),
     /** Where a file in a day's folder lives, for showing its cover. */
     dayAsset,
 
@@ -316,26 +443,8 @@ export function createJournal({
 
     /** Every day with a file, oldest first. Days without one are bare soil. */
     async listDays(): Promise<ListedDay[]> {
-      const years = await folderNames(journalRoot, YEAR);
-      const months = await Promise.all(
-        years.map(async (year) =>
-          (await folderNames(join(journalRoot, year), TWO_DIGITS)).map(
-            (month) => [year, month] as const
-          )
-        )
-      );
-      const dates = await Promise.all(
-        months
-          .flat()
-          .map(async ([year, month]) =>
-            (await folderNames(join(journalRoot, year, month), TWO_DIGITS)).map(
-              (date) => parseDayKey(`${year}-${month}-${date}`)
-            )
-          )
-      );
-      const days = dates.flat().filter((day) => day !== null);
       const listed = await Promise.all(
-        days.sort().map(async (day) => {
+        (await dayFolders()).map(async (day) => {
           const text = await readIfThere(dayFile(day));
           if (text === null) {
             return null;
@@ -358,6 +467,9 @@ export function createJournal({
       const text = await readIfThere(dayFile(day));
       return text === null ? ok(null) : toStored(day, text);
     },
+
+    /** A day's thoughts, or null when it has none. */
+    readThoughts: readThoughtDay,
 
     root: journalRoot,
 
@@ -421,6 +533,34 @@ export function createJournal({
       flowers.set(day, stamp, color),
 
     /**
+     * Days with thoughts, newest first, a few at a time: those before `before`
+     * (or from the newest), and where the next few start, or null at the first.
+     */
+    async thoughtsPage(
+      before: DayKey | null,
+      limit: number
+    ): Promise<ThoughtsPage> {
+      const folders = (await dayFolders()).reverse();
+      const days: ThoughtDay[] = [];
+      let index =
+        before === null ? 0 : folders.findIndex((day) => day < before);
+      if (index === -1) {
+        return { days, next: null };
+      }
+      for (; index < folders.length && days.length < limit; index += 1) {
+        const day = folders[index];
+        // biome-ignore lint/performance/noAwaitInLoops: read until enough days have thoughts
+        const found = day ? await readThoughtDay(day) : null;
+        if (found) {
+          days.push(found);
+        }
+      }
+      const last = days.at(-1);
+      const more = folders.slice(index).length > 0;
+      return { days, next: more && last ? last.day : null };
+    },
+
+    /**
      * Saves a day's page, starting its folder on the first save. An empty page
      * on a day never written leaves no trace.
      */
@@ -455,6 +595,10 @@ export function createJournal({
         })
       );
     },
+
+    /** Saves a day's thoughts, in the order written; any day that has begun takes them. */
+    writeThoughts: (day: DayKey, thoughts: readonly Thought[]) =>
+      saveThoughts(day, () => thoughts),
   };
 }
 

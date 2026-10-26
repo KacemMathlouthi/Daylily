@@ -467,3 +467,140 @@ describe("dayAsset", () => {
     expect(() => journal.dayAsset(day, "../../../..")).toThrow();
   });
 });
+
+describe("thoughts", () => {
+  const thoughtsFile = (day: string) => {
+    const [year = "", month = "", date = ""] = day.split("-");
+    return join(root, year, month, date, "thoughts.md");
+  };
+
+  it("keeps a day's thoughts beside its page, in the order written", async () => {
+    const saved = await journal.writeThoughts(key("2026-10-21"), [
+      { body: "The coffee place closed.", time: "08:12" },
+      { body: "Sam laughed.", time: "14:10" },
+    ]);
+    expect(saved).toEqual({
+      ok: true,
+      value: [
+        { body: "The coffee place closed.", time: "08:12" },
+        { body: "Sam laughed.", time: "14:10" },
+      ],
+    });
+    expect(await readFile(thoughtsFile("2026-10-21"), "utf8")).toContain(
+      "## 08:12\n\nThe coffee place closed.\n\n## 14:10\n\nSam laughed.\n"
+    );
+  });
+
+  it("leaves no trace when there's nothing to keep", async () => {
+    const saved = await journal.writeThoughts(key("2026-10-21"), [
+      { body: " ", time: "08:12" },
+    ]);
+    expect(saved).toEqual({ ok: true, value: null });
+    expect(await readdir(root)).toEqual([]);
+  });
+
+  it("changes thoughts on any day, even one sealed long ago", async () => {
+    await journal.writeDay(key("2026-10-21"), page("A day."));
+    await journal.writeThoughts(key("2026-10-21"), [
+      { body: "Before.", time: "09:00" },
+    ]);
+    now = new Date("2026-11-02T10:00:00+01:00");
+    await journal.sealDay(key("2026-10-21"), null);
+
+    const saved = await journal.writeThoughts(key("2026-10-21"), [
+      { body: "After, weeks later.", time: "09:00" },
+    ]);
+    expect(saved.ok).toBe(true);
+    const day = await journal.readDay(key("2026-10-21"));
+    // The page's seal covers the page only
+    expect(day).toMatchObject({ ok: true, value: { state: "sealed" } });
+  });
+
+  it("refuses thoughts for days ahead of today", async () => {
+    const saved = await journal.writeThoughts(key("2026-10-22"), [
+      { body: "Too soon.", time: "09:00" },
+    ]);
+    expect(saved).toEqual({
+      error: { day: "2026-10-22", kind: "not-writable" },
+      ok: false,
+    });
+  });
+
+  it("never lists a day with only thoughts as written", async () => {
+    await journal.writeThoughts(key("2026-10-21"), [
+      { body: "Just a thought.", time: "09:00" },
+    ]);
+    expect(await journal.listDays()).toEqual([]);
+  });
+
+  it("reads a day's thoughts, and shows a file it can't read without touching it", async () => {
+    expect(await journal.readThoughts(key("2026-10-21"))).toBeNull();
+    await mkdir(join(root, "2026", "10", "20"), { recursive: true });
+    await writeFile(thoughtsFile("2026-10-20"), "---\n: : :\n---\n");
+    expect(await journal.readThoughts(key("2026-10-20"))).toEqual({
+      day: "2026-10-20",
+      state: "unreadable",
+    });
+    const saved = await journal.writeThoughts(key("2026-10-20"), []);
+    expect(saved.ok).toBe(false);
+    expect(await readFile(thoughtsFile("2026-10-20"), "utf8")).toBe(
+      "---\n: : :\n---\n"
+    );
+  });
+
+  it("pages through days with thoughts, newest first, skipping days without", async () => {
+    now = new Date("2026-10-30T20:00:00+01:00");
+    for (const day of [
+      "2026-10-21",
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-29",
+    ]) {
+      // biome-ignore lint/performance/noAwaitInLoops: written in order, like days
+      await journal.writeThoughts(key(day), [{ body: day, time: "10:00" }]);
+    }
+    await journal.writeDay(key("2026-10-30"), page("A page, no thoughts."));
+
+    const first = await journal.thoughtsPage(null, 2);
+    expect(first.days.map((day) => day.day)).toEqual([
+      "2026-10-29",
+      "2026-10-26",
+    ]);
+    expect(first.next).toBe("2026-10-26");
+    const second = await journal.thoughtsPage(key("2026-10-26"), 2);
+    expect(second.days.map((day) => day.day)).toEqual([
+      "2026-10-23",
+      "2026-10-21",
+    ]);
+    const last = await journal.thoughtsPage(key("2026-10-21"), 2);
+    expect(last).toEqual({ days: [], next: null });
+  });
+
+  it("adds thoughts after today's, stamped with the time now", async () => {
+    await journal.writeThoughts(key("2026-10-21"), [
+      { body: "Mine.", time: "09:00" },
+    ]);
+    await journal.addThoughts((time) => [{ body: "Given.", time }]);
+    expect(await journal.readThoughts(key("2026-10-21"))).toEqual({
+      day: "2026-10-21",
+      state: "ok",
+      thoughts: [
+        { body: "Mine.", time: "09:00" },
+        { body: "Given.", time: "20:00" },
+      ],
+    });
+  });
+
+  it("takes an image into any day that has begun, sealed or not", async () => {
+    await journal.writeDay(key("2026-10-21"), page("A day."));
+    now = new Date("2026-11-02T10:00:00+01:00");
+    await journal.sealDay(key("2026-10-21"), null);
+    const bytes = new Uint8Array([1, 2, 3]);
+    expect(
+      await journal.addImage(key("2026-10-21"), bytes, "png", "thoughts")
+    ).toEqual({ ok: true, value: "image-01.png" });
+    expect((await journal.addImage(key("2026-10-21"), bytes, "png")).ok).toBe(
+      false
+    );
+  });
+});

@@ -56,10 +56,34 @@ export async function readConfig(root: string): Promise<JournalConfig> {
 // One change at a time, so two made together each build on the other
 let writing: Promise<unknown> = Promise.resolve();
 
+/**
+ * What the journal remembers that isn't a preference: whether the Thoughts
+ * screen's own notes were given. Kept with the journal, so a folder opened on
+ * two computers gets them once.
+ */
+interface JournalMarks {
+  thoughtsIntroduced?: boolean | undefined;
+}
+
+/** Whether the Thoughts screen's own notes were given in this journal. */
+export async function thoughtsIntroduced(root: string): Promise<boolean> {
+  try {
+    const saved: unknown = JSON.parse(await readFile(configPath(root), "utf8"));
+    return (
+      typeof saved === "object" &&
+      saved !== null &&
+      "thoughtsIntroduced" in saved &&
+      saved.thoughtsIntroduced === true
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** Saves preferences over the current ones, keeping fields it doesn't know. */
 export function writeConfig(
   root: string,
-  changes: JournalConfigChanges
+  changes: JournalConfigChanges & JournalMarks
 ): Promise<JournalConfig> {
   const write = writing.then(() => applyChanges(root, changes));
   writing = write.catch(() => undefined);
@@ -68,7 +92,7 @@ export function writeConfig(
 
 async function applyChanges(
   root: string,
-  changes: JournalConfigChanges
+  changes: JournalConfigChanges & JournalMarks
 ): Promise<JournalConfig> {
   const current = await readConfig(root);
   const next = configSchema.parse({
