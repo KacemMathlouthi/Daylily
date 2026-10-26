@@ -16,7 +16,7 @@ import {
 } from "@daylily/ui/primitives/dialog";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
 import {
   type KeyboardEvent,
   useCallback,
@@ -30,14 +30,16 @@ import {
   journalAssetUrl,
   MAX_QUERY_LENGTH,
   MAX_SEARCH_HITS,
+  type NoteHit,
   type SearchHit,
   type ThoughtHit,
 } from "../../../../shared/journal";
 import { usePastDay } from "../../lib/days";
 import { dateFormat } from "../../lib/format";
 import { fromKey, todayKey } from "../../lib/month";
-import { shownImages } from "../../lib/page-images";
+import { shownImages, shownNoteImages } from "../../lib/page-images";
 import { revealFirstMatch, useSearchDialog } from "../../lib/search";
+import { changedOn } from "../notes/when";
 import { MOD_KEY, Shortcut } from "../shortcut";
 import { Marked } from "./marked";
 
@@ -95,6 +97,28 @@ function ThoughtResult({ hit, today }: { hit: ThoughtHit; today: string }) {
   );
 }
 
+/** A note found (Paper 17d): a page's tile where a day has its cover, then its title and words. */
+function NoteResult({ hit, query }: { hit: NoteHit; query: string }) {
+  return (
+    <div className="flex min-w-0 gap-3">
+      <span className="flex h-11 w-15 shrink-0 items-center justify-center rounded-lg border border-line bg-paper-page">
+        <FileText className="size-4.5 text-ink-muted" strokeWidth={1.6} />
+      </span>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="font-semibold text-ink-faint text-meta uppercase tracking-caps">
+          Note · changed {changedOn(hit.updated, new Date())}
+        </span>
+        <span className="truncate font-display text-ink text-lede leading-5.5">
+          <Marked query={query} text={hit.title || "Untitled"} />
+        </span>
+        <span className="line-clamp-2 text-ink-muted text-ui leading-4.5">
+          <Marked marks={hit.snippet.marks} text={hit.snippet.text} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Hit({
   hit,
   query,
@@ -106,6 +130,9 @@ function Hit({
 }) {
   if (hit.kind === "thought") {
     return <ThoughtResult hit={hit} today={today} />;
+  }
+  if (hit.kind === "note") {
+    return <NoteResult hit={hit} query={query} />;
   }
   const title = hit.title || "Untitled";
   const when = hitDate(hit.day, today);
@@ -177,26 +204,68 @@ function Preview({ day, query }: { day: string; query: string }) {
   );
 }
 
-/** The chosen result, beside the list: a day's page or a thought. */
+/** The chosen result, beside the list: a day's page, a thought or a note. */
 function HitPreview({ hit, query }: { hit: SearchHit; query: string }) {
-  return hit.kind === "day" ? (
-    <Preview day={hit.day} key={hit.id} query={query} />
-  ) : (
-    <ThoughtPreview hit={hit} key={hit.id} query={query} />
-  );
+  switch (hit.kind) {
+    case "day":
+      return <Preview day={hit.day} key={hit.id} query={query} />;
+    case "thought":
+      return <ThoughtPreview hit={hit} key={hit.id} query={query} />;
+    default:
+      return <NotePreview hit={hit} key={hit.id} query={query} />;
+  }
 }
 
-/** "2 DAYS · 1 THOUGHT": what was found, the days and thoughts counted apart. */
+const KINDS = [
+  ["day", "day", "days"],
+  ["thought", "thought", "thoughts"],
+  ["note", "note", "notes"],
+] as const;
+
+/** "2 DAYS · 1 THOUGHT · 1 NOTE": what was found, each kind counted apart. */
 function foundLabel(hits: SearchHit[], more: boolean) {
-  const days = hits.filter((hit) => hit.kind === "day").length;
-  const thoughts = hits.length - days;
-  const parts = [
-    days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : null,
-    thoughts > 0
-      ? `${thoughts} ${thoughts === 1 ? "thought" : "thoughts"}`
-      : null,
-  ].filter(Boolean);
+  const parts = KINDS.flatMap(([kind, one, many]) => {
+    const count = hits.filter((hit) => hit.kind === kind).length;
+    return count > 0 ? [`${count} ${count === 1 ? one : many}`] : [];
+  });
   return `${parts.join(" · ")}${more ? " and more" : ""}`;
+}
+
+/** The chosen note beside the results (Paper 17d): its title, when it changed, its words marked. */
+function NotePreview({ hit, query }: { hit: NoteHit; query: string }) {
+  const { data } = useQuery({
+    queryFn: () => window.daylily.notes.read(hit.name),
+    queryKey: ["journal", "note", hit.name],
+  });
+  const markdown = data?.ok ? (data.value?.body ?? "") : "";
+  const images = useMemo(() => shownNoteImages(), []);
+  const editor = usePageEditor({ content: markdown, editable: false, images });
+
+  useEffect(() => {
+    editor.commands.setContent(markdown, { contentType: "markdown" });
+    editor.commands.setSearchHighlight(query);
+    const frame = requestAnimationFrame(() =>
+      revealFirstMatch(editor.view.dom, false)
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [editor, markdown, query]);
+
+  return (
+    <div className="relative min-w-0 flex-1 overflow-y-auto px-7 pt-7.5 pb-16">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="font-display text-ink text-title-sm leading-8.5 tracking-snug">
+          {hit.title || "Untitled"}
+        </h2>
+        <span className="text-ink-muted text-ui leading-4.5">
+          A note · changed {PREVIEW_DATE.format(new Date(hit.updated))}
+        </span>
+      </div>
+      <PageContent
+        className="pt-4.5 text-body text-ink-2 leading-6.75"
+        editor={editor}
+      />
+    </div>
+  );
 }
 
 /** The chosen thought beside the results (Paper 13d): its time, its day, its words marked. */
@@ -237,7 +306,7 @@ function ThoughtPreview({ hit, query }: { hit: ThoughtHit; query: string }) {
   );
 }
 
-/** The days and thoughts found, the chosen one previewed beside them, and how to move through them. */
+/** The days, thoughts and notes found, the chosen one previewed beside them, and how to move through them. */
 function Results({
   chosen,
   hits,
@@ -306,10 +375,10 @@ function Results({
 }
 
 /**
- * Search every page and thought you've written (Paper "13a", "13b", "13d"):
- * opened with ⌘K from anywhere, results as you type, best first, the chosen one
- * previewed beside them. Enter opens the day, or the thought on the Thoughts
- * screen, at the first match.
+ * Search every page, thought and note you've written (Paper "13a", "13b",
+ * "13d", "17d"): opened with ⌘K from anywhere, results as you type, best
+ * first, the chosen one previewed beside them. Enter opens the day, the
+ * thought on the Thoughts screen, or the note, at the first match.
  */
 export function SearchDialog() {
   const [open, setOpen] = useSearchDialog();
@@ -366,13 +435,21 @@ export function SearchDialog() {
       openedDay.current = true;
       changeOpen(false);
       const find = query.trim();
-      const { day } = hit;
-      if (hit.kind === "thought") {
-        navigate({ search: { day, find, place: hit.index }, to: "/thoughts" });
-      } else if (day === today) {
+      if (hit.kind === "note") {
+        navigate({ search: { find, note: hit.name }, to: "/notes" });
+      } else if (hit.kind === "thought") {
+        navigate({
+          search: { day: hit.day, find, place: hit.index },
+          to: "/thoughts",
+        });
+      } else if (hit.day === today) {
         navigate({ search: { find }, to: "/today" });
       } else {
-        navigate({ params: { key: day }, search: { find }, to: "/day/$key" });
+        navigate({
+          params: { key: hit.day },
+          search: { find },
+          to: "/day/$key",
+        });
       }
     },
     [changeOpen, isPlaceholderData, navigate, query, shown, today]
@@ -415,7 +492,7 @@ export function SearchDialog() {
               className="bg-transparent text-ink text-lg caret-daylily placeholder:text-ink-ghost"
               maxLength={MAX_QUERY_LENGTH}
               onValueChange={setQuery}
-              placeholder="Search your days and thoughts"
+              placeholder="Search your days, thoughts and notes"
               value={query}
             />
             <Shortcut keys={["Esc"]} />
@@ -423,7 +500,7 @@ export function SearchDialog() {
 
           {searching ? null : (
             <p className="px-5 pt-5.5 pb-6 text-ink-subtle text-ui-lg">
-              Search every page and thought you’ve written, by its words.
+              Search every page, thought and note you’ve written, by its words.
             </p>
           )}
           {nothingFound ? (
