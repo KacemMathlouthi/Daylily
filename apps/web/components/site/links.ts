@@ -26,7 +26,7 @@ export const FOOTER_LINKS = [
     heading: "Principles",
     links: [
       { href: "/manifesto", label: "Manifesto" },
-      { href: "#", label: "Privacy" },
+      { href: "/privacy", label: "Privacy" },
       { href: "#", label: "How we use AI" },
     ],
   },

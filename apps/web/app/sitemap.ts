@@ -2,7 +2,14 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { RELEASES } from "./changelog/releases";
 
-const PAGES = ["/", "/download", "/manifesto", "/changelog", "/roadmap"];
+const PAGES = [
+  "/",
+  "/download",
+  "/manifesto",
+  "/privacy",
+  "/changelog",
+  "/roadmap",
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const latestRelease = RELEASES[0]?.date;
