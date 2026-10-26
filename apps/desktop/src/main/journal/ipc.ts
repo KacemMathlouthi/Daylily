@@ -281,9 +281,13 @@ export function registerJournalIpc({
    * are listed, rather than as it opens, so a folder only looked at during
    * onboarding is left as it was. Once per journal, remembered in its config.
    */
-  let introducing: Promise<void> | null = null;
+  const introducing = new Map<string, Promise<void>>();
   function introduceThoughts(current: Journal) {
-    introducing ??= (async () => {
+    const running = introducing.get(current.root);
+    if (running) {
+      return running;
+    }
+    const introduction = (async () => {
       if (await thoughtsIntroduced(current.root)) {
         return;
       }
@@ -296,9 +300,10 @@ export function registerJournalIpc({
     })()
       .catch((error) => console.error("Could not introduce thoughts", error))
       .finally(() => {
-        introducing = null;
+        introducing.delete(current.root);
       });
-    return introducing;
+    introducing.set(current.root, introduction);
+    return introduction;
   }
 
   handle(CHANNELS.thoughtsPage, async (_event, before) => {

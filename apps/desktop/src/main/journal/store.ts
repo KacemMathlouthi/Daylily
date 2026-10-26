@@ -307,9 +307,13 @@ export function createJournal({
       return null;
     }
     const thoughts = readThoughtsFile(text);
-    return thoughts.ok
+    if (!thoughts.ok) {
+      return { day, state: "unreadable" };
+    }
+    // A file whose last thought was deleted is kept, but holds none
+    return thoughts.value.length > 0
       ? { day, state: "ok", thoughts: thoughts.value }
-      : { day, state: "unreadable" };
+      : null;
   }
 
   /** Writes a day's thoughts as given; none on a day without a file leaves no trace. */

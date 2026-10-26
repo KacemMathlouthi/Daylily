@@ -510,10 +510,28 @@ describe("thoughts", () => {
     const saved = await journal.writeThoughts(key("2026-10-21"), [
       { body: "After, weeks later.", time: "09:00" },
     ]);
-    expect(saved.ok).toBe(true);
+    expect(saved).toEqual({
+      ok: true,
+      value: [{ body: "After, weeks later.", time: "09:00" }],
+    });
+    expect(await journal.readThoughts(key("2026-10-21"))).toMatchObject({
+      thoughts: [{ body: "After, weeks later.", time: "09:00" }],
+    });
     const day = await journal.readDay(key("2026-10-21"));
     // The page's seal covers the page only
     expect(day).toMatchObject({ ok: true, value: { state: "sealed" } });
+  });
+
+  it("keeps the file when its last thought goes, and no longer counts the day", async () => {
+    await journal.writeThoughts(key("2026-10-21"), [
+      { body: "Gone soon.", time: "09:00" },
+    ]);
+    await journal.writeThoughts(key("2026-10-21"), []);
+    expect(await readFile(thoughtsFile("2026-10-21"), "utf8")).toContain(
+      "tz: Africa/Tunis"
+    );
+    expect(await journal.readThoughts(key("2026-10-21"))).toBeNull();
+    expect((await journal.thoughtsPage(null, 5)).days).toEqual([]);
   });
 
   it("refuses thoughts for days ahead of today", async () => {

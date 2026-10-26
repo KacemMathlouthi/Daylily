@@ -70,7 +70,14 @@ export const thoughtsSchema = z
       time: z.string().refine(isThoughtTime).nullable(),
     })
   )
-  .max(10_000);
+  .max(10_000)
+  // All of a day's thoughts together, as for a page
+  .refine(
+    (thoughts) =>
+      thoughts.reduce((total, thought) => total + thought.body.length, 0) <=
+      MAX_PAGE_CHARS,
+    "Too long"
+  );
 
 export const imageOwnerSchema = z.enum(["page", "thoughts"]);
 
