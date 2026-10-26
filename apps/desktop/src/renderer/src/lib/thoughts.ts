@@ -133,6 +133,8 @@ export function forgetThoughtsOf(day: DayKey) {
   }
   setDay(day, (held) => ({
     ...held,
+    // Gone, it's no longer a file that can't be read
+    state: "ok",
     thoughts: held.thoughts.filter((thought) => !thought.begun),
   }));
 }

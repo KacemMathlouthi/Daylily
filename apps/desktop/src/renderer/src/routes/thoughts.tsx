@@ -79,7 +79,11 @@ function useReadOnScroll(
           readMore();
         }
       },
-      { rootMargin: `0px 0px ${READ_AHEAD} 0px` }
+      // The app scrolls inside its main panel, not the window: watched there, the margin reads ahead
+      {
+        root: node.closest("[data-slot=sidebar-inset]"),
+        rootMargin: `0px 0px ${READ_AHEAD} 0px`,
+      }
     );
     observer.observe(node);
     return () => observer.disconnect();

@@ -73,11 +73,14 @@ function retryLater(key: SaveKey) {
 
 async function write(key: SaveKey) {
   const writer = writers.get(key);
-  const pending = writer ? writer() : null;
-  if (pending === null) {
+  if (!writer) {
     return;
   }
   try {
+    const pending = writer();
+    if (pending === null) {
+      return;
+    }
     const result = await pending;
     if (!result.ok) {
       const { message, retry } = describe(result.error);
