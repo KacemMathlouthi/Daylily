@@ -10,6 +10,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { flushSaves } from "./lib/autosave";
 import { followJournal, followJournalMoves } from "./lib/journal";
+import { followNotes } from "./lib/notes";
 import { startTheme } from "./lib/theme";
 import { routeTree } from "./route-tree.gen";
 
@@ -21,6 +22,7 @@ startTheme(window.daylily.device.initial.theme, (theme) => {
 const queryClient = new QueryClient();
 followJournal(queryClient);
 followJournalMoves(queryClient);
+followNotes(queryClient);
 
 // Hash history works when the app is loaded from a file:// URL in production
 const router = createRouter({

@@ -37,6 +37,16 @@ export function validateFoundThought(search: Record<string, unknown>): {
     : {};
 }
 
+/** A note opened from search: its file, and what was searched for. */
+export function validateFoundNote(search: Record<string, unknown>): {
+  find?: string;
+  note?: string;
+} {
+  return typeof search.note === "string" && search.note !== ""
+    ? { ...validateFind(search), note: search.note }
+    : {};
+}
+
 /** The glow lasts two seconds and fades over 600ms, as in globals.css. */
 const GLOW_MS = 2600;
 
