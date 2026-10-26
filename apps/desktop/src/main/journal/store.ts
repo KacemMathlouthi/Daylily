@@ -613,22 +613,30 @@ export function createJournal({
 
     /** Every note in the notes folder, in no order; the screen sorts them. */
     async listNotes(): Promise<ListedNote[]> {
-      return Promise.all(
-        (await noteNames()).map(async (name): Promise<ListedNote> => {
+      const listed = await Promise.all(
+        (await noteNames()).map(async (name): Promise<ListedNote | null> => {
           const path = noteFile(name);
-          const text = await readFile(path, "utf8");
-          const note = await toStoredNote(name, text);
-          if (!note.ok) {
-            return {
-              name,
-              state: "unreadable",
-              updated: await noteUpdated(path, null),
-            };
+          try {
+            const note = await toStoredNote(name, await readFile(path, "utf8"));
+            if (!note.ok) {
+              return {
+                name,
+                state: "unreadable",
+                updated: await noteUpdated(path, null),
+              };
+            }
+            const { body, ...summary } = note.value;
+            return { ...summary, excerpt: pageExcerpt(body), state: "ok" };
+          } catch (error) {
+            // Gone between listing the folder and reading it, by another app
+            if (errorCode(error) === "ENOENT") {
+              return null;
+            }
+            throw error;
           }
-          const { body, ...summary } = note.value;
-          return { ...summary, excerpt: pageExcerpt(body), state: "ok" };
         })
       );
+      return listed.filter((note) => note !== null);
     },
 
     /** Where an image on a note lives, for showing it. */
