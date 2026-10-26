@@ -17,6 +17,7 @@ export const FOOTER_LINKS = [
   {
     heading: "Product",
     links: [
+      { href: "/#features", label: "Features" },
       { href: "/download", label: "Download" },
       { href: "/changelog", label: "Changelog" },
       { href: "/roadmap", label: "Roadmap" },
