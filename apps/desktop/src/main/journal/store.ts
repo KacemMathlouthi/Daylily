@@ -163,9 +163,17 @@ async function copyImageIn(
   return fail({ code: "EEXIST", kind: "io" });
 }
 
+/** A save stamps a note's frontmatter a moment before the disk stamps its file. */
+const SAVE_SLACK_MS = 2000;
+
 /** When a note last changed: as its file says, or as the disk does for one written elsewhere. */
 async function noteUpdated(path: string, written: string | null) {
-  return written ?? (await stat(path)).mtime.toISOString();
+  const changed = (await stat(path)).mtime;
+  // Another app's edit moves the file's time on, not the frontmatter's
+  return written !== null &&
+    Date.parse(written) >= changed.getTime() - SAVE_SLACK_MS
+    ? written
+    : changed.toISOString();
 }
 
 /**
@@ -255,23 +263,39 @@ export function createJournal({
         .filter((other) => other !== name)
         .map((other) => other.toLowerCase())
     );
-    const wanted = noteFileName(title, (each) =>
-      others.has(each.toLowerCase())
+    for (;;) {
+      const wanted = noteFileName(title, (each) =>
+        others.has(each.toLowerCase())
+      );
+      if (wanted === name) {
+        return name;
+      }
+      if (wanted.toLowerCase() === name.toLowerCase()) {
+        // The same file where names ignore case: only the letters change
+        // biome-ignore lint/performance/noAwaitInLoops: the loop ends here
+        await rename(noteFile(name), noteFile(wanted));
+        return wanted;
+      }
+      if (await createFileAtomic(noteFile(wanted), text)) {
+        await rm(noteFile(name), { force: true });
+        return wanted;
+      }
+      others.add(wanted.toLowerCase());
+    }
+  }
+
+  /**
+   * The name a note's file has on disk: where names ignore case (macOS,
+   * Windows), `Books.md` may be asked for as `books.md`.
+   */
+  async function spelledOnDisk(name: string) {
+    const names = await noteNames();
+    if (names.includes(name)) {
+      return name;
+    }
+    return (
+      names.find((each) => each.toLowerCase() === name.toLowerCase()) ?? name
     );
-    if (wanted === name) {
-      return name;
-    }
-    if (wanted.toLowerCase() === name.toLowerCase()) {
-      // The same file where names ignore case: only the letters change
-      await rename(noteFile(name), noteFile(wanted));
-      return wanted;
-    }
-    if (!(await createFileAtomic(noteFile(wanted), text))) {
-      // Taken a moment ago, by another app: the note keeps its name for now
-      return name;
-    }
-    await rm(noteFile(name), { force: true });
-    return wanted;
   }
 
   /**
@@ -654,12 +678,14 @@ export function createJournal({
       return text === null ? ok(null) : toStored(day, text);
     },
 
-    /** A note and its words, or null when there's no such note. */
+    /** A note and its words, under its name as spelled on disk, or null when there's no such note. */
     async readNote(
       name: string
     ): Promise<Result<StoredNote | null, DayFileError>> {
       const text = await readIfThere(noteFile(name));
-      return text === null ? ok(null) : toStoredNote(name, text);
+      return text === null
+        ? ok(null)
+        : toStoredNote(await spelledOnDisk(name), text);
     },
 
     /** A day's thoughts, or null when it has none. */

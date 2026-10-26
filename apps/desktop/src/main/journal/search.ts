@@ -119,11 +119,14 @@ export function journalSearch(
     await drop(noteId(name));
     const read = await journal.readNote(name);
     if (read.ok && read.value) {
-      const { title, updated } = read.value;
+      // Spelled as on disk: a rename that only changed letters' case is
+      // reported under both names, and the note is indexed once
+      const { name: onDisk, title, updated } = read.value;
+      await drop(noteId(onDisk));
       await add({
-        id: noteId(name),
+        id: noteId(onDisk),
         kind: "note",
-        name,
+        name: onDisk,
         text: pageText(read.value.body),
         title,
         updated,

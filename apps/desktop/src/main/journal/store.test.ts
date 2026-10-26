@@ -4,6 +4,7 @@ import {
   readdir,
   readFile,
   rm,
+  utimes,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -655,6 +656,25 @@ describe("notes", () => {
       value: null,
     });
     expect(await journal.listNotes()).toEqual([]);
+    expect(await readdir(root)).toEqual([]);
+  });
+
+  it("keeps a note pinned", async () => {
+    const name = await saved(null, note("Gifts", "Words.", true));
+    expect(await journal.readNote(name)).toMatchObject({
+      value: { pinned: true },
+    });
+    expect(await journal.listNotes()).toMatchObject([{ pinned: true }]);
+  });
+
+  it("says a note changed in another app changed when the disk says so", async () => {
+    const name = await saved(null, note("Trip"));
+    const path = join(notesFolder(), name);
+    const later = new Date(now.getTime() + 60 * 60 * 1000);
+    await utimes(path, later, later);
+    expect(await journal.listNotes()).toMatchObject([
+      { updated: later.toISOString() },
+    ]);
   });
 
   it("never takes a name another note has", async () => {

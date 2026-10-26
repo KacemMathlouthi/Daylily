@@ -299,8 +299,10 @@ export function registerJournalIpc({
   handle<Result<void, JournalError>>(
     CHANNELS.notesTrash,
     async (_event, name) => {
+      // A name that isn't a note's is refused outright, not taken for a missing Trash
+      const path = journal.noteFile(noteNameSchema.parse(name));
       try {
-        await shell.trashItem(journal.noteFile(noteNameSchema.parse(name)));
+        await shell.trashItem(path);
         return ok(undefined);
       } catch (error) {
         // No Trash to put it in, as on some Linux setups: the file stays where it is

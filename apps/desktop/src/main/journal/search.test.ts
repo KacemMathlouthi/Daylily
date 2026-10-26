@@ -184,7 +184,7 @@ describe("journalSearch", () => {
       title: "Lemon cake",
     });
     const search = journalSearch(journal);
-    const [hit, ...others] = await search.find("lemon");
+    const [hit, ...others] = await search.find("cake");
     expect(others).toEqual([]);
     expect(hit).toMatchObject({
       id: "note:lemon-cake.md",
@@ -192,6 +192,7 @@ describe("journalSearch", () => {
       name: "lemon-cake.md",
       title: "Lemon cake",
     });
+    expect(days(await search.find("sugar"))).toEqual(["lemon-cake.md"]);
     expect(days(await search.find("sea"))).not.toContain("lemon-cake.md");
   });
 
@@ -207,8 +208,17 @@ describe("journalSearch", () => {
     await search.refresh({ days: [], notes: [name] });
     expect(days(await search.find("lighthouse"))).toEqual(["trip.md"]);
 
-    await rm(join(root, "notes", name));
+    await journal.writeNote(name, {
+      body: "Only the harbour now.",
+      pinned: false,
+      title: "Trip",
+    });
     await search.refresh({ days: [], notes: [name] });
     expect(await search.find("lighthouse")).toEqual([]);
+    expect(days(await search.find("harbour"))).toEqual(["trip.md"]);
+
+    await rm(join(root, "notes", name));
+    await search.refresh({ days: [], notes: [name] });
+    expect(await search.find("harbour")).toEqual([]);
   });
 });
