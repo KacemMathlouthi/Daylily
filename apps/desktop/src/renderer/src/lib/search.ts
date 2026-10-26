@@ -22,6 +22,21 @@ export function validateFind(search: Record<string, unknown>): {
     : {};
 }
 
+/** A thought opened from search: its day, its place in it, and what was searched for. */
+export function validateFoundThought(search: Record<string, unknown>): {
+  day?: string;
+  find?: string;
+  place?: number;
+} {
+  const { day, place } = search;
+  return typeof day === "string" &&
+    typeof place === "number" &&
+    Number.isInteger(place) &&
+    place >= 0
+    ? { ...validateFind(search), day, place }
+    : {};
+}
+
 /** The glow lasts two seconds and fades over 600ms, as in globals.css. */
 const GLOW_MS = 2600;
 

@@ -9,6 +9,7 @@ import { type KeyboardEvent, useCallback, useEffect, useMemo } from "react";
 import { dateFormat } from "../../lib/format";
 import { dayKey, fromKey } from "../../lib/month";
 import { writtenImages } from "../../lib/page-images";
+import { useFindOnPage } from "../../lib/search";
 import {
   changeThought,
   leaveThought,
@@ -83,8 +84,12 @@ function ThoughtEditor({
   day,
   thought,
   today,
+  find,
+  onFound,
   onProblem,
 }: {
+  find: string | undefined;
+  onFound: () => void;
   day: string;
   thought: ShownThought;
   today: string;
@@ -105,6 +110,8 @@ function ThoughtEditor({
     onChange: write,
     ...(thought.begun ? {} : { placeholder: "What’s on your mind?" }),
   });
+
+  useFindOnPage(editor, find, { onDone: onFound });
 
   const [focusing, focused] = useFocusing();
   useEffect(() => {
@@ -151,8 +158,14 @@ export function ThoughtRow({
   thought,
   today,
   newest,
+  find,
+  onFound,
   onProblem,
 }: {
+  /** What search was looking for, when this is the thought it found: it glows there. */
+  find?: string | undefined;
+  /** Called once the found words have glowed, to let them go. */
+  onFound: () => void;
   day: string;
   thought: ShownThought;
   today: string;
@@ -172,6 +185,8 @@ export function ThoughtRow({
       <div className="flex w-full min-w-0 max-w-170 flex-col gap-3 pt-0.75">
         <ThoughtEditor
           day={day}
+          find={find}
+          onFound={onFound}
           onProblem={onProblem}
           thought={thought}
           today={today}

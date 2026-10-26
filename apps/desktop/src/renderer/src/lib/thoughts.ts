@@ -144,6 +144,11 @@ export function readBackTo(day: DayKey | null, done: boolean) {
   readBack.set(done ? "" : day);
 }
 
+/** Whether every day with thoughts has been read and taken in. */
+export function useAllRead() {
+  return readBack.use() === "";
+}
+
 /** Whether a day changed on disk is one the screen shows, so it should be read again. */
 export function showsThoughtsOf(day: DayKey) {
   const back = readBack.get();
@@ -224,6 +229,17 @@ export function leaveThought(day: DayKey, id: string, today: DayKey) {
   if (day === today) {
     openThought(today);
   }
+}
+
+/**
+ * The thought at `place` among a day's, in the order written, as search names
+ * it; undefined while the day isn't read yet.
+ */
+export function thoughtAt(day: DayKey, place: number) {
+  return days
+    .get()
+    .get(day)
+    ?.thoughts.filter((thought) => thought.begun)[place]?.id;
 }
 
 /** The thought that should take the cursor, once, and a way to say it has. */

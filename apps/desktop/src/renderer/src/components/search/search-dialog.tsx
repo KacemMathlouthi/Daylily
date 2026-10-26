@@ -26,10 +26,12 @@ import {
   useState,
 } from "react";
 import {
+  type DayHit,
   journalAssetUrl,
   MAX_QUERY_LENGTH,
   MAX_SEARCH_HITS,
   type SearchHit,
+  type ThoughtHit,
 } from "../../../../shared/journal";
 import { usePastDay } from "../../lib/days";
 import { dateFormat } from "../../lib/format";
@@ -52,7 +54,7 @@ const PREVIEW_DATE = dateFormat({
   year: "numeric",
 });
 
-function HitCover({ hit }: { hit: SearchHit }) {
+function HitCover({ hit }: { hit: DayHit }) {
   return hit.cover ? (
     <img
       alt=""
@@ -68,6 +70,31 @@ function HitCover({ hit }: { hit: SearchHit }) {
   );
 }
 
+/** When a result is from: "Today · Tue, October 20, 2026". */
+function hitDate(day: string, today: string) {
+  const date = HIT_DATE.format(fromKey(day));
+  return day === today ? `Today · ${date}` : date;
+}
+
+/** A thought found (Paper 13d): its time where a day has its cover, then its words. */
+function ThoughtResult({ hit, today }: { hit: ThoughtHit; today: string }) {
+  return (
+    <div className="flex min-w-0 gap-3">
+      <span className="flex h-11 w-15 shrink-0 items-center justify-center rounded-lg border border-line bg-paper-page font-display text-ink text-lede leading-5.5 tracking-snug">
+        {hit.time ?? "·"}
+      </span>
+      <div className="flex min-w-0 flex-col gap-1 pt-px">
+        <span className="font-semibold text-ink-faint text-meta uppercase tracking-caps">
+          Thought · {hitDate(hit.day, today)}
+        </span>
+        <span className="line-clamp-2 font-writing text-body-sm text-ink-2 leading-5.25">
+          <Marked marks={hit.snippet.marks} text={hit.snippet.text} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Hit({
   hit,
   query,
@@ -77,9 +104,11 @@ function Hit({
   query: string;
   today: string;
 }) {
+  if (hit.kind === "thought") {
+    return <ThoughtResult hit={hit} today={today} />;
+  }
   const title = hit.title || "Untitled";
-  const date = HIT_DATE.format(fromKey(hit.day));
-  const when = hit.day === today ? `Today · ${date}` : date;
+  const when = hitDate(hit.day, today);
   return (
     <div className="flex min-w-0 gap-3">
       <HitCover hit={hit} />
@@ -148,7 +177,67 @@ function Preview({ day, query }: { day: string; query: string }) {
   );
 }
 
-/** The days found, the chosen one previewed beside them, and how to move through them. */
+/** The chosen result, beside the list: a day's page or a thought. */
+function HitPreview({ hit, query }: { hit: SearchHit; query: string }) {
+  return hit.kind === "day" ? (
+    <Preview day={hit.day} key={hit.id} query={query} />
+  ) : (
+    <ThoughtPreview hit={hit} key={hit.id} query={query} />
+  );
+}
+
+/** "2 DAYS · 1 THOUGHT": what was found, the days and thoughts counted apart. */
+function foundLabel(hits: SearchHit[], more: boolean) {
+  const days = hits.filter((hit) => hit.kind === "day").length;
+  const thoughts = hits.length - days;
+  const parts = [
+    days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : null,
+    thoughts > 0
+      ? `${thoughts} ${thoughts === 1 ? "thought" : "thoughts"}`
+      : null,
+  ].filter(Boolean);
+  return `${parts.join(" · ")}${more ? " and more" : ""}`;
+}
+
+/** The chosen thought beside the results (Paper 13d): its time, its day, its words marked. */
+function ThoughtPreview({ hit, query }: { hit: ThoughtHit; query: string }) {
+  const { data } = useQuery({
+    queryFn: () => window.daylily.thoughts.read(hit.day),
+    queryKey: ["journal", "thoughts-of", hit.day],
+  });
+  const thought = data?.state === "ok" ? data.thoughts[hit.index] : undefined;
+  const markdown = thought?.body ?? "";
+  const images = useMemo(() => shownImages(hit.day), [hit.day]);
+  const editor = usePageEditor({ content: markdown, editable: false, images });
+
+  useEffect(() => {
+    editor.commands.setContent(markdown, { contentType: "markdown" });
+    editor.commands.setSearchHighlight(query);
+    const frame = requestAnimationFrame(() =>
+      revealFirstMatch(editor.view.dom, false)
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [editor, markdown, query]);
+
+  return (
+    <div className="relative min-w-0 flex-1 overflow-y-auto px-7 pt-7.5 pb-16">
+      <div className="flex flex-col gap-1.5">
+        <span className="font-display text-ink text-title-sm leading-8.5 tracking-snug">
+          {hit.time ?? "·"}
+        </span>
+        <span className="text-ink-muted text-ui leading-4.5">
+          {PREVIEW_DATE.format(fromKey(hit.day))} · a thought
+        </span>
+      </div>
+      <PageContent
+        className="pt-4.5 text-body text-ink-2 leading-6.75"
+        editor={editor}
+      />
+    </div>
+  );
+}
+
+/** The days and thoughts found, the chosen one previewed beside them, and how to move through them. */
 function Results({
   chosen,
   hits,
@@ -160,13 +249,14 @@ function Results({
 }: {
   chosen: string;
   hits: SearchHit[];
-  /** More days matched than are listed. */
+  /** More matched than are listed. */
   more: boolean;
-  onOpen: (day: string) => void;
+  onOpen: (id: string) => void;
   preview: boolean;
   query: string;
   today: string;
 }) {
+  const chosenHit = hits.find((hit) => hit.id === chosen);
   return (
     <>
       <div className="flex h-[min(33.5rem,calc(88vh-8rem))] min-h-0">
@@ -176,23 +266,22 @@ function Results({
             preview ? "w-95 border-line border-r" : "flex-1"
           )}
         >
-          <p className="px-2.5 pt-2 pb-1.5 font-semibold text-ink-faint text-meta tracking-caps">
-            {hits.length}
-            {more ? "+" : ""} {hits.length === 1 ? "DAY" : "DAYS"}
+          <p className="px-2.5 pt-2 pb-1.5 font-semibold text-ink-faint text-meta uppercase tracking-caps">
+            {foundLabel(hits, more)}
           </p>
           {hits.map((hit) => (
             <CommandItem
               className="rounded-xl! p-2.5 data-selected:bg-paper-sunk [&>svg:last-child]:hidden"
-              key={hit.day}
+              key={hit.id}
               onSelect={onOpen}
-              value={hit.day}
+              value={hit.id}
             >
               <Hit hit={hit} query={query} today={today} />
             </CommandItem>
           ))}
         </CommandList>
-        {preview && chosen ? (
-          <Preview day={chosen} key={chosen} query={query} />
+        {preview && chosenHit ? (
+          <HitPreview hit={chosenHit} query={query} />
         ) : null}
       </div>
       <div className="flex items-center justify-between border-line border-t px-5 py-2.5 text-ink-faint text-xs">
@@ -204,7 +293,7 @@ function Results({
           </span>
           <span className="flex items-center gap-1.5">
             <Shortcut keys={["Enter"]} />
-            to open the day
+            to open it
           </span>
         </span>
         <span className="flex items-center gap-1.5">
@@ -217,9 +306,10 @@ function Results({
 }
 
 /**
- * Search every page you've written (Paper "13a", "13b"): opened with ⌘K from
- * anywhere, results as you type, the chosen day previewed beside them. Enter
- * opens the day at the first match.
+ * Search every page and thought you've written (Paper "13a", "13b", "13d"):
+ * opened with ⌘K from anywhere, results as you type, best first, the chosen one
+ * previewed beside them. Enter opens the day, or the thought on the Thoughts
+ * screen, at the first match.
  */
 export function SearchDialog() {
   const [open, setOpen] = useSearchDialog();
@@ -242,8 +332,8 @@ export function SearchDialog() {
 
   // The first result is chosen as results arrive, unless the chosen one is still there
   useEffect(() => {
-    if (!shown.some((hit) => hit.day === chosen)) {
-      setChosen(shown[0]?.day ?? "");
+    if (!shown.some((hit) => hit.id === chosen)) {
+      setChosen(shown[0]?.id ?? "");
     }
   }, [shown, chosen]);
 
@@ -266,22 +356,26 @@ export function SearchDialog() {
     }
   }, [open]);
 
-  const openDay = useCallback(
-    (day: string) => {
+  const openHit = useCallback(
+    (id: string) => {
+      const hit = shown.find((each) => each.id === id);
       // Results for an earlier query are still on screen for a moment; wait for the new ones
-      if (isPlaceholderData) {
+      if (isPlaceholderData || !hit) {
         return;
       }
       openedDay.current = true;
       changeOpen(false);
       const find = query.trim();
-      if (day === today) {
+      const { day } = hit;
+      if (hit.kind === "thought") {
+        navigate({ search: { day, find, place: hit.index }, to: "/thoughts" });
+      } else if (day === today) {
         navigate({ search: { find }, to: "/today" });
       } else {
         navigate({ params: { key: day }, search: { find }, to: "/day/$key" });
       }
     },
-    [changeOpen, isPlaceholderData, navigate, query, today]
+    [changeOpen, isPlaceholderData, navigate, query, shown, today]
   );
 
   const togglePreview = useCallback((event: KeyboardEvent) => {
@@ -302,7 +396,7 @@ export function SearchDialog() {
         overlayClassName="bg-ink/16 supports-backdrop-filter:backdrop-blur-none"
         showCloseButton={false}
       >
-        <DialogTitle className="sr-only">Search your days</DialogTitle>
+        <DialogTitle className="sr-only">Search</DialogTitle>
         <Command
           className="rounded-none! bg-transparent p-0"
           loop
@@ -321,7 +415,7 @@ export function SearchDialog() {
               className="bg-transparent text-ink text-lg caret-daylily placeholder:text-ink-ghost"
               maxLength={MAX_QUERY_LENGTH}
               onValueChange={setQuery}
-              placeholder="Search your days"
+              placeholder="Search your days and thoughts"
               value={query}
             />
             <Shortcut keys={["Esc"]} />
@@ -329,12 +423,12 @@ export function SearchDialog() {
 
           {searching ? null : (
             <p className="px-5 pt-5.5 pb-6 text-ink-subtle text-ui-lg">
-              Search every page you’ve written, by its title or its words.
+              Search every page and thought you’ve written, by its words.
             </p>
           )}
           {nothingFound ? (
             <p className="px-5 pt-5.5 pb-6 text-ink-subtle text-ui-lg">
-              No page mentions “{query.trim()}” yet.
+              Nothing you’ve written mentions “{query.trim()}” yet.
             </p>
           ) : null}
 
@@ -343,7 +437,7 @@ export function SearchDialog() {
               chosen={chosen}
               hits={shown}
               more={more}
-              onOpen={openDay}
+              onOpen={openHit}
               preview={preview}
               query={query}
               today={today}
