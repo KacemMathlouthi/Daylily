@@ -207,7 +207,7 @@ export function changeThought(
 }
 
 /** A thought emptied and left goes from the screen, as it already has from the file. */
-export function leaveThought(day: DayKey, id: string) {
+export function leaveThought(day: DayKey, id: string, today: DayKey) {
   const thought = days
     .get()
     .get(day)
@@ -220,6 +220,10 @@ export function leaveThought(day: DayKey, id: string) {
     thoughts: held.thoughts.filter((each) => each.id !== id),
   }));
   save(day);
+  // Today always keeps a thought to write in, even once every other is gone
+  if (day === today) {
+    openThought(today);
+  }
 }
 
 /** The thought that should take the cursor, once, and a way to say it has. */

@@ -142,6 +142,15 @@ describe("thoughts read from the file", () => {
 });
 
 describe("a thought emptied and left", () => {
+  it("never leaves today without a thought to write in", () => {
+    startNextThought(TODAY);
+    const id = openId();
+    changeThought(TODAY, id, "Soon gone.", new Date(2026, 9, 25, 9, 0));
+    changeThought(TODAY, id, "", new Date(2026, 9, 25, 9, 1));
+    leaveThought(TODAY, id, TODAY);
+    expect(shown()).toEqual([{ begun: false, body: "", time: null }]);
+  });
+
   it("goes from the screen and from the file", async () => {
     receiveThoughts(
       day([
@@ -156,9 +165,12 @@ describe("a thought emptied and left", () => {
       throw new Error("Not found");
     }
     changeThought(TODAY, drop.thought.id, "", new Date());
-    leaveThought(TODAY, drop.thought.id);
+    leaveThought(TODAY, drop.thought.id, TODAY);
     await flushSaves();
-    expect(shown()).toEqual([{ begun: true, body: "Keep.", time: "08:00" }]);
+    expect(shown()).toEqual([
+      { begun: false, body: "", time: null },
+      { begun: true, body: "Keep.", time: "08:00" },
+    ]);
     expect(write).toHaveBeenLastCalledWith(TODAY, [
       { body: "Keep.", time: "08:00" },
     ]);

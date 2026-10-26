@@ -2,7 +2,7 @@ import { cn } from "@daylily/ui/lib/cn";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Maximize, Minimize } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { type MouseEvent, useCallback, useEffect, useRef } from "react";
 import type { ThoughtsPage } from "../../../shared/journal";
 import { StatusBar } from "../components/day/status-bar";
 import { TOOL_BUTTON } from "../components/day/tool-button";
@@ -134,6 +134,15 @@ function ThoughtsScreen() {
     startNextThought(today);
   }, [today]);
 
+  const writeOnPaper = useCallback(
+    (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest("article")) {
+        startNextThought(today);
+      }
+    },
+    [today]
+  );
+
   const isMac = window.daylily.platform === "darwin";
   const toggleFocus = useCallback(
     () => setFocused(!focused),
@@ -165,9 +174,14 @@ function ThoughtsScreen() {
           )}
         </button>
       </header>
-      <div className="flex grow justify-center px-8 pt-7.5 pb-24">
+      {/* A click on the paper itself, not on a thought, goes to the thought being written */}
+      {/* biome-ignore lint/a11y: the keyboard reaches the open thought by itself; this is a convenience for the mouse */}
+      <div
+        className="flex grow cursor-text justify-center px-8 pt-7.5 pb-24"
+        onClick={writeOnPaper}
+      >
         {/* The lane hangs in the margin, so the words sit where the page's do */}
-        <div className="flex w-full max-w-254 flex-col gap-11 xl:pr-42">
+        <div className="flex w-full max-w-254 flex-col gap-14 xl:pr-42">
           {entries.map((entry, index) =>
             entry.kind === "thought" ? (
               <ThoughtRow
