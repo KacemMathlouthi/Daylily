@@ -76,6 +76,13 @@ describe("readThoughtsFile", () => {
     ]);
   });
 
+  it("keeps a code block open past a line that only starts like a fence", () => {
+    const text = "## 08:00\n\n```\n```not-a-closer\n## 09:00\n```\n";
+    expect(read(text)).toEqual([
+      { body: "```\n```not-a-closer\n## 09:00\n```", time: "08:00" },
+    ]);
+  });
+
   it("keeps text written before the first time, untimed", () => {
     expect(read("A note at the top.\n\n## 10:05\n\nThen this.\n")).toEqual([
       { body: "A note at the top.", time: null },

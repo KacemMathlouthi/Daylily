@@ -18,8 +18,10 @@ export const THOUGHTS_FILE = "thoughts.md";
 
 /** A line that begins a thought: `## 14:10` and nothing more. */
 const THOUGHT_HEADING = /^##[ \t]+([01]\d|2[0-3]):([0-5]\d)[ \t]*$/;
-/** A fence opening or closing a code block, where a heading is only text. */
+/** A fence opening a code block, where a heading is only text. */
 const FENCE = /^[ \t]{0,3}(`{3,}|~{3,})/;
+/** A fence closing one: the marks alone, as CommonMark has it. */
+const CLOSING_FENCE = /^[ \t]{0,3}(`{3,}|~{3,})[ \t]*$/;
 const LINE_BREAK = /\r?\n/;
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -51,13 +53,14 @@ function splitThoughts(body: string): Thought[] {
   };
 
   for (const line of body.split(LINE_BREAK)) {
-    const fenceMark = FENCE.exec(line)?.[1];
-    if (fenceMark) {
-      if (fence === null) {
-        fence = fenceMark;
-      } else if (
-        fenceMark[0] === fence[0] &&
-        fenceMark.length >= fence.length
+    if (fence === null) {
+      fence = FENCE.exec(line)?.[1] ?? null;
+    } else {
+      const closing = CLOSING_FENCE.exec(line)?.[1];
+      if (
+        closing &&
+        closing[0] === fence[0] &&
+        closing.length >= fence.length
       ) {
         fence = null;
       }
