@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { Clock } from "@daylily/core/clock";
 import { type DayKey, parseDayKey } from "@daylily/core/day";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { SearchHit } from "../../shared/journal";
 import { journalSearch } from "./search";
 import { createJournal, type Journal } from "./store";
 
@@ -26,7 +27,8 @@ async function write(day: string, body: string, title = "") {
   await journal.writeDay(key(day), { body, cover: null, title });
 }
 
-const days = (hits: { day: string }[]) => hits.map((hit) => hit.day);
+const days = (hits: SearchHit[]) =>
+  hits.map((hit) => (hit.kind === "note" ? hit.name : hit.day));
 
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), "daylily-search-"));
@@ -113,15 +115,15 @@ describe("journalSearch", () => {
     await search.warm();
 
     await write("2026-04-01", "A lighthouse on the point.");
-    await search.refresh([key("2026-04-01")]);
+    await search.refresh({ days: [key("2026-04-01")], notes: [] });
     expect(days(await search.find("lighthouse"))).toEqual(["2026-04-01"]);
 
     await write("2026-04-01", "Only rain today.");
-    await search.refresh([key("2026-04-01")]);
+    await search.refresh({ days: [key("2026-04-01")], notes: [] });
     expect(await search.find("lighthouse")).toEqual([]);
 
     await rm(join(root, "2026", "04"), { force: true, recursive: true });
-    await search.refresh([key("2026-04-01")]);
+    await search.refresh({ days: [key("2026-04-01")], notes: [] });
     expect(await search.find("rain")).toEqual([]);
   });
 
@@ -170,8 +172,43 @@ describe("journalSearch", () => {
     await journal.writeThoughts(key("2026-03-04"), [
       { body: "Only the harbour now.", time: "19:00" },
     ]);
-    await search.refresh([key("2026-03-04")]);
+    await search.refresh({ days: [key("2026-03-04")], notes: [] });
     expect(await search.find("lighthouse")).toEqual([]);
     expect(await search.find("harbour")).toHaveLength(1);
+  });
+
+  it("finds notes by their title and words, beside days", async () => {
+    await journal.writeNote(null, {
+      body: "Less sugar, the zest of two lemons.",
+      pinned: false,
+      title: "Lemon cake",
+    });
+    const search = journalSearch(journal);
+    const [hit, ...others] = await search.find("lemon");
+    expect(others).toEqual([]);
+    expect(hit).toMatchObject({
+      id: "note:lemon-cake.md",
+      kind: "note",
+      name: "lemon-cake.md",
+      title: "Lemon cake",
+    });
+    expect(days(await search.find("sea"))).not.toContain("lemon-cake.md");
+  });
+
+  it("follows notes as they change and go", async () => {
+    const search = journalSearch(journal);
+    await search.warm();
+    const written = await journal.writeNote(null, {
+      body: "A lighthouse on the point.",
+      pinned: false,
+      title: "Trip",
+    });
+    const name = written.ok && written.value ? written.value.name : "";
+    await search.refresh({ days: [], notes: [name] });
+    expect(days(await search.find("lighthouse"))).toEqual(["trip.md"]);
+
+    await rm(join(root, "notes", name));
+    await search.refresh({ days: [], notes: [name] });
+    expect(await search.find("lighthouse")).toEqual([]);
   });
 });

@@ -1,5 +1,6 @@
 import type { PageContent } from "@daylily/core/day-file";
 import type { FlowerColor } from "@daylily/core/flower";
+import type { NoteContent } from "@daylily/core/note-file";
 import type { Result } from "@daylily/core/result";
 import type { Thought } from "@daylily/core/thoughts-file";
 import type {
@@ -11,8 +12,10 @@ import type {
   JournalError,
   JournalInfo,
   ListedDay,
+  ListedNote,
   SearchHit,
   StoredDay,
+  StoredNote,
   ThoughtDay,
   ThoughtsPage,
 } from "./journal";
@@ -49,6 +52,13 @@ export const CHANNELS = {
   journalSwitched: "journal:switched",
   journalUse: "journal:use",
   journalWrite: "journal:write",
+  notesAddImage: "notes:add-image",
+  notesChanged: "notes:changed",
+  notesList: "notes:list",
+  notesRead: "notes:read",
+  notesShow: "notes:show",
+  notesTrash: "notes:trash",
+  notesWrite: "notes:write",
   saveGardenImage: "garden:save-image",
   thoughtsPage: "thoughts:page",
   thoughtsRead: "thoughts:read",
@@ -227,6 +237,38 @@ export interface DaylilyApi {
       day: string,
       page: PageContent
     ) => Promise<Result<StoredDay | null, JournalError>>;
+  };
+  /**
+   * Notes: pages kept without a date in `notes/`, one file each, named from
+   * their titles; never sealed. Named everywhere by their file, like
+   * `books-to-read.md`.
+   */
+  notes: {
+    /**
+     * Copies a pasted or dropped image into `notes/images`, untouched; the path
+     * it returns, like `images/image-01.jpg`, goes in the note.
+     */
+    addImage: (image: Uint8Array) => Promise<Result<string, ImageError>>;
+    /** Every note, in no order. */
+    list: () => Promise<ListedNote[]>;
+    /** Calls `listener` with the notes that changed on disk, by any app. Returns a way to stop. */
+    onChange: (listener: (names: string[]) => void) => () => void;
+    /** A note and its words, or null when there's no such note. */
+    read: (name: string) => Promise<Result<StoredNote | null, JournalError>>;
+    /** Shows a note's file in the system's file manager. */
+    show: (name: string) => Promise<void>;
+    /** Moves a note's file to the system's Trash, where it can be restored. */
+    trash: (name: string) => Promise<Result<void, JournalError>>;
+    /**
+     * Saves a note: a new one when `name` is null, named from its title, or
+     * nothing while it's empty. `rename` gives one that exists the name its
+     * title asks for, once its title has settled. The saved note says its name.
+     */
+    write: (
+      name: string | null,
+      note: NoteContent,
+      rename: boolean
+    ) => Promise<Result<StoredNote | null, JournalError>>;
   };
   /** The OS, available synchronously for layout (macOS keeps its traffic lights). */
   platform: string;

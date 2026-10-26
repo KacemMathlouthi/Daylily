@@ -1,12 +1,13 @@
 import { mkdir, readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
-import { fail, type Result } from "@daylily/core/result";
+import { fail, ok, type Result } from "@daylily/core/result";
 import { app, BrowserWindow, dialog, shell } from "electron";
 import { CHANNELS } from "../../shared/channels";
 import {
   COVER_EXTENSIONS,
   type CoverExtension,
   type ImageError,
+  type JournalError,
   MAX_IMAGE_BYTES,
   THOUGHT_DAYS_PER_PAGE,
 } from "../../shared/journal";
@@ -19,6 +20,8 @@ import {
   folderPathSchema,
   imageBytesSchema,
   imageOwnerSchema,
+  noteNameSchema,
+  noteSchema,
   pageSchema,
   searchQuerySchema,
   thoughtsSchema,
@@ -40,6 +43,22 @@ const WARM_SEARCH_AFTER_MS = 3000;
 function coverExtension(path: string): CoverExtension | null {
   const extension = extname(path).slice(1).toLowerCase();
   return COVER_EXTENSIONS.find((known) => known === extension) ?? null;
+}
+
+/** An image the page sent, checked by its bytes: what it is, or why it isn't one. */
+function checkImage(
+  image: unknown
+): Result<{ bytes: Uint8Array; extension: CoverExtension }, ImageError> {
+  // An empty file is no image either, rather than a broken request
+  if (image instanceof Uint8Array && image.byteLength === 0) {
+    return fail({ heic: false, kind: "not-an-image" });
+  }
+  const bytes = imageBytesSchema.parse(image);
+  const found = imageKind(bytes);
+  if (found.kind !== "image") {
+    return fail({ heic: found.kind === "heic", kind: "not-an-image" });
+  }
+  return ok({ bytes, extension: found.extension });
 }
 
 function broadcast(channel: string, ...args: unknown[]) {
@@ -82,12 +101,17 @@ export function registerJournalIpc({
   };
   warmSoon();
 
-  /** Tells the page which days changed, and keeps search in step with them. */
+  /** Tells the page which days and notes changed, and keeps search in step with them. */
   const watch = () =>
-    watchJournal(journal.root, (days) => {
-      broadcast(CHANNELS.journalChanged, days);
+    watchJournal(journal.root, (changes) => {
+      if (changes.days.length > 0) {
+        broadcast(CHANNELS.journalChanged, changes.days);
+      }
+      if (changes.notes.length > 0) {
+        broadcast(CHANNELS.notesChanged, changes.notes);
+      }
       search
-        .refresh(days)
+        .refresh(changes)
         .catch((error) => console.error("Could not update search", error));
     });
   let watcher = watch();
@@ -232,21 +256,57 @@ export function registerJournalIpc({
   handle<Result<string, ImageError>>(
     CHANNELS.journalAddImage,
     (_event, day, image, owner) => {
-      // An empty file is no image either, rather than a broken request
-      if (image instanceof Uint8Array && image.byteLength === 0) {
-        return fail({ heic: false, kind: "not-an-image" });
+      const checked = checkImage(image);
+      return checked.ok
+        ? journal.addImage(
+            daySchema.parse(day),
+            checked.value.bytes,
+            checked.value.extension,
+            imageOwnerSchema.optional().parse(owner ?? undefined)
+          )
+        : checked;
+    }
+  );
+
+  handle<Result<string, ImageError>>(
+    CHANNELS.notesAddImage,
+    (_event, image) => {
+      const checked = checkImage(image);
+      return checked.ok
+        ? journal.addNoteImage(checked.value.bytes, checked.value.extension)
+        : checked;
+    }
+  );
+
+  handle(CHANNELS.notesList, () => journal.listNotes());
+
+  handle(CHANNELS.notesRead, (_event, name) =>
+    journal.readNote(noteNameSchema.parse(name))
+  );
+
+  handle(CHANNELS.notesWrite, (_event, name, note, rename) =>
+    journal.writeNote(
+      name === null ? null : noteNameSchema.parse(name),
+      noteSchema.parse(note),
+      { rename: rename === true }
+    )
+  );
+
+  handle(CHANNELS.notesShow, (_event, name) => {
+    shell.showItemInFolder(journal.noteFile(noteNameSchema.parse(name)));
+  });
+
+  handle<Result<void, JournalError>>(
+    CHANNELS.notesTrash,
+    async (_event, name) => {
+      try {
+        await shell.trashItem(journal.noteFile(noteNameSchema.parse(name)));
+        return ok(undefined);
+      } catch (error) {
+        // No Trash to put it in, as on some Linux setups: the file stays where it is
+        console.error("Could not move a note to the Trash", error);
+        return fail({ code: "ENOTRASH", kind: "io" });
       }
-      const bytes = imageBytesSchema.parse(image);
-      const found = imageKind(bytes);
-      if (found.kind !== "image") {
-        return fail({ heic: found.kind === "heic", kind: "not-an-image" });
-      }
-      return journal.addImage(
-        daySchema.parse(day),
-        bytes,
-        found.extension,
-        imageOwnerSchema.optional().parse(owner ?? undefined)
-      );
     }
   );
 

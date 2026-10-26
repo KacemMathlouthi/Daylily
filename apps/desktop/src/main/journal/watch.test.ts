@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { writeFileAtomic } from "./atomic-write";
-import { watchJournal } from "./watch";
+import { type JournalChanges, watchJournal } from "./watch";
 
 let root: string;
 let watcher: ReturnType<typeof watchJournal>;
@@ -19,7 +19,10 @@ afterEach(async () => {
 
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const reported = (onChange: ReturnType<typeof vi.fn>) =>
-  onChange.mock.calls.flat(2);
+  onChange.mock.calls.flatMap((call) => {
+    const changes = call[0] as JournalChanges;
+    return [...changes.days, ...changes.notes];
+  });
 
 describe("watchJournal", () => {
   it("reports the days another app changed", async () => {
@@ -53,12 +56,28 @@ describe("watchJournal", () => {
     await vi.waitFor(() => expect(reported(onChange)).toContain("2026-10-21"));
   });
 
+  it("reports the notes changed, by their file's name", async () => {
+    await mkdir(join(root, "notes"), { recursive: true });
+    const onChange = vi.fn();
+    watcher = watchJournal(root, onChange);
+    await watcher.ready;
+
+    await writeFileAtomic(join(root, "notes", "books.md"), "Piranesi");
+    await vi.waitFor(() => expect(onChange).toHaveBeenCalled());
+    expect(onChange).toHaveBeenLastCalledWith({
+      days: [],
+      notes: ["books.md"],
+    });
+  });
+
   it("ignores files that aren't in a day's folder", async () => {
     const onChange = vi.fn();
     watcher = watchJournal(root, onChange);
     await watcher.ready;
 
     await writeFile(join(root, "notes.md"), "Not a day");
+    await mkdir(join(root, "notes", "images"), { recursive: true });
+    await writeFile(join(root, "notes", "images", "image-01.png"), "");
     await mkdir(join(root, ".daylily"), { recursive: true });
     await writeFile(join(root, ".daylily", "config.json"), "{}");
     await pause(500);
