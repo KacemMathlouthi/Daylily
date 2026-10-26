@@ -87,6 +87,9 @@ export function PageView({
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === "Enter" || event.key === "ArrowDown") {
         event.preventDefault();
+        // At once, so a key pressed right after lands in the words; the
+        // editor's own focus waits a frame to place the cursor
+        editor.view.focus();
         editor.commands.focus("start");
       }
     },
