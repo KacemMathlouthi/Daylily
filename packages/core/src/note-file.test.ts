@@ -121,7 +121,8 @@ describe("writeNoteFile", () => {
       { body: "Basil twice a day.", pinned: false, title: "Balcony plants" },
       stamp("2026-10-26T13:10:00Z")
     );
-    expect(read(file, "Balcony plants.md").title).toBe("Balcony plants");
+    // Read under another name, so the title can only come from the file
+    expect(read(file, "elsewhere.md").title).toBe("Balcony plants");
   });
 
   it("refuses to write over a file it can't read", () => {
@@ -161,10 +162,15 @@ describe("noteStem", () => {
     expect(noteStem("con")).toBe("con-note");
     expect(noteStem("COM1")).toBe("com1-note");
     expect(noteStem("console")).toBe("console");
+    expect(noteStem("con.txt")).toBe("con-note.txt");
   });
 
   it("cuts a long title short", () => {
     expect([...noteStem("a".repeat(200))]).toHaveLength(80);
+    // Four bytes each: cut by bytes, never in the middle of one
+    const flowers = noteStem("🌼".repeat(80));
+    expect(new TextEncoder().encode(flowers).length).toBeLessThanOrEqual(180);
+    expect(flowers).toBe("🌼".repeat(45));
   });
 });
 
@@ -188,5 +194,7 @@ describe("isNoteName", () => {
     expect(isNoteName(".draft.md")).toBe(false);
     expect(isNoteName("photo.jpg")).toBe(false);
     expect(isNoteName(".md")).toBe(false);
+    expect(isNoteName("CON.md")).toBe(false);
+    expect(isNoteName("lpt1.notes.md")).toBe(false);
   });
 });

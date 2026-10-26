@@ -40,15 +40,37 @@ const MARKDOWN = /\.md$/i;
 const UNSAFE = /[<>:"/\\|?*'‘’“”\p{Cc}]/gu;
 const SEPARATORS = /[\s-]+/g;
 const EDGES = /^[-.]+|[-.]+$/g;
-/** Names Windows keeps for devices, whatever follows them. */
-const RESERVED = /^(?:con|prn|aux|nul|com\d|lpt\d)$/i;
-/** Long enough for any title someone reads at a glance, short of every system's limit. */
+/** Names Windows keeps for devices, whatever follows them after a dot. */
+const RESERVED = /^(?:con|prn|aux|nul|com\d|lpt\d)(?:\.|$)/i;
+/** Long enough for any title someone reads at a glance. */
 const MAX_STEM = 80;
+/**
+ * Most systems allow 255 bytes in a name; this leaves room for a number and
+ * `.md`, and for the temp name a save writes beside it.
+ */
+const MAX_STEM_BYTES = 180;
+const utf8 = new TextEncoder();
+const BEFORE_DOT = /^[^.]*/;
 const NOTE_NAME = /^(?![.])[^<>:"/\\|?*\p{Cc}]{1,250}\.md$/iu;
 
-/** Whether `name` is a note's file: markdown, directly in the notes folder, not hidden. */
+/**
+ * Whether `name` is a note's file: markdown, directly in the notes folder, not
+ * hidden, and not a name Windows keeps for a device.
+ */
 export function isNoteName(name: string) {
-  return NOTE_NAME.test(name);
+  return NOTE_NAME.test(name) && !RESERVED.test(name);
+}
+
+/** As much of `stem` as fits in `MAX_STEM_BYTES`, never splitting a character. */
+function fitting(stem: string) {
+  let kept = "";
+  for (const character of [...stem].slice(0, MAX_STEM)) {
+    if (utf8.encode(kept + character).length > MAX_STEM_BYTES) {
+      break;
+    }
+    kept += character;
+  }
+  return kept;
 }
 
 /**
@@ -126,11 +148,12 @@ export function noteStem(title: string) {
     .replace(UNSAFE, "")
     .replace(SEPARATORS, "-")
     .replace(EDGES, "");
-  const short = [...stem].slice(0, MAX_STEM).join("").replace(EDGES, "");
+  const short = fitting(stem).replace(EDGES, "");
   if (short === "") {
     return "untitled";
   }
-  return RESERVED.test(short) ? `${short}-note` : short;
+  // A device's name, even before a dot (`con.txt`), takes a word after it
+  return RESERVED.test(short) ? short.replace(BEFORE_DOT, "$&-note") : short;
 }
 
 /**

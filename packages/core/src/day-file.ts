@@ -171,10 +171,11 @@ export function readDayFile(text: string): Result<DayFile, DayFileError> {
   if (!file.ok) {
     return file;
   }
-  return ok({
-    body: file.value.body,
-    meta: metaSchema.parse(file.value.fields),
-  });
+  // Each field falls back on its own; only fields that aren't a set of them fail
+  const meta = metaSchema.safeParse(file.value.fields);
+  return meta.success
+    ? ok({ body: file.value.body, meta: meta.data })
+    : fail({ kind: "malformed", message: meta.error.message });
 }
 
 /**
