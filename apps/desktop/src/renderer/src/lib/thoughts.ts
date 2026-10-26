@@ -169,6 +169,11 @@ function openThought(today: DayKey) {
   return id;
 }
 
+/** Makes sure today has its open thought at the top, without taking the cursor. */
+export function keepOpenThought(today: DayKey) {
+  openThought(today);
+}
+
 /**
  * ⌘ Enter: on to a new thought at the top. If the open one has nothing in it
  * yet, the cursor just goes there.

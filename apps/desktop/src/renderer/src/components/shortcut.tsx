@@ -25,7 +25,11 @@ export function Shortcut({
   className?: string;
 }) {
   return (
-    <KbdGroup aria-label={keys.join(" + ")} className={cn("gap-1", className)}>
+    <KbdGroup
+      aria-label={keys.join(" + ")}
+      className={cn("gap-1", className)}
+      role="group"
+    >
       {keys.map((key, index) => (
         <span className="contents" key={key}>
           {index > 0 ? (
