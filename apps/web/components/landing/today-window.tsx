@@ -4,7 +4,9 @@ import { cn } from "@daylily/ui/lib/cn";
 import {
   Calendar,
   Ellipsis,
+  FileText,
   House,
+  Lightbulb,
   Lock,
   Moon,
   PanelLeftClose,
@@ -16,18 +18,40 @@ import {
 import Image from "next/image";
 import { GhostLine } from "./ghost-line";
 
+/** The screens by what they're for, as the app groups them: Home, then the journal and the notebook. */
 const NAV = [
-  { icon: House, label: "Home" },
-  { active: true, icon: PenLine, label: "Today" },
-  { icon: Calendar, label: "Calendar" },
-  { icon: Sprout, label: "Garden" },
+  { links: [{ icon: House, label: "Home" }], title: null },
+  {
+    links: [
+      { active: true, icon: PenLine, label: "Today" },
+      { icon: Calendar, label: "Calendar" },
+      { icon: Sprout, label: "Garden" },
+    ],
+    title: "Journal",
+  },
+  {
+    links: [
+      { icon: Lightbulb, label: "Thoughts" },
+      { icon: FileText, label: "Notes" },
+    ],
+    title: "Notebook",
+  },
 ] as const;
+
+/** A key as the app shows it, on its own cap. */
+function Key({ children }: { children: string }) {
+  return (
+    <kbd className="flex h-4.5 min-w-4.5 items-center justify-center rounded-[5px] border border-line-strong bg-paper-tint px-1.5 font-medium font-sans text-ink-muted text-tag">
+      {children}
+    </kbd>
+  );
+}
 
 /** Hover feedback for the mock's controls; they look alive without being focusable dead ends. */
 const HOVERABLE =
   "cursor-pointer transition-colors duration-200 ease-soft hover:bg-ink/[0.05]";
 
-/** The app's sidebar as it ships: the journal, search, four screens, and Settings at the foot. */
+/** The app's sidebar as it ships: the journal, search, its screens in groups, and Settings at the foot. */
 function Sidebar() {
   return (
     <aside className="hidden w-58 shrink-0 flex-col justify-between border-line border-r bg-paper-sunk px-2.5 py-3.5 lg:flex">
@@ -39,42 +63,62 @@ function Sidebar() {
           )}
         >
           <DaylilyMark className="text-daylily" size={18} />
-          <span className="font-semibold text-ink text-ui-lg">
-            Your journal
+          <span className="flex flex-col gap-px">
+            <span className="font-semibold text-ink text-ui-lg leading-4.5">
+              Your journal
+            </span>
+            <span className="text-ink-subtle text-meta leading-3.5">
+              ~/Daylily
+            </span>
           </span>
         </div>
         <div className="flex h-7.5 cursor-text items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 transition-colors duration-200 hover:border-ink-ghost">
           <Search className="text-ink-subtle" size={13} strokeWidth={2.2} />
-          <span className="grow text-caption text-ink-subtle">Search days</span>
-          <span className="text-ink-faint text-tag">⌘K</span>
+          <span className="grow text-caption text-ink-subtle">Search</span>
+          <span className="flex items-center gap-1">
+            <Key>⌘</Key>
+            <span aria-hidden="true" className="text-ink-faint text-tag">
+              +
+            </span>
+            <Key>K</Key>
+          </span>
         </div>
         <nav className="flex flex-col gap-px">
-          {NAV.map(({ label, icon: Icon, ...item }) => {
-            const active = "active" in item;
-            return (
-              <div
-                className={cn(
-                  "flex h-7.5 items-center gap-2.25 rounded-row px-2.5",
-                  active ? "bg-paper-press" : HOVERABLE
-                )}
-                key={label}
-              >
-                <Icon
-                  className={active ? "text-ink" : "text-ink-muted"}
-                  size={15}
-                  strokeWidth={1.9}
-                />
-                <span
-                  className={cn(
-                    "font-medium text-ui",
-                    active ? "text-ink" : "text-ink-soft"
-                  )}
-                >
-                  {label}
+          {NAV.map(({ links, title }) => (
+            <div className="flex flex-col gap-px" key={title ?? "top"}>
+              {title ? (
+                <span className="px-2.5 pt-4.5 pb-1.5 font-medium text-ink-faint text-tag tracking-eyebrow">
+                  {title}
                 </span>
-              </div>
-            );
-          })}
+              ) : null}
+              {links.map(({ label, icon: Icon, ...item }) => {
+                const active = "active" in item;
+                return (
+                  <div
+                    className={cn(
+                      "flex h-7.5 items-center gap-2.25 rounded-row px-2.5",
+                      active ? "bg-paper-press" : HOVERABLE
+                    )}
+                    key={label}
+                  >
+                    <Icon
+                      className={active ? "text-ink" : "text-ink-muted"}
+                      size={15}
+                      strokeWidth={1.9}
+                    />
+                    <span
+                      className={cn(
+                        "font-medium text-ui",
+                        active ? "text-ink" : "text-ink-soft"
+                      )}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
       <div className="flex items-center gap-0.5">
