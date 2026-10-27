@@ -8,6 +8,7 @@ import {
   Newsreader,
 } from "next/font/google";
 import type { ReactNode } from "react";
+import { FEATURES } from "@/app/features/features";
 import { Header } from "@/components/site/header";
 import { MotionProvider } from "@/components/site/motion";
 import {
@@ -36,6 +37,13 @@ const mono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-face-mono",
 });
+
+/** Only what the header's Features menu shows, so the pages' copy stays on the server. */
+const HEADER_FEATURES = FEATURES.map(({ name, oneLine, slug }) => ({
+  name,
+  oneLine,
+  slug,
+}));
 
 export const metadata: Metadata = {
   ...pageMetadata({
@@ -66,7 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body suppressHydrationWarning>
         <MotionProvider>
-          <Header />
+          <Header features={HEADER_FEATURES} />
           {children}
         </MotionProvider>
       </body>
