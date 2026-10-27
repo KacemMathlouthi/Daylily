@@ -47,8 +47,9 @@ function Hero({ slug }: { slug: FeatureSlug }) {
           className="h-auto w-full"
           height={feature.heroHeight * 2}
           priority
-          sizes="(max-width: 1440px) 100vw, 1440px"
           src={`/images/features/${slug}-hero.webp`}
+          // Exported at 2x from Paper; compressing again blurs the app's small type.
+          unoptimized
           width={2880}
         />
       </Reveal>
@@ -83,8 +84,8 @@ function HowItWorks({ slug }: { slug: FeatureSlug }) {
                   alt={beat.image}
                   className="h-auto w-full"
                   height={680}
-                  sizes="(max-width: 768px) 100vw, 584px"
                   src={`/images/features/${slug}-${index + 1}.webp`}
+                  unoptimized
                   width={1168}
                 />
                 <div className="flex gap-6 px-1">
