@@ -10,12 +10,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@daylily/ui/primitives/sheet";
+import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { ButtonLink } from "@/components/site/button-link";
+import { FeatureIcon } from "./feature-icon";
 import { GithubMark } from "./github-mark";
-import { GITHUB_URL, NAV_LINKS } from "./links";
+import { type FeatureLink, GITHUB_URL, NAV_LINKS } from "./links";
 
 function MenuIcon() {
   return (
@@ -43,13 +45,36 @@ function CloseIcon() {
   );
 }
 
+function ActiveMark({ active }: { active: boolean }) {
+  return (
+    <DaylilyMark
+      className={cn(
+        "shrink-0 text-daylily",
+        active ? "opacity-100" : "opacity-0"
+      )}
+      size={14}
+    />
+  );
+}
+
+const rowLabelClass =
+  "font-display text-display-xs text-ink leading-11 tracking-heading-sm";
+
 /**
  * The header's links on screens too narrow for them: a button that opens a
- * full-screen sheet of paper with the links, Download and GitHub (Paper:
- * "Menu · mobile · open").
+ * full-screen sheet of paper with the feature pages under Features, the other
+ * links, Download and GitHub (Paper: "Menu · open · mobile · 2026").
  */
-export function MobileMenu({ active }: { active: string | null }) {
+export function MobileMenu({
+  active,
+  features,
+}: {
+  active: string | null;
+  features: FeatureLink[];
+}) {
   const [open, setOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(true);
+  const toggleFeatures = useCallback(() => setFeaturesOpen((was) => !was), []);
   // Following a link closes the sheet, even one to a section of this page
   const close = useCallback(() => setOpen(false), []);
 
@@ -97,25 +122,69 @@ export function MobileMenu({ active }: { active: string | null }) {
           </SheetClose>
         </div>
 
-        <nav className="relative flex flex-col px-5 pt-7">
+        <nav className="relative flex flex-col px-5 pt-4">
+          <button
+            aria-controls="mobile-menu-features"
+            aria-expanded={featuresOpen}
+            className="flex items-center gap-3 pt-3 pb-1.5 text-left"
+            onClick={toggleFeatures}
+            type="button"
+          >
+            <ActiveMark active={active === "features"} />
+            <span className={rowLabelClass}>Features</span>
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                "ml-auto shrink-0 text-ink/60 transition-transform duration-300 ease-soft motion-reduce:transition-none",
+                featuresOpen && "rotate-180"
+              )}
+              size={20}
+              strokeWidth={1.8}
+            />
+          </button>
+          <ul
+            className={cn(
+              "flex flex-col gap-0.5 border-line border-b pb-3.5 pl-6.5",
+              !featuresOpen && "hidden"
+            )}
+            id="mobile-menu-features"
+          >
+            {features.map((feature) => {
+              const href = `/features/${feature.slug}`;
+              return (
+                <li key={feature.slug}>
+                  <Link
+                    className="flex items-center gap-3 py-1.75"
+                    href={href}
+                    onClick={close}
+                  >
+                    <FeatureIcon
+                      className="size-8.5 bg-paper-page [&_svg]:size-4"
+                      slug={feature.slug}
+                    />
+                    <span className="flex flex-col gap-px">
+                      <span className="font-medium text-base text-ink leading-5">
+                        {feature.name}
+                      </span>
+                      <span className="text-ink-muted text-ui leading-4.25">
+                        {feature.oneLine}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
           {NAV_LINKS.map((link) => (
             <Link
-              aria-current={active === link.id ? "true" : undefined}
+              aria-current={active === link.id ? "page" : undefined}
               className="flex items-center gap-3 border-line border-b py-3 last:border-b-0"
               href={link.href}
               key={link.id}
               onClick={close}
             >
-              <DaylilyMark
-                className={cn(
-                  "shrink-0 text-daylily",
-                  active === link.id ? "opacity-100" : "opacity-0"
-                )}
-                size={14}
-              />
-              <span className="font-display text-display-xs text-ink leading-11 tracking-heading-sm">
-                {link.label}
-              </span>
+              <ActiveMark active={active === link.id} />
+              <span className={rowLabelClass}>{link.label}</span>
             </Link>
           ))}
         </nav>

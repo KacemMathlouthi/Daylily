@@ -12,7 +12,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-26 |
+| **Last updated** | 2026-10-27 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -377,7 +377,7 @@ keychain and **never** into the journal folder.
 ### 4.3 Repo layout
 
 ```
-apps/web/            Next.js website: landing, /manifesto, /download, /changelog, /roadmap (later: docs, codexes, accounts)
+apps/web/            Next.js website: landing, /features/… (one page per feature), /manifesto, /privacy, /download, /changelog, /roadmap (later: docs, codexes, accounts)
 apps/desktop/        Electron app
   src/main/            the backend: windows, IPC handlers, the journal store and sealing (src/main/journal), the seal scheduler
   src/preload/         the bridge: exposes the typed window.daylily API, nothing else
@@ -605,7 +605,7 @@ source is in the local `brand/`).
 
 ## 9. Designs and assets
 
-### Paper file: "Daylily — Landing"
+### Paper file: "Daylily"
 The design source of truth. Open it in Paper and use the Paper MCP to read exact values when implementing.
 
 **Design first, in Paper.** Every visual change (layout, position, colour, a new page or state) is made in Paper
@@ -617,7 +617,8 @@ drift, sync Paper back to what was agreed.
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
 | v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added · 13d Search · days and thoughts, best first · 15a to 15d Thoughts (today, the first one, editing an older one, the time staying as you scroll) · 16a Sidebar · grouped · 16b Sidebar · grouped, as it grows (later) · 17a to 17d Notes (a note open, the first one, the note's menu, notes in search) |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
-| v5 README | The README's images (hero, the app, three moments, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
+| v5 README | The README's images (hero, the app, a card for each feature, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
+| v6 Story and website | The story (one sentence, three principles, a day with Daylily), Landing · 2026 (desktop and mobile), a page for each feature (Thoughts, Notes, Journaling, Ghost prompts, Garden and calendar, Search) with its sharing card, Privacy with its card, the repository's text, and the header and footer for 2026: the Features menu open, the header floating once scrolled (desktop and mobile), the mobile menu, the footer's links (desktop and mobile) |
 
 Screens 07, 08 and the AI parts of 09 and 10c are designed for later releases and are **not in v1**.
 Each page is laid out in labelled columns, one per screen or site page; boards no longer current sit in a
@@ -686,6 +687,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-26 | Thoughts polished: never left without a thought to write in, a little more space between them; search finds thoughts beside the pages, best first, and opens them where they are; the sidebar grouped into Journal and Notebook; shortcuts shown as keys. Designed in Paper first (13d, 16a, 16b) |
 | 2026-10-26 | Daylily's own domain, **daylily.ink**: the website, the README and the app's links moved there, the old addresses redirect to it; the Paper file tidied into labelled columns, outdated boards archived; the landing seals at 4am, not midnight |
 | 2026-10-26 | Notes: the pages you keep, undated and never sealed, one markdown file each in `notes/`, named from their titles; a list beside the open note, pinned first; moved to the system's Trash when asked; found by search. Opening any page no longer saves it again. Designed in Paper first (17a to 17d) |
+| 2026-10-27 | The story settled (a journal for your whole day, in your own words); a page for each feature on the website, each leading to the next; a privacy page, plainly; the README rewritten around the whole day with a card for each feature; a Features menu in the header, which floats once you scroll, and the features in the footer. Designed in Paper first (v6) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the

@@ -1,5 +1,6 @@
 import { DaylilyMark } from "@daylily/ui/components/daylily-mark";
 import Image from "next/image";
+import { FEATURES } from "@/app/features/features";
 import { ButtonLink } from "@/components/site/button-link";
 import { FOOTER_LINKS, GITHUB_URL } from "./links";
 import { Reveal } from "./motion";
@@ -41,6 +42,20 @@ function DuskWordmark() {
   );
 }
 
+/** Product, the feature pages, Principles and Community (Paper "Footer · links · 2026"). */
+const GROUPS = [
+  FOOTER_LINKS.product,
+  {
+    heading: "Features",
+    links: FEATURES.map(({ name, slug }) => ({
+      href: `/features/${slug}`,
+      label: name,
+    })),
+  },
+  FOOTER_LINKS.principles,
+  FOOTER_LINKS.community,
+];
+
 export function Footer() {
   return (
     <footer className="relative flex flex-col items-center overflow-clip bg-dusk-fade">
@@ -74,9 +89,12 @@ export function Footer() {
             © 2026 Daylily · Free and open source
           </p>
         </div>
-        <nav className="grid grid-cols-3 gap-6 md:flex md:gap-20">
-          {FOOTER_LINKS.map((group) => (
-            <div className="flex flex-col gap-2.5 md:w-35" key={group.heading}>
+        <nav className="grid grid-cols-2 gap-x-5 gap-y-8 md:flex md:gap-16">
+          {GROUPS.map((group) => (
+            <div
+              className="flex flex-col gap-2.5 md:min-w-35"
+              key={group.heading}
+            >
               <h3 className="font-semibold text-ink text-ui">
                 {group.heading}
               </h3>

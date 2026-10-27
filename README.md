@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Daylily. One page a day. Written by you, kept by you, grown into a garden." src=".github/readme/hero.webp" width="880">
+  <img alt="Daylily. A journal for your whole day, in your own words: thoughts as they come, notes you keep, and one page each evening that seals at 4am and grows into a garden." src=".github/readme/hero.webp" width="880">
 </p>
 
 <p align="center">
@@ -12,22 +12,32 @@
   Free and open source ·
   <a href="https://daylily.ink/changelog">Changelog</a> ·
   <a href="https://daylily.ink/roadmap">Roadmap</a> ·
+  <a href="https://daylily.ink/privacy">Privacy</a> ·
   <a href="https://daylily.ink">Website</a>
 </p>
 
-Most journaling apps want to write your journal *for* you: AI summaries, chat-to-entry, auto-titles. **Daylily goes
-the other way.** Its whole job is to get you to sit down each evening and say what happened, and how it felt, in your
-own words.
+Daylily is a journal for your whole day, in your own words. Jot thoughts as they come, keep notes you change, and each
+evening write one page about how it went. At 4am the page seals, honest and unedited, and a flower opens in your
+garden.
 
-Today is the only page you can write. At 4am it seals, honest and unedited, and becomes a flower in your garden. Your
-days are plain markdown files in a folder you own.
+Most journaling apps want to write your journal *for* you. **Daylily goes the other way:** it asks, it listens, and
+every word stays yours, in plain markdown files on your computer.
 
 <p align="center">
-  <img alt="Daylily's writing screen: today's page, The long way home, with a cover of daylilies on a hillside at sunset, three short paragraphs, and a faint question at the end of the last line: …what would you tell a friend?" src=".github/readme/app.webp" width="880">
+  <img alt="Daylily's writing screen: the sidebar with Home, the Journal (Today, Calendar, Garden) and the Notebook (Thoughts, Notes), and today's page, The long way home, with a cover of daylilies on a hillside at sunset, three short paragraphs, and a faint question at the end of the last line: …what surprised you today?" src=".github/readme/app.webp" width="880">
 </p>
 
+## A day with Daylily
+
+From a thought in the morning to a garden years later. Each one has its own page on the website.
+
 <p align="center">
-  <img alt="Write today: one page in your own words, and a question when you pause. Sealed at 4am: when the day ends, its page stays as you wrote it. A garden of days: every day you write plants a flower, and a missed day is bare soil, never guilt." src=".github/readme/moments.webp" width="880">
+  <a href="https://daylily.ink/features/thoughts"><img alt="Thoughts: write anything down the moment it comes, under the time it came." src=".github/readme/feature-thoughts.webp" width="49%"></a>
+  <a href="https://daylily.ink/features/notes"><img alt="Notes: the back pages, lists and plans you keep and change, pinned on top." src=".github/readme/feature-notes.webp" width="49%"></a>
+  <a href="https://daylily.ink/features/journaling"><img alt="Journaling: one page a day, in your own words. At 4am it seals, honest and unedited, like ink." src=".github/readme/feature-journaling.webp" width="49%"></a>
+  <a href="https://daylily.ink/features/ghost-prompts"><img alt="Ghost prompts: when you pause, a quiet question fades in. Never words you can accept." src=".github/readme/feature-ghost-prompts.webp" width="49%"></a>
+  <a href="https://daylily.ink/features/garden"><img alt="Garden and calendar: every day you write becomes a flower, and its cover fills a calendar like a photo album." src=".github/readme/feature-garden.webp" width="49%"></a>
+  <a href="https://daylily.ink/features/search"><img alt="Search: find any word in any day, thought or note, from Ctrl + K. All of it offline." src=".github/readme/feature-search.webp" width="49%"></a>
 </p>
 
 <p align="center">
@@ -36,27 +46,31 @@ days are plain markdown files in a folder you own.
 
 ## What Daylily believes
 
-1. **One page a day.** Today is the only page you can write. When the day ends it seals, like ink.
-2. **It draws more out of you.** It opens on *"How was your day?"* and, when you pause, asks a little more.
-3. **Your days grow into a garden.** Every day you write plants a flower.
-4. **Your files are yours.** Plain markdown in a folder you own. No lock-in, ever.
-5. **AI asks. It never writes for you.** When it comes, it stays off until you turn it on, one feature at a time.
-6. **Welcome back, never guilt.** No streaks, no wilting. A missed day is bare soil.
+1. **Written by you.** Every word is yours. When AI comes, it asks and answers; it never writes, rewrites or
+   summarises into your journal, and it's off until you turn it on.
+2. **Kept by you.** Plain markdown in a folder you own, readable in any app and in twenty years. Each page seals at
+   4am, like ink. Nothing leaves your computer unless you choose.
+3. **Grown into a garden.** Every day you write plants a flower. A missed day is bare soil, never guilt.
 
-The full story is in the [manifesto](https://daylily.ink/manifesto).
+The full story is in the [manifesto](https://daylily.ink/manifesto), and what leaves your computer (almost nothing)
+is on the [privacy page](https://daylily.ink/privacy).
 
 ## Your journal is a folder
 
-One folder per day, holding the page and its pictures. Open it in any editor, grep it, sync it with anything, or read
-it in twenty years.
+One folder per day, holding the page, its thoughts and its pictures, and one file for each note. Open them in any
+editor, grep them, sync them with anything, or read them in twenty years.
 
 ```
 ~/Daylily/
-  2026/10/24/
-    2026-10-24.md          # title, cover, the day in markdown
+  2026/10/26/
+    2026-10-26.md        # the page: title, cover, the day in markdown
+    thoughts.md          # the day's thoughts, each under its time
     cover.jpg
     image-01.jpg
-  .daylily/config.json     # your reminder time and preferences
+  notes/
+    books-to-read.md     # one file per note, named from its title
+    images/
+  .daylily/config.json   # your reminder time and preferences
 ```
 
 ## Install
@@ -96,9 +110,15 @@ Want to help? Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Where it's growing
 
-Search, a welcome for your first run and updates that install themselves are next. Then richer days, AI that asks but
-never writes, and your journal everywhere you write. See the [roadmap](https://daylily.ink/roadmap) and the
-[changelog](https://daylily.ink/changelog), and
+The same day, a little further.
+
+- **Through the day, everywhere:** Daylily on your phone, and sync through git, your own bucket or a hosted option.
+- **In the evening:** ghost prompts that listen to what you just wrote.
+- **Over the years:** look-backs from weekly to yearly, ask your journal, a year in review, a printed book of a year.
+- **Always:** export, and a journal you can lock.
+
+AI arrives as a companion: off until you turn it on, any provider or a model on your own computer, and plain about
+what it sends. See the [roadmap](https://daylily.ink/roadmap) and the [changelog](https://daylily.ink/changelog), and
 [suggest a change](https://github.com/KacemMathlouthi/Daylily/issues/new?template=suggestion.yml) anytime.
 
 ## License
