@@ -108,7 +108,7 @@ export function NoteList({
     >
       <header
         className={cn(
-          "sticky top-0 z-10 flex h-12 shrink-0 items-center justify-between bg-paper-page pr-3 pl-5",
+          "sticky top-0 z-10 flex h-12 shrink-0 items-center justify-between bg-paper-page pr-3 pl-(--top-bar-start)",
           header
         )}
       >

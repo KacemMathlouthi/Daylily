@@ -220,7 +220,7 @@ function ThoughtsScreen() {
     <div className="flex grow flex-col">
       <header
         className={cn(
-          "sticky top-0 z-20 flex h-12 shrink-0 items-center justify-between bg-paper-page px-5",
+          "sticky top-0 z-20 flex h-12 shrink-0 items-center justify-between bg-paper-page pr-5 pl-(--top-bar-start)",
           isMac && "[-webkit-app-region:drag]",
           chrome
         )}

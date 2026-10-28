@@ -33,6 +33,22 @@ const SHELL_SIZE = {
   "--title-strip": HAS_TITLE_STRIP ? TITLE_STRIP_HEIGHT : "0px",
 } as CSSProperties;
 
+/** Where macOS's traffic lights end, set 18px in from the window's corner, with room after them */
+const MAC_LIGHTS_END = "5.5rem";
+
+/**
+ * Where a screen's top bar starts. The traffic lights are wider than the rail, so
+ * beside the rail, or at the window's edge in focus mode, the bar starts after them.
+ */
+function topBarStart(sidebarOpen: boolean, focused: boolean) {
+  if (window.daylily.platform !== "darwin" || (sidebarOpen && !focused)) {
+    return "1.25rem";
+  }
+  return focused
+    ? MAC_LIGHTS_END
+    : `calc(${MAC_LIGHTS_END} - var(--sidebar-width-icon))`;
+}
+
 /** Kept in this computer's settings, so the app reopens as it was left. */
 function useSidebarOpen() {
   const [open, setOpen] = useState(
@@ -97,7 +113,12 @@ function AppShell() {
         className="h-full min-h-0 pt-(--title-strip)"
         onOpenChange={setOpen}
         open={open}
-        style={SHELL_SIZE}
+        style={
+          {
+            ...SHELL_SIZE,
+            "--top-bar-start": topBarStart(open, focused),
+          } as CSSProperties
+        }
       >
         {HAS_TITLE_STRIP ? <TitleStrip /> : null}
         {/* Onboarding lies over the app, which waits beneath it out of reach */}

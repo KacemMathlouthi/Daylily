@@ -39,7 +39,7 @@ export function DayHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex h-12 shrink-0 items-center justify-between bg-paper-page px-5",
+        "sticky top-0 z-20 flex h-12 shrink-0 items-center justify-between bg-paper-page pr-5 pl-(--top-bar-start)",
         // macOS has no title bar, so the header drags the window there
         isMac && "[-webkit-app-region:drag]",
         className
