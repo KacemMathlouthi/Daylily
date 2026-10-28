@@ -66,7 +66,11 @@ export function ReminderTimeSelect({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="max-h-72">
+      {/*
+       * Below the button like a menu: laid over it, the chosen time sits on the
+       * button and the forty-eight times run up to the top of the window
+       */}
+      <SelectContent alignItemWithTrigger={false} className="max-h-72">
         {TIMES.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
