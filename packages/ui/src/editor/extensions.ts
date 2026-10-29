@@ -9,6 +9,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { CodeBlock } from "./code-block";
 import { GhostPrompts, type GhostPromptsOptions } from "./ghost-prompts";
 import { MarkdownPaste, type MarkdownPasteOptions } from "./markdown-paste";
+import { MovingBlock } from "./moving-block";
 import { PageImage, type PageImageOptions } from "./page-image";
 import { SearchHighlight } from "./search-highlight";
 
@@ -90,6 +91,8 @@ export function pageExtensions({
       // Both replaced below: code that can be bold, and a highlighted code block
       code: false,
       codeBlock: false,
+      // Drawn by the page's styles as the daylily line (Paper 18b)
+      dropcursor: { class: "drop-cursor", color: false, width: 2 },
       heading: { levels: [2, 3] },
       // Clicks open in the system browser: the app's window handler sends them there
       link: {
@@ -112,6 +115,7 @@ export function pageExtensions({
     Markdown,
     QuoteExit,
     SearchHighlight,
+    MovingBlock,
   ];
   if (placeholder) {
     extensions.push(Placeholder.configure({ placeholder }));
