@@ -51,6 +51,7 @@ export function NoteView({
   const editor = usePageEditor({
     content: note.body,
     images,
+    label: "The note",
     onChange: write,
     placeholder:
       "A list, a plan, a recipe: anything you’ll come back to and change.",

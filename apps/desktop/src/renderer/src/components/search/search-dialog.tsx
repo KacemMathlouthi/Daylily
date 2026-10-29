@@ -160,7 +160,12 @@ function Preview({ day, query }: { day: string; query: string }) {
   const markdown = page.kind === "written" ? page.markdown : "";
   // The images of whichever day is chosen: the editor reads them through a ref
   const images = useMemo(() => shownImages(day), [day]);
-  const editor = usePageEditor({ content: markdown, editable: false, images });
+  const editor = usePageEditor({
+    content: markdown,
+    editable: false,
+    images,
+    label: "The page found",
+  });
 
   useEffect(() => {
     editor.commands.setContent(markdown, { contentType: "markdown" });
@@ -240,7 +245,12 @@ function NotePreview({ hit, query }: { hit: NoteHit; query: string }) {
   });
   const markdown = data?.ok ? (data.value?.body ?? "") : "";
   const images = useMemo(() => shownNoteImages(), []);
-  const editor = usePageEditor({ content: markdown, editable: false, images });
+  const editor = usePageEditor({
+    content: markdown,
+    editable: false,
+    images,
+    label: "The note found",
+  });
 
   useEffect(() => {
     editor.commands.setContent(markdown, { contentType: "markdown" });
@@ -278,7 +288,12 @@ function ThoughtPreview({ hit, query }: { hit: ThoughtHit; query: string }) {
   const thought = data?.state === "ok" ? data.thoughts[hit.index] : undefined;
   const markdown = thought?.body ?? "";
   const images = useMemo(() => shownImages(hit.day), [hit.day]);
-  const editor = usePageEditor({ content: markdown, editable: false, images });
+  const editor = usePageEditor({
+    content: markdown,
+    editable: false,
+    images,
+    label: "The thought found",
+  });
 
   useEffect(() => {
     editor.commands.setContent(markdown, { contentType: "markdown" });

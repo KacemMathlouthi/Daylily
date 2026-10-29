@@ -28,6 +28,8 @@ export interface UsePageEditorOptions {
    * the page takes images at all (`add` given or not) is fixed when it's made.
    */
   images?: PageImageOptions;
+  /** What a screen reader calls the page, such as "Today’s page". */
+  label: string;
   onChange?: (change: PageChange) => void;
   /** Told when pasted text looks like markdown, so the page can offer to format it. */
   onMarkdownPaste?: (paste: MarkdownPaste) => void;
@@ -54,6 +56,7 @@ export function usePageEditor({
   ghostPrompts,
   autofocus = false,
   images,
+  label,
   onChange,
   onMarkdownPaste,
 }: UsePageEditorOptions) {
@@ -71,6 +74,7 @@ export function usePageEditor({
     content,
     contentType: "markdown",
     editable,
+    editorProps: { attributes: { "aria-label": label } },
     // Pasted text stays as written; the paste prompt offers formatting instead
     enablePasteRules: false,
     extensions: pageExtensions({
