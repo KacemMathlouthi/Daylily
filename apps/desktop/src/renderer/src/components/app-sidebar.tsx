@@ -181,89 +181,92 @@ export function AppSidebar() {
       className="top-(--title-strip) h-[calc(100svh-var(--title-strip))] select-none"
       collapsible="icon"
     >
-      <SidebarHeader className="gap-4.5 px-3 pt-3.5">
-        {/* Room for the macOS traffic lights; the only part of the sidebar that drags the window */}
-        {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}
-        <SidebarMenu>
-          <SidebarMenuItem>
-            {/* The journal and where it lives; it opens its settings, as there's one journal to pick */}
-            <SidebarMenuButton
-              className="h-auto gap-2.25 px-2 py-1.25"
-              render={<Link search={{ section: "journal" }} to="/settings" />}
-              tooltip="Your journal"
-            >
-              <DaylilyMark className="shrink-0 text-daylily" size={18} />
-              <span className="flex min-w-0 flex-col gap-px">
-                <span className="font-semibold text-ink text-ui-lg leading-4.5">
-                  Your journal
-                </span>
-                {journal ? (
-                  <span className="truncate text-ink-subtle text-meta leading-3.5">
-                    {journal.displayRoot}
+      {/* A landmark for screen readers, without a box of its own in the layout */}
+      <nav aria-label="Daylily" className="contents">
+        <SidebarHeader className="gap-4.5 px-3 pt-3.5">
+          {/* Room for the macOS traffic lights; the only part of the sidebar that drags the window */}
+          {isMac ? <div className="h-5 [-webkit-app-region:drag]" /> : null}
+          <SidebarMenu>
+            <SidebarMenuItem>
+              {/* The journal and where it lives; it opens its settings, as there's one journal to pick */}
+              <SidebarMenuButton
+                className="h-auto gap-2.25 px-2 py-1.25"
+                render={<Link search={{ section: "journal" }} to="/settings" />}
+                tooltip="Your journal"
+              >
+                <DaylilyMark className="shrink-0 text-daylily" size={18} />
+                <span className="flex min-w-0 flex-col gap-px">
+                  <span className="font-semibold text-ink text-ui-lg leading-4.5">
+                    Your journal
                   </span>
-                ) : null}
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SideTip label="Search" railOnly>
-          <button
-            aria-label="Search"
-            className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 hover:border-ink-ghost group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
-            onClick={openSearch}
-            type="button"
-          >
-            <Search
-              className="shrink-0 text-ink-subtle"
-              size={13}
-              strokeWidth={2.2}
-            />
-            <span
-              className={cn("grow text-caption text-ink-subtle", RAIL_HIDDEN)}
-            >
-              Search
-            </span>
-            <Shortcut className={RAIL_HIDDEN} keys={[MOD_KEY, "K"]} />
-          </button>
-        </SideTip>
-      </SidebarHeader>
-      <SidebarContent className="px-3 pt-4.5">
-        {NAV.map((group) => (
-          <SidebarGroup className="p-0" key={group.title ?? "top"}>
-            {group.title ? (
-              // In the rail the titles go, leaving the groups a little apart
-              <SidebarGroupLabel className="h-auto px-2.5 pt-4.5 pb-1.5 font-medium text-ink-faint text-tag tracking-eyebrow group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:h-3 group-data-[collapsible=icon]:p-0">
-                {group.title}
-              </SidebarGroupLabel>
-            ) : null}
-            <SidebarMenu className="gap-px">
-              {group.links.map((link) => (
-                <NavItem key={link.to} {...link} />
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
-      <SidebarFooter className="gap-2.5 px-3 pb-3.5">
-        <UpdateCard />
-        {/* A row beside Settings; in the rail they stack, theme first as in Paper */}
-        <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
-          <SidebarMenu className="min-w-0 grow">
-            <NavItem icon={Settings} label="Settings" to="/settings" />
+                  {journal ? (
+                    <span className="truncate text-ink-subtle text-meta leading-3.5">
+                      {journal.displayRoot}
+                    </span>
+                  ) : null}
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
-          <FooterAction
-            className="group-data-[collapsible=icon]:order-first"
-            icon={theme === "dark" ? Sun : Moon}
-            label={theme === "dark" ? "Light mode" : "Dark mode"}
-            onClick={toggleTheme}
-          />
-          <FooterAction
-            icon={collapsed ? PanelLeftOpen : PanelLeftClose}
-            label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            onClick={toggleSidebar}
-          />
-        </div>
-      </SidebarFooter>
+          <SideTip label="Search" railOnly>
+            <button
+              aria-label="Search"
+              className="flex h-7.5 items-center gap-2 rounded-row border border-line bg-paper-page px-2.5 text-left transition-colors duration-150 hover:border-ink-ghost group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+              onClick={openSearch}
+              type="button"
+            >
+              <Search
+                className="shrink-0 text-ink-subtle"
+                size={13}
+                strokeWidth={2.2}
+              />
+              <span
+                className={cn("grow text-caption text-ink-subtle", RAIL_HIDDEN)}
+              >
+                Search
+              </span>
+              <Shortcut className={RAIL_HIDDEN} keys={[MOD_KEY, "K"]} />
+            </button>
+          </SideTip>
+        </SidebarHeader>
+        <SidebarContent className="px-3 pt-4.5">
+          {NAV.map((group) => (
+            <SidebarGroup className="p-0" key={group.title ?? "top"}>
+              {group.title ? (
+                // In the rail the titles go, leaving the groups a little apart
+                <SidebarGroupLabel className="h-auto px-2.5 pt-4.5 pb-1.5 font-medium text-ink-faint text-tag tracking-eyebrow group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:h-3 group-data-[collapsible=icon]:p-0">
+                  {group.title}
+                </SidebarGroupLabel>
+              ) : null}
+              <SidebarMenu className="gap-px">
+                {group.links.map((link) => (
+                  <NavItem key={link.to} {...link} />
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          ))}
+        </SidebarContent>
+        <SidebarFooter className="gap-2.5 px-3 pb-3.5">
+          <UpdateCard />
+          {/* A row beside Settings; in the rail they stack, theme first as in Paper */}
+          <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
+            <SidebarMenu className="min-w-0 grow">
+              <NavItem icon={Settings} label="Settings" to="/settings" />
+            </SidebarMenu>
+            <FooterAction
+              className="group-data-[collapsible=icon]:order-first"
+              icon={theme === "dark" ? Sun : Moon}
+              label={theme === "dark" ? "Light mode" : "Dark mode"}
+              onClick={toggleTheme}
+            />
+            <FooterAction
+              icon={collapsed ? PanelLeftOpen : PanelLeftClose}
+              label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              onClick={toggleSidebar}
+            />
+          </div>
+        </SidebarFooter>
+      </nav>
     </Sidebar>
   );
 }

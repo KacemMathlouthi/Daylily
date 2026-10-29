@@ -70,6 +70,7 @@ export function PageView({
     editable: !sealed,
     ghostPrompts: { enabled: ghostPrompts, prompts: NUDGES },
     images,
+    label: "Today’s page",
     onChange: onWrite,
     onMarkdownPaste: setPaste,
     placeholder: "How was your day?",

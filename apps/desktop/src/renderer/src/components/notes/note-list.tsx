@@ -102,9 +102,10 @@ export function NoteList({
   );
 
   return (
+    // Scrolls on its own, under its header, so a long list never scrolls the note away
     <nav
       aria-label="Notes"
-      className="flex w-70 shrink-0 flex-col border-line border-r bg-paper-page"
+      className="flex w-70 shrink-0 flex-col overflow-y-auto border-line border-r bg-paper-page"
     >
       <header
         className={cn(

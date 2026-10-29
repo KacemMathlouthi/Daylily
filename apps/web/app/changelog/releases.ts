@@ -27,6 +27,29 @@ export const RELEASES: Release[] = [
   {
     changes: [
       {
+        body: "A screen reader now says what each page is as you reach it: today’s page, a thought, a note, or what search found. The sidebar is a place it can jump to, like the list of notes.",
+        color: "text-daylily",
+        title: "Named for screen readers",
+      },
+      {
+        body: "Search’s preview can be reached with Tab and read with the arrow keys, like the list of what was found.",
+        color: "text-saffron",
+        title: "The preview, by keyboard",
+      },
+      {
+        body: "In a small window, a long list of notes now scrolls on its own, so the note beside it stays where it is.",
+        color: "text-cornflower",
+        title: "Notes in a small window",
+      },
+    ],
+    date: "2026-10-29",
+    lead: "Thoughts, notes and search, looked at closely.",
+    title: "Looked over.",
+    version: "0.11.1",
+  },
+  {
+    changes: [
+      {
         body: "Right after the welcome, a new step shows what the Notebook in the sidebar is for: thoughts through the day, each under its time, and notes you keep coming back to.",
         color: "text-daylily",
         title: "The rest of the day",

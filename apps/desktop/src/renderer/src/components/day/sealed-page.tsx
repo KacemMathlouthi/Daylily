@@ -30,6 +30,7 @@ export function SealedPage({
     content: page.markdown,
     editable: false,
     images,
+    label: "The day’s page",
   });
   useFindOnPage(editor, find, { onDone: onFound });
 

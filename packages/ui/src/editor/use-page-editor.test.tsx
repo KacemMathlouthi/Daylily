@@ -27,7 +27,12 @@ function Page({
   editable: boolean;
   onChange: (change: PageChange) => void;
 }) {
-  opened = usePageEditor({ content, editable, onChange });
+  opened = usePageEditor({
+    content,
+    editable,
+    label: "Today’s page",
+    onChange,
+  });
   return null;
 }
 
@@ -55,5 +60,10 @@ describe("usePageEditor", () => {
     const onChange = open("Words.");
     act(() => opened?.commands.insertContent(" More."));
     expect(onChange).toHaveBeenCalledOnce();
+  });
+
+  it("names the page for screen readers", () => {
+    open("Words.");
+    expect(opened?.view.dom.getAttribute("aria-label")).toBe("Today’s page");
   });
 });

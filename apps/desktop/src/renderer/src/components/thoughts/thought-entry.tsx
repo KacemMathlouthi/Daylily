@@ -107,6 +107,7 @@ function ThoughtEditor({
   const editor = usePageEditor({
     content: thought.body,
     images,
+    label: "A thought",
     onChange: write,
     ...(thought.begun ? {} : { placeholder: "What’s on your mind?" }),
   });
