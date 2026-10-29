@@ -27,6 +27,29 @@ export const RELEASES: Release[] = [
   {
     changes: [
       {
+        body: "Right after the welcome, a new step shows what the Notebook in the sidebar is for: thoughts through the day, each under its time, and notes you keep coming back to.",
+        color: "text-daylily",
+        title: "The rest of the day",
+      },
+      {
+        body: "Your page still asks once, in the evening, and it’s still the only page that seals and grows a flower. Thoughts and notes stay open.",
+        color: "text-saffron",
+        title: "The page stays the page",
+      },
+      {
+        body: "Help › Welcome to Daylily shows the new step too, if you’ve been writing for a while already.",
+        color: "text-cornflower",
+        title: "For everyone",
+      },
+    ],
+    date: "2026-10-29",
+    lead: "A hello that knows about the whole day, not only the evening.",
+    title: "The whole day.",
+    version: "0.11.0",
+  },
+  {
+    changes: [
+      {
         body: "Rest the mouse beside a paragraph, a heading, a picture, a quote or a list item, and six small dots appear in the margin. Grab them to move it somewhere else on the page; a daylily line shows where it will land.",
         color: "text-daylily",
         title: "A handle beside each block",
