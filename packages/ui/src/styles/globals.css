@@ -249,6 +249,77 @@
   }
 
   /*
+   * Where a moved block lands (Paper 18b): ProseMirror's drop cursor, drawn as the
+   * same daylily line. Between words, when text is dragged, it stays a caret.
+   */
+  .page-content .drop-cursor.prosemirror-dropcursor-block {
+    background:
+      radial-gradient(
+        circle 3.5px at 3.5px 50%,
+        var(--daylily) 98%,
+        transparent
+      ),
+      linear-gradient(var(--daylily), var(--daylily)) 0 50% / 100% 2px no-repeat;
+    @apply pointer-events-none mt-px h-1.75! -translate-y-1/2;
+  }
+
+  .page-content .drop-cursor.prosemirror-dropcursor-inline {
+    @apply pointer-events-none bg-daylily;
+  }
+
+  /* A photo being dropped has its own line, between blocks */
+  .page-content:has(.drop-line-before, .drop-line-after) .drop-cursor {
+    @apply hidden;
+  }
+
+  /*
+   * The handle beside the block under the mouse (Paper 18a, 18b), in the margin
+   * so it never moves the words; 10px from the block, at the middle of its first line.
+   */
+  .page-content .block-handle {
+    @apply flex w-7.5 cursor-grab transition-opacity duration-150 ease-soft motion-reduce:transition-none;
+  }
+
+  .page-content .block-handle:active {
+    @apply cursor-grabbing;
+  }
+
+  .page-content[data-typing] .block-handle {
+    @apply pointer-events-none! opacity-0;
+  }
+
+  .page-content .block-handle-grip {
+    @apply mt-1 flex h-6 w-5 items-center justify-center rounded-md text-ink-ghost transition-colors duration-150 ease-soft;
+  }
+
+  .page-content .block-handle:hover .block-handle-grip {
+    @apply bg-paper-sunk text-ink-subtle;
+  }
+
+  .page-content .block-handle-grip[data-kind="heading-2"],
+  .page-content .block-handle-grip[data-kind="codeBlock"] {
+    @apply mt-3;
+  }
+
+  .page-content .block-handle-grip[data-kind="heading-3"] {
+    @apply mt-1.5;
+  }
+
+  .page-content .block-handle-grip[data-kind="table"] {
+    @apply mt-2;
+  }
+
+  /* Left of the bullet, at the edge of the list, as every other block's (Paper 18b) */
+  .page-content .block-handle-grip[data-kind="listItem"] {
+    @apply -translate-x-6;
+  }
+
+  /* The block being moved, faint where it was until it lands */
+  .page-content .block-moving {
+    @apply opacity-35;
+  }
+
+  /*
    * Code and tables scroll sideways, which clips anything drawn outside them, and
    * code keeps ::before for its language: the line sits just inside their edge.
    */

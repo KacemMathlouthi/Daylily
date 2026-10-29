@@ -12,7 +12,7 @@ when a decision is made or a milestone lands, update the relevant section in the
 | **Stack** | Electron · Next.js · React · TypeScript · Tailwind 4 · Base UI · Tiptap |
 | **Model** | Open-core, AGPL-3.0 |
 | **Repo** | `KacemMathlouthi/Daylily` |
-| **Last updated** | 2026-10-27 |
+| **Last updated** | 2026-10-29 |
 
 **Contents**
 1. [Manifesto](#1-manifesto)
@@ -269,7 +269,7 @@ keychain and **never** into the journal folder.
 | **Sidebar** | Home on its own, then two groups titled in small type: **Journal** (Today, Calendar, Garden) and **Notebook** (Thoughts, Notes). In the rail the titles go and the groups keep a little space between them. A group for the AI features, **Companion**, comes when they do (Paper 16a, 16b). |
 | **Thoughts** | A canvas of every thought, newest first, the page's width, with a lane to its left holding each one's time in serif and its day under it, sticky as it scrolls (Paper: 15a to 15d). The open thought at the top waits for its first word under "Now"; ⌘ + Enter starts the next from anywhere. Each thought is the page's editor: markdown, the format toolbar, images. Days come fourteen at a time as you scroll back. Today always keeps a thought to write in, even after every other is deleted, and a click on the blank paper goes to it. In the sidebar's Notebook. |
 | **Notes** | A list of notes beside the one open (Paper 17a): pinned first, then "Recent", each with its title, when it changed and how it begins; "+" starts a new note, which waits on top as "New note · Now". The note is its title in the page's large serif and the page's editor under it. Over it, when it changed, its pin, a ⋯ menu (pin, show in folder, move to Trash: 17c) and focus mode; under it, where it's saved and its words. An empty folder opens on a new note with a quiet line about what notes are (17b). |
-| **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. Images pasted or dropped onto the page (Paper: 14a, 14b). |
+| **Writing** | Distraction-free editor. Nudges on pause. Cover picker: our gallery or your own image. Images pasted or dropped onto the page (Paper: 14a, 14b). A handle beside each block moves it (Paper: 18a, 18b). |
 | **Sealed day** | Read-only render of a past day with its cover, title, date and seal time, and ‹ › to the written days around it (← → too; after the last comes today). A day with nothing written opens as a rested day, never guilt. "Edited outside" marker if needed. If the writing screen is open at 4am, the page seals in place (Paper: 04c). Paper: 04a to 04c. |
 | **Calendar** | Month grid of covers and titles, moved month by month with two arrows. Empty days are bare. Click opens the sealed day. |
 | **Garden** | Every written day as a flower, bare soil for missed days, one year at a time with the years you wrote listed beside it (like a GitHub profile). "Save as image" draws a 1080 square share card at 2x: the person's name, the year's flowers, three stats and the meadow (Paper: 06c). |
@@ -289,6 +289,13 @@ keychain and **never** into the journal folder.
   stays its own size when smaller. Text copied with a picture of it (as Office apps do) pastes as text. Removing an
   image from the page leaves its file. Images are inline in the markdown, so one written inside a line in another
   editor keeps its place; one whose file is gone, or any web address, shows as a quiet card and is never loaded.
+- **Moving a block:** beside the block under the mouse, a handle of six dots in the margin, at its first line
+  (left of a list item's bullet); it goes while you type. Grabbed, the block goes faint and the daylily line shows
+  where it will land, between blocks; a list item moves with the items under it, and dropped outside its list
+  becomes a list of its own. Esc puts it back, and so does Undo once it's down; it lands unselected. Its markdown
+  moves exactly as written and saves like any other change. Today's page, thoughts and notes; never a sealed day.
+  Mouse only for now. Built on Tiptap's drag handle (`packages/ui/src/components/page-content.tsx`), with the drop
+  cursor drawn as the daylily line and `MovingBlock` marking the block in motion.
 - **Cover:** pick from the bundled gallery (copied into the day folder) or an image from disk. If none is chosen
   by seal, a random gallery cover is assigned. Days before seal show a soft "add a cover" state.
 - **Flowers:** size comes from `words` in buckets; petal colour is one of the four flower colours. A gallery cover
@@ -423,6 +430,7 @@ brand/               brand sources, local only (ignored by git)
 | Desktop routing | TanStack Router, file-based, hash history (the app loads from `file://`) |
 | Desktop data | TanStack Query over the `window.daylily` bridge |
 | Validation | Zod at every boundary: IPC, config, frontmatter |
+| Moving blocks | Tiptap's drag handle (`@tiptap/extension-drag-handle-react`). It imports Tiptap's collaboration extension, `@tiptap/y-tiptap`, `yjs` and `y-protocols`, so they're installed for it alone; Daylily has no collaboration |
 | CI | GitHub Actions: check, knip, typecheck, build and tests on every PR; installers built on each OS for PRs that change packaging |
 | Releases | semantic-release (`release.config.mjs`, `.github/workflows/release.yml`): after CI passes on `main`, the merged commits decide the next version, tagged `vX.Y.Z`; the installers (macOS dmg, Windows setup, Linux AppImage and deb), the `latest*.yml` files and blockmaps that installed copies update from (electron-updater), and `SHA256SUMS` are attached and the GitHub Release published. Nothing is committed back; the website's changelog (`apps/web/app/changelog/releases.ts`) is written by hand, an entry for each release. The app's version comes from the tag; in the repo it reads `0.0.0-development` |
 
@@ -615,7 +623,7 @@ drift, sync Paper back to what was agreed.
 | Page | Contents |
 |---|---|
 | v2 Landing | The website: the landing page, Header · scrolled, Buttons · states, Manifesto (with "For your eyes only.", the eye painting), Download, Changelog, Roadmap; on phones, Header · mobile, Menu · mobile · open and Calendar · week · mobile; the sharing cards (OG · Home, Manifesto, Download, Changelog, Roadmap) and the GitHub social preview |
-| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added · 13d Search · days and thoughts, best first · 15a to 15d Thoughts (today, the first one, editing an older one, the time staying as you scroll) · 16a Sidebar · grouped · 16b Sidebar · grouped, as it grows (later) · 17a to 17d Notes (a note open, the first one, the note's menu, notes in search) |
+| v3 App screens | 01 Launch · 01b Launch bloom (motion storyboard) · 02 Home · 03 Writing · 03a to 03c Today blank, selection and menu, cover picker · 04 Sealed day · 04a to 04c Sealed day for v1, rested day, seal at 4am (motion) · 04d edited outside Daylily · 04e a day that can't be read · 05 Calendar · 05f days without a cover, and unreadable days · 05g a journal's first day · 06 Garden · 07 Ask your journal · 08 Look-backs · 09 Settings · AI · 09f updates, and the journal in the sidebar · 09g update states · 10a–c Onboarding (welcome, your folder, a little help; the first vision, with AI) · 10d–h Onboarding for v1 (welcome over the eye, make it yours over the rocket, a little help over the earth, the folder's states, hello) · 11 Writing · dark · 13a Search, results and preview · 13b before typing, and nothing found · 13c a day opened at its match · 14a Images on the page · 14b dropping, can't be shown, can't be added · 13d Search · days and thoughts, best first · 15a to 15d Thoughts (today, the first one, editing an older one, the time staying as you scroll) · 16a Sidebar · grouped · 16b Sidebar · grouped, as it grows (later) · 17a to 17d Notes (a note open, the first one, the note's menu, notes in search) · 18a Writing · moving a block · 18b its states (the handle, moving it, where it shows) |
 | v4 App icon | macOS (light and dark), Windows, Linux, and an icon overview board |
 | v5 README | The README's images (hero, the app, a card for each feature, download buttons, divider, closing) and a preview of it on GitHub; exported at 2x to `.github/readme/` |
 | v6 Story and website | The story (one sentence, three principles, a day with Daylily), Landing · 2026 (desktop and mobile), a page for each feature (Thoughts, Notes, Journaling, Ghost prompts, Garden and calendar, Search) with its sharing card, Privacy with its card, the repository's text, and the header and footer for 2026: the Features menu open, the header floating once scrolled (desktop and mobile), the mobile menu, the footer's links (desktop and mobile), and the 404 page (desktop and mobile) |
@@ -688,6 +696,7 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-26 | Daylily's own domain, **daylily.ink**: the website, the README and the app's links moved there, the old addresses redirect to it; the Paper file tidied into labelled columns, outdated boards archived; the landing seals at 4am, not midnight |
 | 2026-10-26 | Notes: the pages you keep, undated and never sealed, one markdown file each in `notes/`, named from their titles; a list beside the open note, pinned first; moved to the system's Trash when asked; found by search. Opening any page no longer saves it again. Designed in Paper first (17a to 17d) |
 | 2026-10-27 | The story settled (a journal for your whole day, in your own words); a page for each feature on the website, each leading to the next; a privacy page, plainly; the README rewritten around the whole day with a card for each feature; a Features menu in the header, which floats once you scroll, and the features in the footer. Designed in Paper first (v6) |
+| 2026-10-29 | Moving a block: a handle beside each paragraph, heading, image, quote, code block and list item moves it, landing on the daylily line, on the page, in thoughts and in notes. Designed in Paper first (18a, 18b) |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
