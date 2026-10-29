@@ -1,5 +1,6 @@
 import { folderStep } from "./folder-step";
 import { helpStep } from "./help-step";
+import { notebookStep } from "./notebook-step";
 import type { OnboardingStep } from "./step";
 import { welcomeStep } from "./welcome-step";
 
@@ -10,6 +11,7 @@ import { welcomeStep } from "./welcome-step";
  */
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
   welcomeStep,
+  notebookStep,
   folderStep,
   helpStep,
 ];
