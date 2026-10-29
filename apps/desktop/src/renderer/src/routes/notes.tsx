@@ -178,7 +178,8 @@ function NotesScreen() {
               ? changedLong(updated.listed.updated, now)
               : null
           }
-          className={cn(drag, chrome)}
+          // With the list gone in focus mode, the toolbar starts at the window's edge
+          className={cn(drag, chrome, focused && "pl-(--top-bar-start)")}
           focused={focused}
           note={ready}
           onFocusChange={setFocused}
