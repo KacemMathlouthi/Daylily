@@ -423,6 +423,7 @@ brand/               brand sources, local only (ignored by git)
 | Icons | lucide-react |
 | TypeScript | 6.0. TypeScript 7 lacks the compiler API that Next and knip rely on; revisit when they support it |
 | Tests | Vitest (`pnpm test`), run on Linux, macOS and Windows in CI |
+| End-to-end tests | Playwright on the app as built in `out/` (`pnpm test:e2e`, in `apps/desktop/e2e`), on Linux, macOS and Windows in CI: words kept through a force-quit (the page, a thought, a note), nothing written when nothing was typed, days sealed after a closed app, on waking and in another zone, a sealed day read-only and one edited elsewhere said so. Each test opens Daylily on a computer of its own (`--user-data-dir` and a temp journal). The renderer reads the clock itself, so 4am passing while the app runs is left to the unit tests |
 | Sample journal | `pnpm journal:seed` writes the sample year and a half into `~/Daylily` (or `-- --journal <folder>`) as sealed days with covers, skipping days already written; `pnpm journal:unseed` removes only the files it wrote that are still unchanged |
 | Component workbench | Storybook, later, once the first components exist |
 | Desktop build | electron-vite (Vite for main, preload and renderer); electron-builder for packaging, added when we package |
@@ -698,11 +699,12 @@ the maintainer's machine. The public plan is the website's `/roadmap`.
 | 2026-10-27 | The story settled (a journal for your whole day, in your own words); a page for each feature on the website, each leading to the next; a privacy page, plainly; the README rewritten around the whole day with a card for each feature; a Features menu in the header, which floats once you scroll, and the features in the footer. Designed in Paper first (v6) |
 | 2026-10-29 | Moving a block: a handle beside each paragraph, heading, image, quote, code block and list item moves it, landing on the daylily line, on the page, in thoughts and in notes. Designed in Paper first (18a, 18b) |
 | 2026-10-29 | Onboarding meets the notebook: a step of its own, *the rest of the day*, says what thoughts and notes are for, beside the train window; four steps now. Designed in Paper first (10i; the other option, a note in the welcome, archived) |
+| 2026-10-29 | End-to-end tests on the built app, on Linux, macOS and Windows: words kept through a force-quit, days sealed after a closed app, sleep and a change of zone. A polish pass on Thoughts, Notes and Search: every page, thought and note named for screen readers, the sidebar a landmark, search's preview reachable from the keyboard, the notes list scrolling on its own in a small window |
 
 ### Next
 The plan, in order, with each item's impact, effort and what blocks it, lives in `ROADMAP.md`, on the
 maintainer's machine (not in git; the website's `/roadmap` is the public version).
-Keep it current as items ship or move. The next few: end-to-end tests, then the first AI connection.
+Keep it current as items ship or move. The next few: the first AI connection, then ghost prompts that listen.
 
 ---
 
