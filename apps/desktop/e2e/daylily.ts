@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -38,7 +39,14 @@ export async function freshComputer(): Promise<Computer> {
   );
   return {
     journal,
-    remove: () => rm(root, { force: true, recursive: true }),
+    // Windows can hold a file for a moment after the app is gone
+    remove: () =>
+      rm(root, {
+        force: true,
+        maxRetries: 10,
+        recursive: true,
+        retryDelay: 200,
+      }),
     userData,
   };
 }
@@ -90,6 +98,22 @@ async function mainWindow(app: ElectronApplication) {
       return page;
     }
   }
+}
+
+/**
+ * Ends Daylily at once, with no chance to save, as a crash or a pulled plug
+ * would. On Windows the app's other processes outlive the main one and hold its
+ * files, so the whole tree goes, as Task Manager's "End task" does.
+ */
+export async function forceQuit({ app }: Opened) {
+  const main = app.process();
+  const exited = new Promise((resolve) => main.once("exit", resolve));
+  if (process.platform === "win32" && main.pid !== undefined) {
+    execFileSync("taskkill", ["/pid", String(main.pid), "/t", "/f"]);
+  } else {
+    main.kill("SIGKILL");
+  }
+  await exited;
 }
 
 /** Today's page, its editor ready to write in. */

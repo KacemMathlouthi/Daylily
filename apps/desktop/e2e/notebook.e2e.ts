@@ -2,7 +2,12 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dayOf, dayPath } from "@daylily/core/day";
 import { expect, test } from "@playwright/test";
-import { type Computer, freshComputer, openDaylily } from "./daylily";
+import {
+  type Computer,
+  forceQuit,
+  freshComputer,
+  openDaylily,
+} from "./daylily";
 
 const ZONE = "UTC";
 
@@ -32,7 +37,7 @@ test("keeps a thought typed before a force-quit", async () => {
   await thought.click();
   await opened.window.keyboard.type("Someone on the bus was reading Rilke.");
   await opened.window.waitForTimeout(1000);
-  opened.app.process().kill("SIGKILL");
+  await forceQuit(opened);
 
   // Beside the day's page, in the day's folder
   const [year, month, date] = dayPath(dayOf(new Date(), ZONE));
@@ -51,7 +56,7 @@ test("keeps a note typed before a force-quit", async () => {
   await opened.window.locator(".page-content .ProseMirror").click();
   await opened.window.keyboard.type("The Remains of the Day");
   await opened.window.waitForTimeout(1000);
-  opened.app.process().kill("SIGKILL");
+  await forceQuit(opened);
 
   const notes = await notesOnDisk();
   expect(notes.join("\n")).toContain("The Remains of the Day");

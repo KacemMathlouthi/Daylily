@@ -2,6 +2,7 @@ import { dayOf } from "@daylily/core/day";
 import { expect, test } from "@playwright/test";
 import {
   type Computer,
+  forceQuit,
   freshComputer,
   openDaylily,
   openToday,
@@ -30,7 +31,7 @@ test("keeps what was typed half a second before a force-quit", async () => {
   await opened.window.waitForTimeout(1000);
   await opened.window.keyboard.type(" And then");
   // Mid-sentence, with no chance to save: the words before the pause must be there
-  opened.app.process().kill("SIGKILL");
+  await forceQuit(opened);
 
   const today = dayOf(new Date(), ZONE);
   const saved = await readDay(computer.journal, today);
