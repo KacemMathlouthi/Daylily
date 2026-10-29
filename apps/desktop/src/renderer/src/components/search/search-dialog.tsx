@@ -19,6 +19,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { FileText, Search } from "lucide-react";
 import {
   type KeyboardEvent,
+  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -154,6 +155,32 @@ function Hit({
   );
 }
 
+/**
+ * Where the chosen result is shown beside the list. It scrolls, so it can be
+ * reached from the keyboard to be read with the arrows.
+ */
+function PreviewPane({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className: string;
+}) {
+  return (
+    <section
+      aria-label="Preview"
+      className={cn(
+        "relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-inset",
+        className
+      )}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: a region that scrolls must be reachable to be read
+      tabIndex={0}
+    >
+      {children}
+    </section>
+  );
+}
+
 /** The chosen day beside the results, its page marked where the words are. */
 function Preview({ day, query }: { day: string; query: string }) {
   const page = usePastDay(day);
@@ -180,7 +207,7 @@ function Preview({ day, query }: { day: string; query: string }) {
     return null;
   }
   return (
-    <div className="relative min-w-0 flex-1 overflow-y-auto px-7 pt-5.5 pb-16">
+    <PreviewPane className="pt-5.5">
       {page.cover ? (
         <img
           alt={page.cover.label}
@@ -205,7 +232,7 @@ function Preview({ day, query }: { day: string; query: string }) {
         className="pt-3.5 text-body text-ink-2 leading-6.75"
         editor={editor}
       />
-    </div>
+    </PreviewPane>
   );
 }
 
@@ -262,7 +289,7 @@ function NotePreview({ hit, query }: { hit: NoteHit; query: string }) {
   }, [editor, markdown, query]);
 
   return (
-    <div className="relative min-w-0 flex-1 overflow-y-auto px-7 pt-7.5 pb-16">
+    <PreviewPane className="pt-7.5">
       <div className="flex flex-col gap-1.5">
         <h2 className="font-display text-ink text-title-sm leading-8.5 tracking-snug">
           {hit.title || "Untitled"}
@@ -275,7 +302,7 @@ function NotePreview({ hit, query }: { hit: NoteHit; query: string }) {
         className="pt-4.5 text-body text-ink-2 leading-6.75"
         editor={editor}
       />
-    </div>
+    </PreviewPane>
   );
 }
 
@@ -305,7 +332,7 @@ function ThoughtPreview({ hit, query }: { hit: ThoughtHit; query: string }) {
   }, [editor, markdown, query]);
 
   return (
-    <div className="relative min-w-0 flex-1 overflow-y-auto px-7 pt-7.5 pb-16">
+    <PreviewPane className="pt-7.5">
       <div className="flex flex-col gap-1.5">
         <span className="font-display text-ink text-title-sm leading-8.5 tracking-snug">
           {hit.time ?? "·"}
@@ -318,7 +345,7 @@ function ThoughtPreview({ hit, query }: { hit: ThoughtHit; query: string }) {
         className="pt-4.5 text-body text-ink-2 leading-6.75"
         editor={editor}
       />
-    </div>
+    </PreviewPane>
   );
 }
 
@@ -525,6 +552,8 @@ export function SearchDialog() {
             </p>
           ) : null}
 
+          {/* The field names the list of results; with none to show it's there, empty */}
+          {shown.length === 0 ? <CommandList hidden /> : null}
           {shown.length > 0 ? (
             <Results
               chosen={chosen}
