@@ -1,39 +1,10 @@
 import { Switch } from "@daylily/ui/primitives/switch";
 import { Bell, MessageCircleQuestion } from "lucide-react";
-import { type ReactNode, useCallback } from "react";
+import { useCallback } from "react";
 import earth from "../../assets/earth.jpg";
 import { ReminderTimeSelect } from "../reminder-time";
 import type { OnboardingStep, StepProps } from "./step";
-
-/** A help that can be turned on or off (Paper 10f). */
-function HelpRow({
-  icon,
-  title,
-  children,
-  control,
-}: {
-  icon: ReactNode;
-  title: string;
-  children: ReactNode;
-  control: ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-xl bg-paper-sunk px-4 py-3.5">
-      <div className="flex items-center gap-3 text-ink-muted">
-        {icon}
-        <div className="flex flex-col gap-px">
-          <span className="font-medium text-ink text-sm leading-4.5">
-            {title}
-          </span>
-          <span className="text-caption text-ink-subtle leading-4">
-            {children}
-          </span>
-        </div>
-      </div>
-      <div className="flex shrink-0 items-center gap-2.5">{control}</div>
-    </div>
-  );
-}
+import { StepRow } from "./step-row";
 
 /** Paper 10f: the quiet questions and the evening reminder, both on to begin with. */
 function ALittleHelp({ choices, change }: StepProps) {
@@ -63,7 +34,7 @@ function ALittleHelp({ choices, change }: StepProps) {
         </p>
       </div>
       <div className="flex flex-col gap-2.5">
-        <HelpRow
+        <StepRow
           control={
             <Switch
               aria-label="Ghost prompts"
@@ -80,8 +51,8 @@ function ALittleHelp({ choices, change }: StepProps) {
           <span className="font-writing text-ui-lg italic">
             …and how did that feel?
           </span>
-        </HelpRow>
-        <HelpRow
+        </StepRow>
+        <StepRow
           control={
             <>
               <ReminderTimeSelect
@@ -101,7 +72,7 @@ function ALittleHelp({ choices, change }: StepProps) {
           title="Ask me “How was your day?”"
         >
           Once a day, skipped if you’ve already written.
-        </HelpRow>
+        </StepRow>
       </div>
     </>
   );
