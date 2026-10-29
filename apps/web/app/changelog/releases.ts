@@ -25,6 +25,47 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    changes: [
+      {
+        body: "Rest the mouse beside a paragraph, a heading, a picture, a quote or a list item, and six small dots appear in the margin. Grab them to move it somewhere else on the page; a daylily line shows where it will land.",
+        color: "text-daylily",
+        title: "A handle beside each block",
+      },
+      {
+        body: "A list item takes the items under it along, and dropped outside its list it becomes a list of its own.",
+        color: "text-saffron",
+        title: "Lists come along",
+      },
+      {
+        body: "Your words move exactly as you wrote them, on today’s page, in your thoughts and in your notes. Undo puts a block back, and sealed days stay as they were.",
+        color: "text-cornflower",
+        title: "Only the order changes",
+      },
+    ],
+    date: "2026-10-29",
+    lead: "Put a paragraph where it belongs, without cutting and pasting.",
+    title: "Rearranged.",
+    version: "0.10.0",
+  },
+  {
+    changes: [
+      {
+        body: "Choosing when Daylily asks how your day was now opens the list of times just below the button, in onboarding and in Settings, instead of reaching up to the top of the window.",
+        color: "text-daylily",
+        title: "The reminder’s time",
+      },
+      {
+        body: "With the sidebar folded into its icons, or in focus mode, the bar at the top of each screen now starts after the red, yellow and green buttons instead of under them.",
+        color: "text-saffron",
+        title: "Room for the window’s buttons on a Mac",
+      },
+    ],
+    date: "2026-10-29",
+    lead: "Two small things, put right.",
+    title: "Mended.",
+    version: "0.9.1",
+  },
+  {
     art: "/images/covers/cake.jpg",
     changes: [
       {
